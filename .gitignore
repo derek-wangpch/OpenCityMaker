@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Build and compiler output
+dist/
+dist-wechat/
+*.tsbuildinfo
+
+# Test and generated QA output
+test-results/
+playwright-report/
+artifacts/
+
+# Local agent and hosting state
+.claude/worktrees/
+.openai/
+.site-bin/
+.site-publish-git/
+.site-tmp/
+
+# Operating-system metadata
+.DS_Store

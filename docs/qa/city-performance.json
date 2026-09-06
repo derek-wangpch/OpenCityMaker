@@ -1,0 +1,80 @@
+{
+  "measuredAt": "2026-09-05T10:11:06.384Z",
+  "renderer": "Chromium / SwiftShader",
+  "viewport": "1440x1100",
+  "method": "One warmup per version, then five alternating fresh contexts. External requests blocked equally. goto to visible discovery image.",
+  "versions": {
+    "baseline": {
+      "assets": [
+        {
+          "name": "index-BZLpNv0N.js",
+          "bytes": 278694,
+          "gzipBytes": 95041
+        },
+        {
+          "name": "index-DqV0zlzG.css",
+          "bytes": 18416,
+          "gzipBytes": 4842
+        },
+        {
+          "name": "three-DiZoJBJR.js",
+          "bytes": 513871,
+          "gzipBytes": 130751
+        }
+      ],
+      "totalJsBytes": 792565,
+      "totalJsGzipBytes": 225792,
+      "loadsMs": [
+        1281,
+        1319,
+        1262,
+        1256,
+        1247
+      ],
+      "gallery": {
+        "cards": 44,
+        "retainedJsHeapMiB": 4.8,
+        "summedProcessRssMiB": 567,
+        "decodedRgbaEstimateMiB": 12.2
+      },
+      "medianMs": 1262
+    },
+    "current": {
+      "assets": [
+        {
+          "name": "index-DqV0zlzG.css",
+          "bytes": 18416,
+          "gzipBytes": 4842
+        },
+        {
+          "name": "index-cb4mH4h4.js",
+          "bytes": 347957,
+          "gzipBytes": 122526
+        },
+        {
+          "name": "three-pAaXFTEn.js",
+          "bytes": 514868,
+          "gzipBytes": 131034
+        }
+      ],
+      "totalJsBytes": 862825,
+      "totalJsGzipBytes": 253560,
+      "loadsMs": [
+        1282,
+        1285,
+        1712,
+        1696,
+        1259
+      ],
+      "gallery": {
+        "cards": 132,
+        "retainedJsHeapMiB": 6.5,
+        "summedProcessRssMiB": 597.1,
+        "decodedRgbaEstimateMiB": 36.7
+      },
+      "medianMs": 1285
+    }
+  },
+  "browserVersion": "153.0.8010.12",
+  "memoryCaveat": "RSS sums all CDP-reported Chromium processes and double-counts shared pages; it is not Chrome Task Manager private footprint or physical-phone GPU memory. RGBA is an estimate, not measured allocation."
+}

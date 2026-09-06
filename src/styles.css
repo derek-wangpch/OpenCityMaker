@@ -1,0 +1,1514 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=Outfit:wght@400;450;500;550;600;650;700;750&display=swap");
+:root {
+  font-family: "DM Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: #303e34;
+  background: #f5f3eb;
+  font-synthesis: none;
+  font-weight: 400;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+/* Game UI is not a document: swiping should never start a text selection. */
+body {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+/* Re-enable selection where it is actually useful. */
+input,
+textarea,
+[contenteditable="true"],
+.selectable {
+  -webkit-user-select: text;
+  user-select: text;
+}
+button,
+a,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+button,
+select {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+  color: inherit;
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.36;
+}
+button:focus,
+button:focus-visible {
+  outline: none;
+}
+a:focus-visible,
+select:focus-visible,
+canvas:focus-visible {
+  outline: 3px solid #b08044;
+  outline-offset: 4px;
+}
+button {
+  border: 0;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button,
+select {
+  touch-action: manipulation;
+}
+button {
+  transition:
+    background 0.18s,
+    transform 0.18s;
+}
+button:not(:disabled):active {
+  transform: translateY(1px);
+}
+.app {
+  max-width: 1600px;
+  margin: auto;
+}
+.header {
+  height: 94px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 5.5%;
+  border-bottom: 1px solid #dedfd3;
+  gap: 25px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Outfit", sans-serif;
+  font-weight: 650;
+  font-size: 25px;
+  letter-spacing: -1px;
+}
+.brand-symbol {
+  position: relative;
+  display: grid;
+  place-items: center;
+  background: var(--accent);
+  color: #f1ddae;
+  width: 37px;
+  height: 39px;
+  border-radius: 11px;
+}
+.brand-symbol svg:last-child {
+  position: absolute;
+  right: 4px;
+  top: 3px;
+}
+.brand-dot {
+  font-size: 11px;
+  align-self: flex-start;
+  margin: 6px 0 0 -6px;
+}
+.header nav {
+  display: flex;
+  gap: 28px;
+  align-self: stretch;
+}
+.header nav button {
+  position: relative;
+  background: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: #818678;
+  padding: 0 3px;
+}
+.header nav button.active {
+  color: var(--accent);
+}
+.header nav button.active:after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent);
+  border-radius: 3px;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.language {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+}
+.language select {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 6px 0;
+  color: #4c584d;
+  cursor: pointer;
+}
+.icon-button {
+  background: transparent;
+  display: grid;
+  place-items: center;
+  padding: 8px;
+}
+.help-button {
+  border-left: 1px solid #dcded2;
+  padding-left: 20px;
+}
+main {
+  margin: 0 5.5%;
+}
+.intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 35px 0 28px;
+  flex-wrap: wrap;
+}
+.intro > div:first-child {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+.eyebrow {
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 1.6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  color: #677763;
+}
+.tiny-star {
+  color: #bd8254;
+  font-size: 17px;
+}
+h1 {
+  font-family: "Outfit", sans-serif;
+  font-size: 48px;
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -1.8px;
+  margin: 9px 0;
+}
+.native-name {
+  font-size: 29px;
+  font-family: serif;
+  letter-spacing: 5px;
+  font-weight: 400;
+  color: #9d9d85;
+  margin-left: 21px;
+}
+.intro p {
+  color: #7c8374;
+  font-size: 13px;
+  margin: 11px 0 0;
+}
+.city-switch {
+  display: flex;
+  padding: 5px;
+  border: 1px solid #dcdfd2;
+  border-radius: 12px;
+  gap: 4px;
+  /* A scroll container resolves min-width to zero, so the rail shrinks to the
+     line instead of painting past it once the catalog outgrows the viewport. */
+  flex: 0 1 auto;
+  min-width: 0;
+  width: min(100%, 690px);
+  max-width: 690px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+}
+.city-carousel {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  max-width: 100%;
+}
+.city-carousel .city-switch {
+  flex: 1 1 auto;
+  width: auto;
+}
+.city-carousel-arrow {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #dcdfd2;
+  border-radius: 8px;
+  background: #f4f3e9;
+  color: #6a7964;
+}
+.city-switch::-webkit-scrollbar {
+  display: none;
+}
+.city-switch button {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  background: none;
+  border-radius: 8px;
+  padding: 12px 15px;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+.city-switch button.selected {
+  background: var(--accent);
+  color: #f9f8ed;
+  box-shadow: 0 3px 6px #324c3415;
+}
+.city-switch-number {
+  font-size: 9px;
+  opacity: 0.55;
+}
+.selected-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #c6d5a3;
+}
+.game-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 276px;
+  gap: 22px;
+}
+.game-panel {
+  transition: background-color 3s ease-in-out;
+  min-width: 0;
+  /* The board scales with the panel height, so tall windows get a bigger city
+     while short ones keep the original 574px floor. */
+  height: clamp(574px, 72vh, 760px);
+  background: var(--scene);
+  border: 1px solid #d9dfcd;
+  border-radius: 17px;
+  overflow: hidden;
+  position: relative;
+  isolation: isolate;
+}
+.panel-top {
+  position: absolute;
+  z-index: 2;
+  top: 21px;
+  left: 25px;
+  right: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #6e7e66;
+  letter-spacing: 0.3px;
+}
+.board-location {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.board-location span {
+  opacity: 0.4;
+  padding: 0 4px;
+}
+.board-edition {
+  font-size: 9px;
+  letter-spacing: 1.7px;
+}
+.scorebar {
+  position: absolute;
+  top: 57px;
+  left: 26px;
+  right: 26px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 29px;
+}
+.score {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.score > span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: #69795f;
+  font-weight: 600;
+}
+.score strong {
+  font-family: "Outfit", sans-serif;
+  font-weight: 500;
+  font-size: 35px;
+  line-height: 1;
+}
+.score.best {
+  border-left: 1px solid #c4ceba;
+  padding-left: 26px;
+}
+.score.best strong {
+  font-size: 26px;
+  color: #788369;
+}
+.board-actions {
+  display: flex;
+  margin-left: auto;
+  gap: 7px;
+  align-self: flex-start;
+}
+.board-actions button {
+  border: 1px solid #c7d0bd;
+  background: #f3f6e957;
+  border-radius: 9px;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+}
+.board-actions button:hover {
+  background: #f5f7ec;
+}
+.board-canvas {
+  position: absolute;
+  inset: 90px 0 70px;
+}
+.board-canvas canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+.board-bottom {
+  position: absolute;
+  bottom: 21px;
+  left: 26px;
+  right: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  z-index: 2;
+}
+.board-instruction {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.board-instruction > span {
+  font-size: 12px;
+  color: #596e50;
+}
+.board-instruction small {
+  font-size: 9px;
+  color: #7c8a71;
+  letter-spacing: 0.3px;
+}
+.direction-pad {
+  display: grid;
+  grid-template-columns: repeat(2, 30px);
+  gap: 4px;
+}
+.direction-pad button {
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
+  background: #f2f5e691;
+  border: 1px solid #cdd6c1;
+  color: #6c805f;
+}
+.direction-pad button:hover {
+  background: #fffdf0;
+}
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.discovery-card {
+  background: #faf8f0;
+  border: 1px solid #e0dfd2;
+  border-radius: 15px;
+  padding: 23px 23px 17px;
+  text-align: center;
+  flex: 1;
+}
+.discovery-card > .eyebrow {
+  justify-content: center;
+  font-size: 9px;
+  letter-spacing: 1.15px;
+}
+.discovery-image {
+  position: relative;
+  background: none;
+  height: 163px;
+  display: block;
+  width: 100%;
+  padding: 0;
+}
+.discovery-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 8px #4454390d);
+}
+.discovery-image > svg {
+  height: 120px;
+  width: 80px;
+  color: #929d84;
+}
+.value-tag {
+  position: absolute;
+  right: 24px;
+  bottom: 13px;
+  padding: 5px 8px;
+  background: #f9f6ec;
+  border: 1px solid #d9dec9;
+  border-radius: 6px;
+  color: #738061;
+  font-family: "Outfit";
+  font-weight: 500;
+  font-size: 13px;
+}
+.landmark-step {
+  font-size: 8px;
+  letter-spacing: 1.8px;
+  color: #9b937b;
+}
+.discovery-card h2 {
+  font-family: "Outfit", sans-serif;
+  font-size: 23px;
+  font-weight: 500;
+  letter-spacing: -0.4px;
+  margin: 7px 0 9px;
+}
+.discovery-card p {
+  font-size: 11px;
+  line-height: 1.8;
+  color: #87907c;
+  margin: 0 auto;
+  max-width: 180px;
+}
+.merge-equation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  gap: 9px;
+  margin-top: 13px;
+  color: #a4ae95;
+}
+.merge-equation img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+.merge-equation > span {
+  font-family: "Outfit";
+  border: 1px dashed #bdc7aa;
+  background: #f2f2e6;
+  border-radius: 6px;
+  font-size: 13px;
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  color: #708361;
+}
+.collection-card {
+  background: #efeee4;
+  border: 1px solid #e1e1d4;
+  border-radius: 15px;
+  padding: 19px 20px;
+}
+.collection-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.collection-heading h2 {
+  font-size: 12px;
+  font-weight: 600;
+  margin: 0;
+}
+.collection-heading > span {
+  font-family: "Outfit";
+  font-size: 12px;
+  color: #556c4d;
+}
+.collection-heading > span > span {
+  color: #9ba18d;
+}
+.collection-mini {
+  display: flex;
+  justify-content: space-between;
+  margin: 12px 0 10px;
+  gap: 4px;
+}
+.collection-mini button {
+  width: 49px;
+  height: 48px;
+  padding: 0;
+  position: relative;
+  background: #f6f4e9;
+  border-radius: 8px;
+}
+.collection-mini img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.collection-mini .locked img {
+  opacity: 0.3;
+  filter: grayscale(0.5) blur(5px);
+}
+.collection-mini .locked.dev-clear img,
+.atlas-card.dev-clear:not(.found) > img {
+  filter: none;
+  opacity: 1;
+}
+.collection-mini button > svg {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  color: #7f8b70;
+}
+.progress-track {
+  height: 3px;
+  background: #dce0ce;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.progress-track > span {
+  display: block;
+  height: 100%;
+  background: #72915d;
+  transition: width 0.3s;
+}
+.collection-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background: none;
+  padding: 15px 0 0;
+  font-size: 10px;
+  font-weight: 550;
+  color: #5c7150;
+}
+.journey {
+  grid-column: 1/-1;
+  border: 1px solid #dfe1d4;
+  border-radius: 12px;
+  padding: 20px 26px 14px;
+}
+.journey-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.journey-heading > .eyebrow {
+  font-size: 9px;
+}
+.journey-heading > span:last-child {
+  font-size: 11px;
+  color: #617153;
+}
+.journey-heading > span:last-child > span {
+  color: #a0a68f;
+}
+.journey-steps {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin: 16px 2px 0;
+}
+.journey-steps:before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  height: 1px;
+  background: #d8ddcb;
+}
+.journey-steps button {
+  z-index: 1;
+  background: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 25px;
+  color: #a4ad97;
+}
+.journey-steps button > span {
+  display: grid;
+  place-items: center;
+  height: 21px;
+  width: 21px;
+  border: 1px solid #d9dfce;
+  border-radius: 50%;
+  background: #f5f3eb;
+}
+.journey-steps button > span > span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #cdd4be;
+}
+.journey-steps button.achieved > span {
+  background: var(--accent);
+  color: #fff9e9;
+  border-color: var(--accent);
+}
+.journey-steps small {
+  font-size: 9px;
+  font-family: "Outfit";
+}
+.journey-steps button.achieved small {
+  color: var(--accent);
+}
+footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 23px 0 26px;
+  font-size: 9px;
+  color: #939a88;
+}
+footer > span:first-child {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.save-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #829b6c;
+}
+.save-dot.warning {
+  background: #c9884f;
+}
+footer button {
+  font-size: 9px;
+  background: none;
+  padding: 0;
+  color: #7d8973;
+}
+.atlas-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+.gallery-city {
+  grid-column: 1 / -1;
+  scroll-margin-top: 24px;
+  font-family: "Outfit", sans-serif;
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -0.4px;
+  margin: 12px 0 -4px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid #dcdfd2;
+  color: #4a5a4c;
+}
+.atlas-card {
+  position: relative;
+  min-width: 0;
+  background: #eeeee3;
+  border: 1px solid #e0e2d5;
+  border-radius: 13px;
+  padding: 15px 17px;
+  text-align: left;
+  transition:
+    background 0.2s,
+    transform 0.2s;
+}
+.atlas-card:not(.found) > img {
+  filter: blur(9px);
+}
+.atlas-card:hover {
+  background: #e8ecdd;
+  transform: translateY(-3px);
+}
+.atlas-card.found {
+  background: #e7eddc;
+}
+.atlas-card-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: #8a957c;
+}
+.atlas-card-top > span:last-child {
+  color: #5f7453;
+  letter-spacing: 0;
+  font-family: "Outfit";
+  font-size: 12px;
+}
+.atlas-card > img {
+  width: 100%;
+  height: 170px;
+  object-fit: contain;
+}
+.atlas-card-bottom h2 {
+  font-size: 13px;
+  font-family: "Outfit";
+  font-weight: 500;
+  line-height: 1.5;
+  margin: 0 0 8px;
+}
+.atlas-card-bottom > span {
+  font-size: 9px;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  color: #939e84;
+}
+.atlas-card.found .atlas-card-bottom > span {
+  color: #6c8558;
+}
+.modal {
+  border: 1px solid #e0e3d4;
+  border-radius: 20px;
+  padding: 0;
+  background: #f8f6ed;
+  color: #354a3b;
+  width: min(440px, calc(100% - 32px));
+  max-height: calc(100dvh - 40px);
+  box-shadow: 0 30px 120px #263c3426;
+}
+.modal::backdrop {
+  background: #293e365c;
+  backdrop-filter: blur(5px);
+}
+.modal-body {
+  padding: 30px;
+  position: relative;
+}
+.modal h2 {
+  font-family: "Outfit", sans-serif;
+  font-size: 27px;
+  line-height: 1.2;
+  font-weight: 500;
+  letter-spacing: -0.4px;
+  margin: 8px 30px 18px 0;
+}
+.close {
+  position: absolute;
+  right: 12px;
+  top: 13px;
+  color: #88947b;
+}
+.modal p {
+  font-size: 13px;
+  line-height: 1.8;
+  color: #6c7c62;
+}
+.modal p.muted {
+  color: #89947d;
+  font-size: 11px;
+}
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff9ee;
+  padding: 12px 17px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.secondary {
+  background: #e9ecdf;
+  color: #58704e;
+}
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+.help-illustration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #e7ebdb;
+  border-radius: 12px;
+  height: 100px;
+  margin: 25px 0;
+  color: #769263;
+}
+.help-illustration svg:nth-child(2),
+.help-illustration svg:nth-child(4) {
+  width: 15px;
+}
+.model-view {
+  height: 280px;
+  background: #e9eddf;
+  border-radius: 12px;
+  margin: 15px 0 8px;
+  overflow: hidden;
+}
+.model-view canvas {
+  display: block;
+  height: 100%;
+  width: 100%;
+  touch-action: none;
+  cursor: grab;
+}
+.model-view canvas:active {
+  cursor: grabbing;
+}
+.viewer-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #91a07f;
+  font-size: 10px;
+}
+.viewer-meta > span:first-child {
+  color: #5e7951;
+  border: 1px solid #d8dfcc;
+  padding: 4px 9px;
+  border-radius: 5px;
+  font-family: "Outfit";
+  font-size: 12px;
+}
+.reference {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--accent);
+  border-bottom: 1px solid #b4c4a6;
+  padding: 4px 0;
+  margin-top: 5px;
+}
+.end-overlay {
+  position: absolute;
+  inset: 120px 0 80px;
+  display: grid;
+  place-items: center;
+  background: #e9efddc9;
+  backdrop-filter: blur(5px);
+  z-index: 3;
+  text-align: center;
+  padding: 20px;
+}
+.end-overlay > div {
+  max-width: 340px;
+}
+.end-icon {
+  display: inline-flex;
+  color: #839758;
+}
+.end-overlay h2 {
+  font-family: "Outfit";
+  font-size: 27px;
+  font-weight: 500;
+  margin: 10px 0;
+}
+.end-overlay p {
+  font-size: 12px;
+  color: #71816a;
+  line-height: 1.7;
+}
+.text-button {
+  display: block;
+  margin: 10px auto 0;
+  font-size: 11px;
+  background: none;
+  text-decoration: underline;
+}
+.end-overlay.end-loss,
+.mobile-board .end-overlay.end-loss {
+  inset: auto 12px 12px;
+  padding: 16px;
+  background: #f4f6ed;
+  border: 1px solid #cbd4bd;
+  border-radius: 12px;
+  backdrop-filter: none;
+}
+.end-loss > div {
+  max-width: 440px;
+}
+.end-loss .end-icon {
+  display: none;
+}
+.end-loss h2 {
+  font-size: 20px;
+  margin: 0 0 8px;
+}
+.end-loss p {
+  font-size: 14px;
+  margin: 0 0 12px;
+}
+.end-loss .secondary {
+  margin-right: 8px;
+}
+.end-loss .text-button {
+  font-size: 14px;
+}
+.end-review {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 3;
+}
+.celebration .end-icon {
+  animation: celebrate 1s ease-out both;
+}
+@keyframes celebrate {
+  0% {
+    transform: scale(0.3) rotate(-30deg);
+    opacity: 0;
+  }
+  65% {
+    transform: scale(1.3) rotate(10deg);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.webgl-error {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 60px;
+  font-size: 14px;
+  text-align: center;
+  background: var(--scene);
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+/* The board's mirror stays hidden until a tile takes focus: tabbing into the
+   board then shows the 4×4 grid it stands for, over the board it mirrors. */
+.board-mirror:focus-within {
+  inset: 90px 0 70px;
+  width: auto;
+  height: auto;
+  margin: 0;
+  clip: auto;
+  overflow: visible;
+  white-space: normal;
+  display: grid;
+  align-content: center;
+  justify-content: center;
+  gap: 7px;
+  z-index: 4;
+  /* Only the tiles themselves catch clicks: the gaps stay part of the board. */
+  pointer-events: none;
+}
+.board-mirror:focus-within [role="row"] {
+  display: flex;
+  gap: 7px;
+}
+.board-mirror:focus-within [role="cell"] {
+  width: clamp(66px, 20vw, 104px);
+  min-height: 46px;
+  display: grid;
+  align-items: center;
+  padding: 6px 7px;
+  border-radius: 11px;
+  border: 1px solid #c7d0bd;
+  background: #f3f6e9e8;
+  backdrop-filter: blur(4px);
+  color: #6d7b68;
+  font-size: 11px;
+  line-height: 1.25;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.board-mirror:focus-within button {
+  all: unset;
+  pointer-events: auto;
+  cursor: pointer;
+  color: #375447;
+  text-align: center;
+}
+.board-mirror:focus-within button b {
+  display: block;
+  font-family: "Outfit";
+  font-size: 13px;
+  color: #345d49;
+}
+.board-mirror:focus-within button:focus-visible {
+  outline: 2px solid #345d49;
+  outline-offset: 6px;
+  border-radius: 8px;
+}
+@media (min-width: 1400px) {
+  .game-panel {
+    height: clamp(630px, 76vh, 860px);
+  }
+  .discovery-image {
+    height: 195px;
+  }
+  .discovery-card h2 {
+    margin-top: 13px;
+  }
+  .game-layout {
+    grid-template-columns: minmax(0, 1fr) 310px;
+  }
+  .collection-mini button {
+    width: 56px;
+    height: 54px;
+  }
+}
+@media (max-width: 1000px) {
+  .header {
+    margin: 0 4%;
+    height: 80px;
+  }
+  main {
+    margin: 0 4%;
+  }
+  .game-layout {
+    grid-template-columns: minmax(0, 1fr) 245px;
+    gap: 17px;
+  }
+  .game-panel {
+    height: 550px;
+  }
+  .discovery-card {
+    padding: 20px 14px 15px;
+  }
+  .discovery-image {
+    height: 150px;
+  }
+  .discovery-card h2 {
+    font-size: 21px;
+  }
+  .board-canvas {
+    inset: 102px -20px 87px;
+  }
+  .board-instruction > span {
+    font-size: 10px;
+  }
+  .board-instruction small {
+    font-size: 8px;
+  }
+  .atlas-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  footer > span:nth-child(2) {
+    max-width: 240px;
+    text-align: center;
+    line-height: 1.7;
+  }
+}
+@media (max-width: 740px) {
+  .header {
+    height: 70px;
+    gap: 14px;
+  }
+  .brand {
+    font-size: 22px;
+    gap: 7px;
+  }
+  .brand-symbol {
+    width: 31px;
+    height: 33px;
+    border-radius: 9px;
+  }
+  .brand-symbol > svg:first-child {
+    width: 20px;
+  }
+  .header nav {
+    gap: 16px;
+    margin-left: auto;
+  }
+  .header nav button {
+    font-size: 11px;
+  }
+  .header-actions {
+    gap: 8px;
+  }
+  .language {
+    gap: 4px;
+  }
+  .language > svg {
+    display: none;
+  }
+  .language select {
+    width: 53px;
+    font-size: 10px;
+  }
+  .help-button {
+    display: none;
+  }
+  .intro {
+    padding: 24px 0 20px;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .eyebrow {
+    font-size: 8px;
+    letter-spacing: 1.05px;
+  }
+  h1 {
+    font-size: 37px;
+    margin: 7px 0;
+  }
+  .native-name {
+    font-size: 22px;
+    margin-left: 14px;
+  }
+  .intro p {
+    font-size: 11px;
+    margin-top: 7px;
+  }
+  .city-switch {
+    padding: 4px;
+  }
+  .city-switch button {
+    padding: 10px 12px;
+    font-size: 11px;
+    gap: 12px;
+  }
+  .game-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .game-panel {
+    height: 510px;
+  }
+  .board-canvas {
+    inset: 76px -6px 62px;
+  }
+  .panel-top {
+    top: 17px;
+    left: 20px;
+    right: 20px;
+  }
+  .scorebar {
+    top: 50px;
+    left: 20px;
+    right: 20px;
+    gap: 23px;
+  }
+  .score strong {
+    font-size: 31px;
+  }
+  .score.best strong {
+    font-size: 24px;
+  }
+  .score.best {
+    padding-left: 22px;
+  }
+  .score > span {
+    font-size: 8px;
+  }
+  .board-actions button {
+    width: 32px;
+    height: 32px;
+  }
+  .board-bottom {
+    bottom: 17px;
+    left: 20px;
+    right: 20px;
+  }
+  .board-instruction > span {
+    font-size: 11px;
+  }
+  .board-instruction small {
+    font-size: 8px;
+  }
+  .sidebar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .discovery-card {
+    padding: 17px 12px 13px;
+  }
+  .discovery-card > .eyebrow {
+    font-size: 7px;
+    letter-spacing: 0.6px;
+    gap: 4px;
+  }
+  .discovery-image {
+    height: 120px;
+  }
+  .discovery-card h2 {
+    font-size: 18px;
+  }
+  .discovery-card p {
+    font-size: 10px;
+  }
+  .landmark-step {
+    font-size: 7px;
+  }
+  .merge-equation {
+    display: none;
+  }
+  .collection-card {
+    padding: 17px 14px;
+    display: flex;
+    flex-direction: column;
+  }
+  .collection-heading h2 {
+    font-size: 11px;
+  }
+  .collection-mini {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 16px 0;
+    flex: 1;
+  }
+  .collection-mini button {
+    width: 100%;
+    height: 68px;
+  }
+  .collection-link {
+    font-size: 9px;
+  }
+  .journey {
+    grid-column: 1;
+    padding: 17px 16px 12px;
+  }
+  .journey-steps small {
+    font-size: 8px;
+  }
+  .journey-steps button > span {
+    width: 18px;
+    height: 18px;
+  }
+  .journey-steps:before {
+    top: 9px;
+  }
+  .journey-steps button {
+    width: 20px;
+  }
+  .journey-heading > .eyebrow {
+    font-size: 8px;
+  }
+  .atlas-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .atlas-card {
+    padding: 12px;
+  }
+  .atlas-card > img {
+    height: 145px;
+  }
+  .atlas-card-bottom h2 {
+    font-size: 12px;
+  }
+  footer {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    font-size: 8px;
+    margin-top: 18px;
+  }
+  footer > span:nth-child(2) {
+    order: 3;
+    width: 100%;
+    max-width: none;
+    text-align: left;
+    margin-top: 3px;
+  }
+  footer button {
+    font-size: 8px;
+  }
+  .value-tag {
+    right: 6px;
+    bottom: 6px;
+    font-size: 11px;
+  }
+  .modal-body {
+    padding: 24px;
+  }
+  .model-view {
+    height: 240px;
+  }
+}
+@media (max-width: 400px) {
+  .header nav {
+    gap: 9px;
+  }
+  .brand {
+    font-size: 20px;
+  }
+  .brand-dot {
+    display: none;
+  }
+  .game-panel {
+    height: 445px;
+  }
+  .intro {
+    padding-top: 18px;
+  }
+  .city-switch {
+    width: 100%;
+  }
+  .board-canvas {
+    inset: 81px -2px 60px;
+  }
+  .board-bottom {
+    left: 15px;
+    right: 15px;
+  }
+  .board-instruction > span {
+    font-size: 10px;
+  }
+  .collection-mini button {
+    height: 55px;
+  }
+  .discovery-image {
+    height: 110px;
+  }
+  .atlas-card > img {
+    height: 125px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *:before,
+  *:after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.reduced-motion *,
+.reduced-motion *:before,
+.reduced-motion *:after {
+  animation: none !important;
+  transition: none !important;
+}
+.boot-screen {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  font-family: "Outfit", sans-serif;
+  font-size: 28px;
+}
+.boot-screen span {
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  color: #6c7c62;
+}
+footer .history-trigger {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--accent);
+  font-size: 11px;
+}
+.history-filter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  gap: 15px;
+  margin: 20px 0;
+}
+.history-filter select {
+  border: 1px solid #d6ddcc;
+  border-radius: 7px;
+  padding: 8px;
+  background: #f5f5e9;
+  color: var(--accent);
+}
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 12px 0;
+}
+.history-row {
+  padding: 15px;
+  border: 1px solid #dbe0d0;
+  background: #eff1e5;
+  border-radius: 10px;
+}
+.history-row-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+.outcome {
+  font-size: 10px;
+  color: #7d866d;
+}
+.outcome.won {
+  color: #426b46;
+}
+.history-row dl {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 15px 0;
+}
+.history-row dt {
+  font-size: 9px;
+  color: #7b886e;
+}
+.history-row dd {
+  font-family: "Outfit", sans-serif;
+  font-size: 21px;
+  margin: 4px 0 0;
+}
+.history-dates {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #8a947d;
+  font-size: 9px;
+}
+.history-empty {
+  padding: 25px 0;
+  text-align: center;
+}

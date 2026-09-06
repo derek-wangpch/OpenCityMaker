@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>model preview</title>
+    <style>
+      body {
+        margin: 0;
+        display: flex;
+      }
+      canvas {
+        width: 460px;
+        height: 560px;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      // Plain JavaScript only: vite does not transform TypeScript inside
+      // inline module scripts, so no `as` casts or type annotations here.
+      import { SceneView } from "/src/scene/render.ts";
+      const params = new URLSearchParams(location.search);
+      const city = params.get("city") ?? "shenzhen";
+      const pack = await import(`/src/cities/${city}.ts`);
+      const view = new SceneView(
+        Object.assign(document.createElement("canvas"), {
+          width: 460,
+          height: 560,
+        }),
+        "model",
+      );
+      document.body.append(view.canvas);
+      const elevation = params.get("view") ?? "default";
+      view.model(
+        pack[city],
+        Number(params.get("v") ?? 2),
+        Number(params.get("rotation") ?? 0),
+      );
+      if (elevation !== "default") {
+        const center = 1.25;
+        if (elevation === "top") {
+          view.camera.up.set(0, 0, -1);
+          view.camera.position.set(0, 12, 0);
+          view.camera.lookAt(0, 0, 0);
+        } else {
+          view.camera.position.set(
+            elevation === "side" ? 12 : 0,
+            center,
+            elevation === "side" ? 0 : 12,
+          );
+          view.camera.lookAt(0, center, 0);
+        }
+        view.renderer.render(view.scene, view.camera);
+      }
+      window.__done = true;
+    </script>
+  </body>
+</html>

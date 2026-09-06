@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Beijing tier review</title>
+    <style>
+      body {
+        margin: 0;
+      }
+      canvas {
+        width: 460px;
+        height: 560px;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      import { SceneView } from "/src/scene/render.ts";
+      import { beijing } from "/src/cities/beijing.ts";
+      const p = new URLSearchParams(location.search),
+        view = new SceneView(
+          Object.assign(document.createElement("canvas"), {
+            width: 460,
+            height: 560,
+          }),
+          "model",
+        );
+      document.body.append(view.canvas);
+      view.model(
+        beijing,
+        Number(p.get("v") || 2048),
+        Number(p.get("rotation") || 0),
+      );
+      const elevation = p.get("view") || "default";
+      if (elevation !== "default") {
+        if (elevation === "top") {
+          view.camera.up.set(0, 0, -1);
+          view.camera.position.set(0, 12, 0);
+          view.camera.lookAt(0, 0, 0);
+        } else {
+          view.camera.position.set(
+            elevation === "side" ? 12 : 0,
+            1.25,
+            elevation === "side" ? 0 : 12,
+          );
+          view.camera.lookAt(0, 1.25, 0);
+        }
+        view.renderer.render(view.scene, view.camera);
+      }
+      window.addEventListener("pagehide", () => view.dispose(), { once: true });
+      window.__done = true;
+    </script>
+  </body>
+</html>

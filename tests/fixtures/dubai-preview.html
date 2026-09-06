@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>Dubai model review</title>
+  <style>
+    body {
+      margin: 0;
+      background: white;
+    }
+    canvas {
+      display: block;
+      width: 460px;
+      height: 560px;
+    }
+  </style>
+  <canvas></canvas>
+  <script type="module">
+    import { SceneView } from "/src/scene/render.ts";
+    import { dubai } from "/src/cities/dubai.ts";
+    const params = new URLSearchParams(location.search);
+    const view = new SceneView(document.querySelector("canvas"), "model");
+    const tier = Number(params.get("tier") ?? 11);
+    const elevation = params.get("view") ?? "default";
+    // Undo the Burj Al Arab's presentation rotation only for canonical elevations.
+    const rotation = Number(
+      params.get("rotation") ??
+        (tier === 10 && elevation !== "default" ? 0.9 : 0),
+    );
+    view.model(dubai, 2 ** tier, rotation);
+    if (elevation === "top") {
+      view.camera.up.set(0, 0, -1);
+      view.camera.position.set(0, 12, 0);
+      view.camera.lookAt(0, 0, 0);
+    } else if (elevation !== "default") {
+      view.camera.position.set(
+        elevation === "side" ? 12 : 0,
+        1.25,
+        elevation === "side" ? 0 : 12,
+      );
+      view.camera.lookAt(0, 1.25, 0);
+    }
+    view.renderer.render(view.scene, view.camera);
+    window.addEventListener("pagehide", () => view.dispose(), { once: true });
+    window.__done = true;
+  </script>
+</html>

@@ -1,0 +1,24 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>新加坡建筑 · Tier review</title>
+<style>body{margin:24px;background:#eef0e6;color:#34443c;font:15px system-ui}h1{font-size:24px}p{color:#687569}.row{display:grid;grid-template-columns:180px repeat(5,1fr);align-items:center;border-top:1px solid #cdd3c4;min-width:1050px}.row img{width:100%;display:block}.name{font-weight:600}.label{text-align:center;font-size:12px}.render{position:absolute;left:-1000px;width:320px;height:320px}a{color:inherit}</style>
+<h1>新加坡建筑 · Tier 11 → 1</h1><p>跳过艺术科学博物馆。默认游戏视角 / 正面 / 侧面 / 顶部 / 旋转背面。</p><main id="models"></main>
+<script type="module">
+import {SceneView} from '/src/scene/render.ts';
+import {singapore} from '/src/cities/singapore.ts';
+const canvas=document.createElement('canvas');canvas.className='render';canvas.width=canvas.height=320;document.body.append(canvas);
+const scene=new SceneView(canvas,'model');
+for(const b of [...singapore.buildings].reverse().filter(b=>b.model!=='sg-artscience')){
+ const row=document.createElement('section');row.className='row';row.id=b.model;
+ const name=document.createElement('div');name.className='name';name.textContent=`T${Math.log2(b.value)} · ${b.name['zh-CN']}`;row.append(name);
+ for(const mode of ['default','front','side','top','back']){
+  scene.camera.up.set(0,1,0);
+  if(mode==='default'||mode==='back'){scene.camera.position.set(9,11,12);scene.camera.lookAt(0,.85,0);}
+  else if(mode==='top'){scene.camera.up.set(0,0,-1);scene.camera.position.set(0,12,0);scene.camera.lookAt(0,0,0);}
+  else {scene.camera.position.set(mode==='side'?12:0,1.1,mode==='side'?0:12);scene.camera.lookAt(0,1.1,0);}
+  scene.model(singapore,b.value,mode==='back'?Math.PI:0);
+  const cell=document.createElement('div'), img=document.createElement('img');img.src=canvas.toDataURL();img.alt=`${b.model}-${mode}`;cell.append(img);
+  const label=document.createElement('div');label.className='label';label.textContent=mode;cell.append(label);row.append(cell);
+ }
+ document.querySelector('main').append(row);
+}
+scene.dispose();canvas.remove();window.__done=true;
+</script></html>

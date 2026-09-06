@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>Model preview</title>
+  <style>
+    body {
+      margin: 0;
+      background: white;
+    }
+    canvas {
+      display: block;
+      width: 460px;
+      height: 560px;
+    }
+  </style>
+  <canvas></canvas>
+  <script type="module">
+    import { SceneView } from "/src/scene/render.ts";
+
+    const params = new URLSearchParams(location.search);
+    const view = new SceneView(document.querySelector("canvas"), "model");
+    const city = params.get("city") ?? "sydney";
+    const pack = await import(`/src/cities/${city}.ts`);
+    const elevation = params.get("view") ?? "default";
+    view.model(pack[city], Number(params.get("v") ?? 128), Number(params.get("rotation") ?? 0));
+    if (elevation === "top") {
+      view.camera.up.set(0, 0, -1);
+      view.camera.position.set(0, 12, 0);
+      view.camera.lookAt(0, 0, 0);
+    } else if (elevation !== "default") {
+      view.camera.position.set(
+        elevation === "side" ? 12 : 0,
+        1.25,
+        elevation === "side" ? 0 : 12,
+      );
+      view.camera.lookAt(0, 1.25, 0);
+    }
+    view.renderer.render(view.scene, view.camera);
+    window.addEventListener("pagehide", () => view.dispose(), { once: true });
+    window.__done = true;
+  </script>
+</html>

@@ -1,0 +1,11 @@
+{
+  "name": "CityMaker",
+  "short_name": "CityMaker",
+  "description": "A little merge. A growing city.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f3eb",
+  "theme_color": "#f5f3eb",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

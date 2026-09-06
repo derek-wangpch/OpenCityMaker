@@ -1,0 +1,805 @@
+{
+  "checkedAt": "2026-09-05",
+  "method": "HTTP GET with redirects; official tourism, heritage, operator and architect references. Generic housing references establish neighborhood context rather than a replica address. Non-200 responses are access restrictions, not verified live content.",
+  "uniqueURLs": 79,
+  "statusCounts": {
+    "200": 58,
+    "202": 1,
+    "403": 19,
+    "406": 1
+  },
+  "buildings": [
+    {
+      "city": "tokyo",
+      "model": "tk-machiya",
+      "url": "https://www.gotokyo.org/en/spot/170/index.html",
+      "status": "200",
+      "finalURL": "https://www.gotokyo.org/en/spot/170/index.html",
+      "title": "YanakaGinza | The Official Tokyo Travel Guide, GO TOKYO",
+      "bytes": 41391
+    },
+    {
+      "city": "tokyo",
+      "model": "tk-nagaya",
+      "url": "https://www.gotokyo.org/en/spot/170/index.html",
+      "status": "200",
+      "finalURL": "https://www.gotokyo.org/en/spot/170/index.html",
+      "title": "YanakaGinza | The Official Tokyo Travel Guide, GO TOKYO",
+      "bytes": 41391
+    },
+    {
+      "city": "tokyo",
+      "model": "tk-shotengai",
+      "url": "https://www.gotokyo.org/en/spot/170/index.html",
+      "status": "200",
+      "finalURL": "https://www.gotokyo.org/en/spot/170/index.html",
+      "title": "YanakaGinza | The Official Tokyo Travel Guide, GO TOKYO",
+      "bytes": 41391
+    },
+    {
+      "city": "tokyo",
+      "model": "tk-sento",
+      "url": "https://www.tokyoupdates.metro.tokyo.lg.jp/en/post-1607/",
+      "status": "200",
+      "finalURL": "https://www.tokyoupdates.metro.tokyo.lg.jp/en/post-1607/",
+      "title": "Soaking In Tokyo's Rich Sento Culture | TOKYO UPDATES [The Official Information Website of Tokyo Metropolitan Government]",
+      "bytes": 53260
+    },
+    {
+      "city": "tokyo",
+      "model": "tk-kaminarimon",
+      "url": "https://www.senso-ji.jp/english/",
+      "status": "200",
+      "finalURL": "https://www.senso-ji.jp/english/",
+      "title": "ASAKUSA KANNON SENSOJI",
+      "bytes": 35512
+    },
+    {
+      "city": "tokyo",
+      "model": "tk-sensoji",
+      "url": "https://www.senso-ji.jp/english/",
+      "status": "200",
+      "finalURL": "https://www.senso-ji.jp/english/",
+      "title": "ASAKUSA KANNON SENSOJI",
+      "bytes": 35512
+    },
+    {
+      "city": "tokyo",
+      "model": "tk-station",
+      "url": "https://www.gotokyo.org/en/destinations/central-tokyo/tokyo-station-and-marunouchi/index.html",
+      "status": "200",
+      "finalURL": "https://www.gotokyo.org/en/destinations/central-tokyo/tokyo-station-and-marunouchi/index.html",
+      "title": "Tokyo Station &amp; Marunouchi area travel guide | The Official Tokyo Travel Guide, GO TOKYO",
+      "bytes": 52115
+    },
+    {
+      "city": "tokyo",
+      "model": "tk-diet",
+      "url": "https://www.shugiin.go.jp/internet/itdb_english.nsf/html/statics/guide/tours.htm",
+      "status": "200",
+      "finalURL": "https://www.shugiin.go.jp/internet/itdb_english.nsf/html/statics/guide/tours.htm",
+      "title": "Tours of the National Diet in English (House of Representatives)",
+      "bytes": 11475
+    },
+    {
+      "city": "tokyo",
+      "model": "tk-tocho",
+      "url": "https://www.yokoso.metro.tokyo.lg.jp/en/",
+      "status": "200",
+      "finalURL": "https://www.yokoso.metro.tokyo.lg.jp/en/",
+      "title": "TMG Visitor's Guide",
+      "bytes": 5527
+    },
+    {
+      "city": "tokyo",
+      "model": "tk-tower",
+      "url": "https://www.gotokyo.org/en/spot/4/index.html",
+      "status": "200",
+      "finalURL": "https://www.gotokyo.org/en/spot/4/index.html",
+      "title": "Tokyo Tower | The Official Tokyo Travel Guide, GO TOKYO",
+      "bytes": 45021
+    },
+    {
+      "city": "tokyo",
+      "model": "tk-skytree",
+      "url": "https://www.tokyo-skytree.jp/en/",
+      "status": "200",
+      "finalURL": "https://en.tokyo-skytree.jp/",
+      "title": "[Official] Tokyo TOKYO SKYTREE",
+      "bytes": 323931
+    },
+    {
+      "city": "singapore",
+      "model": "sg-shophouse",
+      "url": "https://www.visitsingapore.com/neighbourhood/featured-neighbourhood/katong-joo-chiat/shophouses-koon-seng-road/",
+      "status": "200",
+      "finalURL": "https://www.visitsingapore.com/neighbourhood/featured-neighbourhood/katong-joo-chiat/shophouses-koon-seng-road/",
+      "title": "Singapore&#39;s Colorful Shophouses Along Koon Seng Road",
+      "bytes": 66653
+    },
+    {
+      "city": "singapore",
+      "model": "sg-terrace",
+      "url": "https://www.visitsingapore.com/neighbourhood/featured-neighbourhood/katong-joo-chiat/shophouses-koon-seng-road/",
+      "status": "200",
+      "finalURL": "https://www.visitsingapore.com/neighbourhood/featured-neighbourhood/katong-joo-chiat/shophouses-koon-seng-road/",
+      "title": "Singapore&#39;s Colorful Shophouses Along Koon Seng Road",
+      "bytes": 66653
+    },
+    {
+      "city": "singapore",
+      "model": "sg-bungalow",
+      "url": "https://www.roots.gov.sg/stories-landing/stories/black-and-white-houses-in-singapore/story",
+      "status": "202",
+      "finalURL": "https://www.roots.gov.sg/stories-landing/stories/black-and-white-houses-in-singapore/story",
+      "title": "",
+      "bytes": 0
+    },
+    {
+      "city": "singapore",
+      "model": "sg-hdb",
+      "url": "https://www.hdb.gov.sg/about-us/history",
+      "status": "403",
+      "finalURL": "https://www.hdb.gov.sg/about-us/history",
+      "title": "",
+      "bytes": 3506
+    },
+    {
+      "city": "singapore",
+      "model": "sg-raffles",
+      "url": "https://www.raffles.com/singapore/",
+      "status": "200",
+      "finalURL": "https://www.raffles.com/singapore/",
+      "title": "Raffles Hotel Singapore: Book Luxury Hotel Experience | Raffles Hotels &amp; Resorts",
+      "bytes": 647832
+    },
+    {
+      "city": "singapore",
+      "model": "sg-gallery",
+      "url": "https://www.nationalgallery.sg/sg/en/architecture-and-history.html",
+      "status": "200",
+      "finalURL": "https://www.nationalgallery.sg/sg/en/architecture-and-history.html",
+      "title": "Our Architecture &amp; History | National Gallery Singapore",
+      "bytes": 246913
+    },
+    {
+      "city": "singapore",
+      "model": "sg-esplanade",
+      "url": "https://www.esplanade.com/",
+      "status": "200",
+      "finalURL": "https://www.esplanade.com/",
+      "title": "",
+      "bytes": 246225
+    },
+    {
+      "city": "singapore",
+      "model": "sg-merlion",
+      "url": "https://www.visitsingapore.com/see-do-singapore/recreation-leisure/viewpoints/merlion-park/",
+      "status": "200",
+      "finalURL": "https://www.visitsingapore.com/neighbourhood/featured-neighbourhood/marina-bay/merlion-park/",
+      "title": "Merlion Park Singapore | A Must-Visit Spot",
+      "bytes": 65818
+    },
+    {
+      "city": "singapore",
+      "model": "sg-artscience",
+      "url": "https://www.safdiearchitects.com/projects/marina-bay-sands-artscience-museum",
+      "status": "200",
+      "finalURL": "https://www.safdiearchitects.com/projects/marina-bay-sands-artscience-museum",
+      "title": "Marina Bay Sands - ArtScience Museum",
+      "bytes": 29021
+    },
+    {
+      "city": "singapore",
+      "model": "sg-supertrees",
+      "url": "https://www.gardensbythebay.com.sg/en/things-to-do/attractions/supertree-grove.html",
+      "status": "200",
+      "finalURL": "https://www.gardensbythebay.com.sg/en/things-to-do/attractions/supertree-grove.html",
+      "title": "Supertree Grove",
+      "bytes": 111095
+    },
+    {
+      "city": "singapore",
+      "model": "sg-sands",
+      "url": "https://www.safdiearchitects.com/projects/marina-bay-sands-integrated-resort",
+      "status": "200",
+      "finalURL": "https://www.safdiearchitects.com/projects/marina-bay-sands-integrated-resort",
+      "title": "Marina Bay Sands Integrated Resort",
+      "bytes": 32414
+    },
+    {
+      "city": "dubai",
+      "model": "db-windtower",
+      "url": "https://www.visitdubai.com/en/places-to-visit/al-fahidi-historical-neighbourhood",
+      "status": "403",
+      "finalURL": "https://www.visitdubai.com/en/places-to-visit/al-fahidi-historical-neighbourhood",
+      "title": "Access Denied",
+      "bytes": 453
+    },
+    {
+      "city": "dubai",
+      "model": "db-courtyard",
+      "url": "https://www.visitdubai.com/en/places-to-visit/al-fahidi-historical-neighbourhood",
+      "status": "403",
+      "finalURL": "https://www.visitdubai.com/en/places-to-visit/al-fahidi-historical-neighbourhood",
+      "title": "Access Denied",
+      "bytes": 453
+    },
+    {
+      "city": "dubai",
+      "model": "db-souk",
+      "url": "https://www.visitdubai.com/en/places-to-visit/textile-souk",
+      "status": "403",
+      "finalURL": "https://www.visitdubai.com/en/places-to-visit/textile-souk",
+      "title": "Access Denied",
+      "bytes": 423
+    },
+    {
+      "city": "dubai",
+      "model": "db-fahidi",
+      "url": "https://www.visitdubai.com/en/places-to-visit/al-fahidi-historical-neighbourhood",
+      "status": "403",
+      "finalURL": "https://www.visitdubai.com/en/places-to-visit/al-fahidi-historical-neighbourhood",
+      "title": "Access Denied",
+      "bytes": 453
+    },
+    {
+      "city": "dubai",
+      "model": "db-mosque",
+      "url": "https://www.jumeirahmosque.ae/",
+      "status": "406",
+      "finalURL": "https://www.jumeirahmosque.ae/",
+      "title": "Not Acceptable!",
+      "bytes": 226
+    },
+    {
+      "city": "dubai",
+      "model": "db-saeed",
+      "url": "https://alshindagha.dubaiculture.gov.ae/",
+      "status": "200",
+      "finalURL": "https://alshindagha.dubaiculture.gov.ae/ar/Pages/default.aspx",
+      "title": "الصفحة الرئيسية - متحف الشندغة",
+      "bytes": 91496
+    },
+    {
+      "city": "dubai",
+      "model": "db-future",
+      "url": "https://museumofthefuture.ae/en",
+      "status": "200",
+      "finalURL": "https://museumofthefuture.ae/en",
+      "title": "Museum of The Future - Future Museum Dubai - Visit Today",
+      "bytes": 158147
+    },
+    {
+      "city": "dubai",
+      "model": "db-frame",
+      "url": "https://www.visitdubai.com/en/places-to-visit/dubai-frame",
+      "status": "403",
+      "finalURL": "https://www.visitdubai.com/en/places-to-visit/dubai-frame",
+      "title": "Access Denied",
+      "bytes": 422
+    },
+    {
+      "city": "dubai",
+      "model": "db-emirates",
+      "url": "https://www.jumeirah.com/en/stay/dubai/jumeirah-emirates-towers",
+      "status": "200",
+      "finalURL": "https://www.jumeirah.com/en/stay/dubai/jumeirah-emirates-towers",
+      "title": "Book your stay with Jumeirah Emirates Towers in Dubai",
+      "bytes": 4421753
+    },
+    {
+      "city": "dubai",
+      "model": "db-burj-al-arab",
+      "url": "https://www.jumeirah.com/en/stay/dubai/burj-al-arab-jumeirah",
+      "status": "200",
+      "finalURL": "https://www.jumeirah.com/en/stay/dubai/jumeirah-burj-al-arab-a-jumeirah-icon",
+      "title": "Jumeirah Burj Al Arab | Dubai’s Most Iconic Hotel | Jumeirah",
+      "bytes": 1154520
+    },
+    {
+      "city": "dubai",
+      "model": "db-khalifa",
+      "url": "https://www.visitdubai.com/en/places-to-visit/burj-khalifa",
+      "status": "403",
+      "finalURL": "https://www.visitdubai.com/en/places-to-visit/burj-khalifa",
+      "title": "Access Denied",
+      "bytes": 423
+    },
+    {
+      "city": "sydney",
+      "model": "sy-cottage",
+      "url": "https://www.therocks.com/see-do-stay/cadmans-cottage",
+      "status": "200",
+      "finalURL": "https://www.therocks.com/see-do-stay/cadmans-cottage",
+      "title": "Cadman’s Cottage | The Rocks | The Rocks",
+      "bytes": 34989
+    },
+    {
+      "city": "sydney",
+      "model": "sy-terrace",
+      "url": "https://therocks.com/editorials/stories-in-stone-exploring-the-rocks-historic-lan",
+      "status": "200",
+      "finalURL": "https://therocks.com/editorials/stories-in-stone-exploring-the-rocks-historic-lan",
+      "title": "Stories in Stone: Exploring The Rocks’ Historic Landmarks | The Rocks",
+      "bytes": 60351
+    },
+    {
+      "city": "sydney",
+      "model": "sy-warehouse",
+      "url": "https://www.therocks.com/editorials/a-walk-through-time-five-must-see-historic-buildin",
+      "status": "200",
+      "finalURL": "https://www.therocks.com/editorials/a-walk-through-time-five-must-see-historic-buildin",
+      "title": "A walk through time: Five must-see historic buildings in The Rocks | The Rocks",
+      "bytes": 38148
+    },
+    {
+      "city": "sydney",
+      "model": "sy-wharf",
+      "url": "https://www.sydneytheatre.com.au/your-visit/the-wharf",
+      "status": "403",
+      "finalURL": "https://www.sydneytheatre.com.au/your-visit/the-wharf",
+      "title": "Just a moment...",
+      "bytes": 5475
+    },
+    {
+      "city": "sydney",
+      "model": "sy-qvb",
+      "url": "https://www.qvb.com.au/centre-info/history-of-qvb",
+      "status": "200",
+      "finalURL": "https://www.qvb.com.au/centre-info/history-of-qvb",
+      "title": "History of QVB - QVB",
+      "bytes": 824812
+    },
+    {
+      "city": "sydney",
+      "model": "sy-townhall",
+      "url": "https://www.sydneytownhall.com.au/",
+      "status": "200",
+      "finalURL": "https://www.cityofsydney.nsw.gov.au/landmarks/sydney-town-hall",
+      "title": "Sydney Town Hall - City of Sydney",
+      "bytes": 128092
+    },
+    {
+      "city": "sydney",
+      "model": "sy-stmarys",
+      "url": "https://stmaryscathedral.org.au/",
+      "status": "403",
+      "finalURL": "https://stmaryscathedral.org.au/",
+      "title": "Attention Required! | Cloudflare",
+      "bytes": 4545
+    },
+    {
+      "city": "sydney",
+      "model": "sy-university",
+      "url": "https://www.sydney.edu.au/engage/visit.html",
+      "status": "200",
+      "finalURL": "https://www.sydney.edu.au/engage/visit.html",
+      "title": "Visit the University - The University of Sydney",
+      "bytes": 72439
+    },
+    {
+      "city": "sydney",
+      "model": "sy-centralpark",
+      "url": "https://www.jeannouvel.com/en/projects/one-central-park/",
+      "status": "200",
+      "finalURL": "https://www.jeannouvel.com/en/projects/one-central-park/",
+      "title": "One Central Park &mdash; Ateliers Jean Nouvel",
+      "bytes": 46827
+    },
+    {
+      "city": "sydney",
+      "model": "sy-harbourbridge",
+      "url": "https://www.sydney.com/articles/top-attractions-in-sydney",
+      "status": "200",
+      "finalURL": "https://www.sydney.com/articles/top-attractions-in-sydney",
+      "title": "The top attractions in Sydney: iconic sights &amp; experiences | Sydney.com",
+      "bytes": 255818
+    },
+    {
+      "city": "sydney",
+      "model": "sy-opera",
+      "url": "https://www.sydneyoperahouse.com/our-story/the-spherical-solution",
+      "status": "200",
+      "finalURL": "https://www.sydneyoperahouse.com/our-story/the-spherical-solution",
+      "title": "The spherical solution | Sydney Opera House",
+      "bytes": 69788
+    },
+    {
+      "city": "newyork",
+      "model": "ny-brownstone",
+      "url": "https://s-media.nyc.gov/agencies/lpc/lp/0099.pdf",
+      "status": "200",
+      "finalURL": "https://s-media.nyc.gov/agencies/lpc/lp/0099.pdf",
+      "title": "",
+      "bytes": 3990293
+    },
+    {
+      "city": "newyork",
+      "model": "ny-row",
+      "url": "https://s-media.nyc.gov/agencies/lpc/lp/0099.pdf",
+      "status": "200",
+      "finalURL": "https://s-media.nyc.gov/agencies/lpc/lp/0099.pdf",
+      "title": "",
+      "bytes": 3990293
+    },
+    {
+      "city": "newyork",
+      "model": "ny-tenement",
+      "url": "https://www.tenement.org/",
+      "status": "403",
+      "finalURL": "https://www.tenement.org/",
+      "title": "Just a moment...",
+      "bytes": 5364
+    },
+    {
+      "city": "newyork",
+      "model": "ny-watertank",
+      "url": "https://www.nyc.gov/site/doh/business/permits-and-licenses/drinking-water-tank-inspection-reporting.page",
+      "status": "200",
+      "finalURL": "https://www.nyc.gov/site/doh/business/permits-and-licenses/drinking-water-tank-inspection-reporting.page",
+      "title": "Drinking Water Tank Inspection Reporting - NYC Health",
+      "bytes": 28516
+    },
+    {
+      "city": "newyork",
+      "model": "ny-flatiron",
+      "url": "https://flatironnomad.nyc/wp-content/uploads/2022/05/FLATIRON-WALKING-TOUR-BROCHURE.pdf",
+      "status": "200",
+      "finalURL": "https://flatironnomad.nyc/wp-content/uploads/2022/05/FLATIRON-WALKING-TOUR-BROCHURE.pdf",
+      "title": "",
+      "bytes": 8163025
+    },
+    {
+      "city": "newyork",
+      "model": "ny-grandcentral",
+      "url": "https://grandcentralterminal.com/history/",
+      "status": "403",
+      "finalURL": "https://grandcentralterminal.com/history/",
+      "title": "Attention Required! | Cloudflare",
+      "bytes": 4559
+    },
+    {
+      "city": "newyork",
+      "model": "ny-brooklyn",
+      "url": "https://www.nyc.gov/html/dot/html/infrastructure/brooklyn-bridge.shtml",
+      "status": "200",
+      "finalURL": "https://www.nyc.gov/html/dot/html/infrastructure/brooklyn-bridge.shtml",
+      "title": "NYC DOT - Brooklyn Bridge",
+      "bytes": 24934
+    },
+    {
+      "city": "newyork",
+      "model": "ny-chrysler",
+      "url": "https://s-media.nyc.gov/agencies/lpc/lp/0992.pdf",
+      "status": "200",
+      "finalURL": "https://s-media.nyc.gov/agencies/lpc/lp/0992.pdf",
+      "title": "",
+      "bytes": 5199072
+    },
+    {
+      "city": "newyork",
+      "model": "ny-liberty",
+      "url": "https://www.nps.gov/npnh/learn/news/fact-sheet-stli.htm?fullweb=1",
+      "status": "200",
+      "finalURL": "https://www.nps.gov/npnh/learn/news/fact-sheet-stli.htm?fullweb=1",
+      "title": "Fact Sheet: Statue of Liberty National Monument - National Parks of New York Harbor (U.S. National Park Service)",
+      "bytes": 36436
+    },
+    {
+      "city": "newyork",
+      "model": "ny-empire",
+      "url": "https://www.esbnyc.com/about/history",
+      "status": "200",
+      "finalURL": "https://www.esbnyc.com/about/history",
+      "title": "History of the New York City Landmark | Empire State Building",
+      "bytes": 83651
+    },
+    {
+      "city": "newyork",
+      "model": "ny-onewtc",
+      "url": "https://www.som.com/projects/one-world-trade-center/",
+      "status": "403",
+      "finalURL": "https://www.som.com/projects/one-world-trade-center/",
+      "title": "Attention Required! | Cloudflare",
+      "bytes": 4545
+    },
+    {
+      "city": "paris",
+      "model": "pa-cafe",
+      "url": "https://parisjetaime.com/eng/article/architecture-in-paris-a236",
+      "status": "403",
+      "finalURL": "https://parisjetaime.com/eng/article/architecture-in-paris-a236",
+      "title": "Attention Required! | Cloudflare",
+      "bytes": 5489
+    },
+    {
+      "city": "paris",
+      "model": "pa-apartment",
+      "url": "https://parisjetaime.com/eng/article/architecture-in-paris-a236",
+      "status": "403",
+      "finalURL": "https://parisjetaime.com/eng/article/architecture-in-paris-a236",
+      "title": "Attention Required! | Cloudflare",
+      "bytes": 5489
+    },
+    {
+      "city": "paris",
+      "model": "pa-block",
+      "url": "https://parisjetaime.com/eng/article/architecture-in-paris-a236",
+      "status": "403",
+      "finalURL": "https://parisjetaime.com/eng/article/architecture-in-paris-a236",
+      "title": "Attention Required! | Cloudflare",
+      "bytes": 5489
+    },
+    {
+      "city": "paris",
+      "model": "pa-vosges",
+      "url": "https://parisjetaime.com/eng/culture/place-des-vosges-p3531",
+      "status": "403",
+      "finalURL": "https://parisjetaime.com/eng/culture/place-des-vosges-p3531",
+      "title": "Attention Required! | Cloudflare",
+      "bytes": 5489
+    },
+    {
+      "city": "paris",
+      "model": "pa-garnier",
+      "url": "https://www.operadeparis.fr/en/visits/palais-garnier",
+      "status": "200",
+      "finalURL": "https://www.operadeparis.fr/en/visits/palais-garnier",
+      "title": "Visit the Palais Garnier - Opéra national de Paris",
+      "bytes": 726897
+    },
+    {
+      "city": "paris",
+      "model": "pa-louvre",
+      "url": "https://www.louvre.fr/en/explore/the-palace",
+      "status": "200",
+      "finalURL": "https://www.louvre.fr/en/explore/the-palace",
+      "title": "The palace - From the former palace of the French monarchs to the largest museum in the world",
+      "bytes": 302666
+    },
+    {
+      "city": "paris",
+      "model": "pa-notredame",
+      "url": "https://www.notredamedeparis.fr/en/",
+      "status": "403",
+      "finalURL": "https://www.notredamedeparis.fr/en/",
+      "title": "Just a moment...",
+      "bytes": 5273
+    },
+    {
+      "city": "paris",
+      "model": "pa-sacrecoeur",
+      "url": "https://www.sacre-coeur-montmartre.com/english/",
+      "status": "200",
+      "finalURL": "https://www.sacre-coeur-montmartre.com/en/",
+      "title": "Basilique du Sacré-Cœur",
+      "bytes": 167570
+    },
+    {
+      "city": "paris",
+      "model": "pa-invalides",
+      "url": "https://www.musee-armee.fr/en/your-visit/museum-spaces/the-dome-tomb-of-napoleon.html",
+      "status": "200",
+      "finalURL": "https://www.musee-armee.fr/en/your-visit/museum-spaces/the-dome-tomb-of-napoleon.html",
+      "title": "The Dome (tomb of Napoleon)",
+      "bytes": 62791
+    },
+    {
+      "city": "paris",
+      "model": "pa-triumph",
+      "url": "https://www.paris-arc-de-triomphe.fr/en",
+      "status": "200",
+      "finalURL": "https://www.paris-arc-de-triomphe.fr/en",
+      "title": "Welcome to the Arc de triomphe",
+      "bytes": 364394
+    },
+    {
+      "city": "paris",
+      "model": "pa-eiffel",
+      "url": "https://www.toureiffel.paris/en/the-monument/history",
+      "status": "403",
+      "finalURL": "https://www.toureiffel.paris/en/the-monument/history",
+      "title": "",
+      "bytes": 44
+    },
+    {
+      "city": "london",
+      "model": "ld-terrace",
+      "url": "https://historicengland.org.uk/images-books/publications/conserving-georgian-victorian-terraced-housing/heag277-conserving-georgian-and-victorian-terraced-housing/",
+      "status": "403",
+      "finalURL": "https://historicengland.org.uk/images-books/publications/conserving-georgian-victorian-terraced-housing/heag277-conserving-georgian-and-victorian-terraced-housing/",
+      "title": "Just a moment...",
+      "bytes": 6022
+    },
+    {
+      "city": "london",
+      "model": "ld-telephone",
+      "url": "https://historicengland.org.uk/listing/the-list/list-entry/1415684",
+      "status": "403",
+      "finalURL": "https://historicengland.org.uk/listing/the-list/list-entry/1415684",
+      "title": "Just a moment...",
+      "bytes": 5582
+    },
+    {
+      "city": "london",
+      "model": "ld-mews",
+      "url": "https://www.visitlondon.com/things-to-do/london-areas/notting-hill",
+      "status": "403",
+      "finalURL": "https://www.visitlondon.com/things-to-do/london-areas/notting-hill",
+      "title": "Just a moment...",
+      "bytes": 5545
+    },
+    {
+      "city": "london",
+      "model": "ld-covent",
+      "url": "https://www.coventgarden.london/",
+      "status": "200",
+      "finalURL": "https://www.coventgarden.london/",
+      "title": "Covent Garden | Shopping, Dining and Culture Destination | Covent Garden",
+      "bytes": 4325042
+    },
+    {
+      "city": "london",
+      "model": "ld-battersea",
+      "url": "https://batterseapowerstation.co.uk/",
+      "status": "200",
+      "finalURL": "https://batterseapowerstation.co.uk/",
+      "title": "Battersea Power Station",
+      "bytes": 52508
+    },
+    {
+      "city": "london",
+      "model": "ld-buckingham",
+      "url": "https://www.rct.uk/visit/buckingham-palace",
+      "status": "403",
+      "finalURL": "https://www.rct.uk/visit/buckingham-palace",
+      "title": "Attention Required! | Cloudflare",
+      "bytes": 4541
+    },
+    {
+      "city": "london",
+      "model": "ld-stpauls",
+      "url": "https://www.stpauls.co.uk/",
+      "status": "200",
+      "finalURL": "https://www.stpauls.co.uk/",
+      "title": "St Paul&#039;s Cathedral | St Paul&#039;s Cathedral",
+      "bytes": 249857
+    },
+    {
+      "city": "london",
+      "model": "ld-towerbridge",
+      "url": "https://www.towerbridge.org.uk/",
+      "status": "200",
+      "finalURL": "https://www.towerbridge.org.uk/",
+      "title": "Explore inside Tower Bridge - Tower Bridge",
+      "bytes": 126435
+    },
+    {
+      "city": "london",
+      "model": "ld-bigben",
+      "url": "https://www.parliament.uk/about/living-heritage/building/palace/big-ben/",
+      "status": "403",
+      "finalURL": "https://www.parliament.uk/about/living-heritage/building/palace/big-ben/",
+      "title": "Just a moment...",
+      "bytes": 5567
+    },
+    {
+      "city": "london",
+      "model": "ld-eye",
+      "url": "https://www.londoneye.com/",
+      "status": "200",
+      "finalURL": "https://www.londoneye.com/",
+      "title": "The London Eye: The Official Tickets Website",
+      "bytes": 207807
+    },
+    {
+      "city": "london",
+      "model": "ld-shard",
+      "url": "https://www.the-shard.com/",
+      "status": "200",
+      "finalURL": "https://www.the-shard.com/",
+      "title": "The Shard: Inspiring change",
+      "bytes": 434159
+    },
+    {
+      "city": "rome",
+      "model": "rm-trastevere",
+      "url": "https://www.turismoroma.it/en/page/rione-xiii-trastevere",
+      "status": "200",
+      "finalURL": "https://www.turismoroma.it/en/page/rione-xiii-trastevere",
+      "title": "Rione XIII - Trastevere | Turismo Roma",
+      "bytes": 156681
+    },
+    {
+      "city": "rome",
+      "model": "rm-domus",
+      "url": "https://www.turismoroma.it/en/places/case-romane-del-celio-sotto-ss-giovanni-e-paolo",
+      "status": "200",
+      "finalURL": "https://www.turismoroma.it/en/places/case-romane-del-celio-sotto-ss-giovanni-e-paolo",
+      "title": "Celio Roman Houses | Turismo Roma",
+      "bytes": 124502
+    },
+    {
+      "city": "rome",
+      "model": "rm-insula",
+      "url": "https://www.turismoroma.it/en/places/ara-coeli-insula",
+      "status": "200",
+      "finalURL": "https://www.turismoroma.it/en/places/ara-coeli-insula",
+      "title": "The Ara Coeli Insula | Turismo Roma",
+      "bytes": 143102
+    },
+    {
+      "city": "rome",
+      "model": "rm-aqueduct",
+      "url": "https://www.parcoappiaantica.it/",
+      "status": "200",
+      "finalURL": "https://www.parcoappiaantica.it/",
+      "title": "Parco Regionale dell&#039;Appia Antica | Benvenuti",
+      "bytes": 362412
+    },
+    {
+      "city": "rome",
+      "model": "rm-forum",
+      "url": "https://colosseo.it/en/area/the-roman-forum/",
+      "status": "200",
+      "finalURL": "https://colosseo.it/en/area/the-roman-forum/",
+      "title": "The Roman Forum - Parco archeologico del Colosseo",
+      "bytes": 138992
+    },
+    {
+      "city": "rome",
+      "model": "rm-pantheon",
+      "url": "https://www.turismoroma.it/en/places/pantheon",
+      "status": "200",
+      "finalURL": "https://www.turismoroma.it/en/places/pantheon",
+      "title": "The Pantheon | Turismo Roma",
+      "bytes": 140590
+    },
+    {
+      "city": "rome",
+      "model": "rm-castel",
+      "url": "https://www.turismoroma.it/it/luoghi/castel-santangelo",
+      "status": "200",
+      "finalURL": "https://www.turismoroma.it/it/luoghi/castel-santangelo",
+      "title": "Castel Sant'Angelo | Turismo Roma",
+      "bytes": 142097
+    },
+    {
+      "city": "rome",
+      "model": "rm-trevi",
+      "url": "https://www.turismoroma.it/en/places/trevi-fountain",
+      "status": "200",
+      "finalURL": "https://www.turismoroma.it/en/places/trevi-fountain",
+      "title": "The Trevi Fountain | Turismo Roma",
+      "bytes": 140465
+    },
+    {
+      "city": "rome",
+      "model": "rm-vittoriano",
+      "url": "https://www.turismoroma.it/en/places/monument-vittorio-emanuele-ii-vittoriano",
+      "status": "200",
+      "finalURL": "https://www.turismoroma.it/en/places/monument-vittorio-emanuele-ii-vittoriano",
+      "title": "Monument to Vittorio Emanuele II (Vittoriano) | Turismo Roma",
+      "bytes": 149508
+    },
+    {
+      "city": "rome",
+      "model": "rm-colosseum",
+      "url": "https://colosseo.it/en/area/the-colosseum/",
+      "status": "200",
+      "finalURL": "https://colosseo.it/en/area/the-colosseum/",
+      "title": "The Colosseum - Parco archeologico del Colosseo",
+      "bytes": 106882
+    },
+    {
+      "city": "rome",
+      "model": "rm-stpeters",
+      "url": "https://www.basilicasanpietro.va/en",
+      "status": "200",
+      "finalURL": "https://www.basilicasanpietro.va/en",
+      "title": "Official Website of St. Peter&#x27;s Basilica | A masterpiece to explore",
+      "bytes": 219040
+    }
+  ]
+}
