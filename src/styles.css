@@ -97,20 +97,13 @@ button:not(:disabled):active {
   font-size: 25px;
   letter-spacing: -1px;
 }
+/* The app icon itself, so the header, the tab and the Home Screen agree. */
 .brand-symbol {
-  position: relative;
-  display: grid;
-  place-items: center;
-  background: var(--accent);
-  color: #f1ddae;
-  width: 37px;
+  display: block;
+  flex: none;
+  width: 39px;
   height: 39px;
-  border-radius: 11px;
-}
-.brand-symbol svg:last-child {
-  position: absolute;
-  right: 4px;
-  top: 3px;
+  border-radius: 10px;
 }
 .brand-dot {
   font-size: 11px;
@@ -1190,12 +1183,9 @@ footer button {
     gap: 7px;
   }
   .brand-symbol {
-    width: 31px;
+    width: 33px;
     height: 33px;
-    border-radius: 9px;
-  }
-  .brand-symbol > svg:first-child {
-    width: 20px;
+    border-radius: 8px;
   }
   .header nav {
     gap: 16px;

@@ -19,7 +19,6 @@ import {
   Eye,
   EyeOff,
   Globe2,
-  House,
   History as HistoryIcon,
   LockKeyhole,
   MapPin,
@@ -145,10 +144,13 @@ export function DesktopGame({
           }}
           aria-label="CityMaker"
         >
-          <span className="brand-symbol">
-            <House size={23} />
-            <Plus size={11} />
-          </span>
+          <img
+            className="brand-symbol"
+            src="/favicon.svg"
+            width="39"
+            height="39"
+            alt=""
+          />
           CityMaker
         </a>
         <nav aria-label={t.play}>

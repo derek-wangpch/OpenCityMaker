@@ -5,9 +5,7 @@ import {
   CircleHelp,
   Globe2,
   History as HistoryIcon,
-  House,
   MapPin,
-  Plus,
   Share,
   Trophy,
 } from "lucide-react";
@@ -52,10 +50,13 @@ export function StartPage({
     <section className="mobile-page mobile-start">
       <div className="mobile-start-top">
         <span className="brand">
-          <span className="brand-symbol">
-            <House size={23} />
-            <Plus size={11} />
-          </span>
+          <img
+            className="brand-symbol"
+            src="/favicon.svg"
+            width="39"
+            height="39"
+            alt=""
+          />
           CityMaker
         </span>
         <label className="language">
