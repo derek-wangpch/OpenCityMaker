@@ -143,21 +143,21 @@ export function StartPage({
           {t.how}
         </button>
       </div>
+      {homeScreen === "available" && (
+        <button
+          className="mobile-install"
+          onClick={() => setHowToInstall(true)}
+        >
+          <SquarePlus size={14} />
+          {t.addToHome}
+        </button>
+      )}
       {howToInstall && <AddToHome t={t} close={() => setHowToInstall(false)} />}
       <footer className="mobile-footer">
         <span>
           <span className={`save-dot ${stored ? "" : "warning"}`} />
           {stored === null ? t.saving : stored ? t.saved : t.unsaved}
         </span>
-        {homeScreen === "available" && (
-          <button
-            className="mobile-install"
-            onClick={() => setHowToInstall(true)}
-            aria-label={t.addToHome}
-          >
-            <SquarePlus size={15} />
-          </button>
-        )}
         <button onClick={() => setReduced((v) => !v)} aria-pressed={reduced}>
           {reduced ? t.reduce : t.normal}
         </button>
