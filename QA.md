@@ -37,6 +37,7 @@
 - The city rail scrolls within the viewport at 360px rather than widening the document, keeps the selected city inside its own bounds, and its arrow keys move focus without moving the board.
 - Weather button cycles clear → cloudy → rain → snow → fog → off with the localized state in its accessible name, persists the choice across reloads through IndexedDB, tints `--scene` per state, and keeps the gallery's model contexts free of weather. Reduce motion parks weather on one static frame (frame counter stays flat); rain without reduce-motion streams frames. The button fits the 360px mobile bottom bar without document overflow.
 - Per-city headings in the development gallery.
+- Session ids without `crypto.randomUUID`: the `getRandomValues` fallback yields distinct version 4 ids, and a context with neither still produces distinct ids. `randomUUID` is secure-context only, so a page served over plain HTTP — a phone opening the dev server across the LAN — used to throw before the first save was read and stayed on the loading screen; reproduced and re-verified in WebKit at `http://<lan-ip>:<port>/`.
 - Home screen availability by launch environment: iPhone and iPad browsers (including desktop-class iPadOS user agents) are offered the steps; a desktop Mac with the same user agent but no touch points, an embedded WeChat webview, Android Chrome, and any already-standalone launch are not.
 
 ## Visual checks

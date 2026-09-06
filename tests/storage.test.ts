@@ -3,6 +3,7 @@ import {
   SAVE_KEY,
   freshCity,
   readSave,
+  sessionId,
   writeSave,
   type Save,
   type StorageLike,
@@ -168,5 +169,42 @@ describe("twelve-city additions", () => {
     }
     for (const id of roster.slice(0, 4))
       expect(save.cities[id]).toEqual(oldCities[id]);
+  });
+});
+
+describe("session ids without a secure context", () => {
+  // `crypto.randomUUID` is secure-context only: over plain HTTP it is simply
+  // missing, which used to throw on the very first save and hang the boot.
+  // Node exposes `crypto` as a getter, so it is replaced by descriptor and the
+  // original one is put back afterwards.
+  const withCrypto = <T>(replacement: object, body: () => T) => {
+    const real = Object.getOwnPropertyDescriptor(globalThis, "crypto")!;
+    Object.defineProperty(globalThis, "crypto", {
+      value: replacement,
+      configurable: true,
+    });
+    try {
+      return body();
+    } finally {
+      Object.defineProperty(globalThis, "crypto", real);
+    }
+  };
+  const UUID =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+
+  it("falls back to getRandomValues, which is available everywhere", () => {
+    const { getRandomValues } = crypto;
+    const ids = withCrypto(
+      { getRandomValues: getRandomValues.bind(crypto) },
+      () => [sessionId(), sessionId()],
+    );
+    expect(ids[0]).toMatch(UUID);
+    expect(ids[0]).not.toBe(ids[1]);
+  });
+
+  it("still produces a distinct id with no usable crypto at all", () => {
+    const ids = withCrypto({}, () => [sessionId(), sessionId()]);
+    expect(ids[0]).toBeTruthy();
+    expect(ids[0]).not.toBe(ids[1]);
   });
 });

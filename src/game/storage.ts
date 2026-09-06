@@ -8,8 +8,29 @@ export interface Session {
   moves: number;
   undoMoves: number | null;
 }
+/**
+ * `crypto.randomUUID` exists only in a secure context, so a page served over
+ * plain HTTP — a phone opening the dev server across the LAN, or a self-hosted
+ * deployment without TLS — used to throw here before the first save could even
+ * be read, leaving the loading screen up forever. `getRandomValues` has no such
+ * restriction and is more than enough for an id that only has to be unique
+ * inside one browser profile.
+ */
+export function sessionId(): string {
+  const source: Partial<Crypto> | undefined = globalThis.crypto;
+  if (typeof source?.randomUUID === "function") return source.randomUUID();
+  if (typeof source?.getRandomValues === "function") {
+    const bytes = source.getRandomValues(new Uint8Array(16));
+    bytes[6] = (bytes[6] & 0x0f) | 0x40; // version 4
+    bytes[8] = (bytes[8] & 0x3f) | 0x80; // variant 1
+    const hex = [...bytes].map((b) => b.toString(16).padStart(2, "0")).join("");
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  }
+  // Last resort: still unique enough to key one device's own history.
+  return `${Date.now().toString(16)}-${Math.random().toString(16).slice(2, 14)}`;
+}
 export const newSession = (): Session => ({
-  id: crypto.randomUUID(),
+  id: sessionId(),
   startedAt: Date.now(),
   moves: 0,
   undoMoves: null,
