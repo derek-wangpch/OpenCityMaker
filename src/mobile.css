@@ -235,21 +235,18 @@ html.mobile-app body {
   font-size: 11px;
   color: #56634f;
 }
-/* Offered only where the share sheet can actually reach the Home Screen. */
-.mobile-install {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  margin-top: 10px;
-  padding: 11px 10px;
-  background: #ffffff8c;
-  border: 1px dashed #cfd6c3;
-  border-radius: 12px;
-  font-size: 11px;
-  color: #56634f;
-  flex: none;
+/*
+ * Offered only where the share sheet can actually reach the Home Screen. It
+ * shares the footer row with the motion toggle: `margin-left` moves the pair
+ * to the right edge together, and it stays a button rather than a wrapping
+ * span so the narrow-screen `footer > span:nth-child(2)` rule leaves it alone.
+ */
+.mobile-footer .mobile-install {
+  display: grid;
+  place-items: center;
+  margin-left: auto;
+  padding: 2px;
+  text-decoration: none;
 }
 .mobile-footer {
   display: flex;
