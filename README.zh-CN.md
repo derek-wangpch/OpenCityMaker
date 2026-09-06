@@ -80,6 +80,8 @@ npm run test:e2e
 
 游戏引擎只处理数值和合并规则，城市资料与模型彼此独立。新增城市的基本流程是：
 
+使用 AI 协助贡献模型时，可以调用仓库中的 `$building-reference-modeling` [建筑参考图建模 skill](.agents/skills/building-reference-modeling/SKILL.md)。它涵盖多视角资料检索、按 tier 控制细节、卡通化建模和视觉验证，并要求明确记录仍属推断的部分。
+
 1. 在 `src/cities/<id>.ts` 添加城市资料、三语言文本和配色。
 2. 在 `src/cities/<id>/buildings/` 为 2 到 2048 的 11 个等级分别添加建筑资料。
 3. 在 `src/scene/models/<id>/` 为每座建筑实现对应的 Three.js 模型工厂并注册。
