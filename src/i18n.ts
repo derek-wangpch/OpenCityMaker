@@ -106,8 +106,18 @@ const en = {
   weatherSnow: "Snow",
   weatherFog: "Fog",
   weatherCloudy: "Cloudy",
+
+  addToHome: "Add to Home Screen",
+  addToHomeTitle: "Keep CityMaker on your Home Screen",
+  addToHomeBody:
+    "Your browser can place CityMaker beside your apps. It opens full screen without the address bar, and your cities keep saving on this device.",
+  addToHomeStep1: "Tap the Share button in the browser toolbar.",
+  addToHomeStep2: "Scroll down and choose “Add to Home Screen”.",
+  addToHomeStep3: "Tap Add. CityMaker appears with your apps.",
+  addToHomeNote:
+    "This is the web version placed on your Home Screen, not an App Store download. It still needs a connection to open.",
 };
-type Messages = typeof en;
+export type Messages = typeof en;
 const cn: Messages = {
   history: "战绩历史",
   historyHint:
@@ -210,6 +220,16 @@ const cn: Messages = {
   weatherSnow: "雪",
   weatherFog: "雾",
   weatherCloudy: "多云",
+
+  addToHome: "添加到主屏幕",
+  addToHomeTitle: "把 CityMaker 放到主屏幕",
+  addToHomeBody:
+    "浏览器可以把 CityMaker 放到主屏幕，和应用摆在一起，打开时全屏显示、没有地址栏，存档依旧保存在这台设备上。",
+  addToHomeStep1: "点按浏览器工具栏中的「分享」按钮。",
+  addToHomeStep2: "向下滑动，选择「添加到主屏幕」。",
+  addToHomeStep3: "点按「添加」，CityMaker 就会出现在主屏幕上。",
+  addToHomeNote:
+    "这是把网页版放到主屏幕，并非从 App Store 下载的应用，打开时仍需联网。",
 };
 const tw: Messages = {
   ...cn,
@@ -307,6 +327,16 @@ const tw: Messages = {
   weatherSnow: "雪",
   weatherFog: "霧",
   weatherCloudy: "多雲",
+
+  addToHome: "加入主畫面",
+  addToHomeTitle: "把 CityMaker 加入主畫面",
+  addToHomeBody:
+    "瀏覽器可以把 CityMaker 放到主畫面，和應用程式排在一起，開啟時全螢幕顯示、沒有網址列，存檔仍然保存在這部裝置上。",
+  addToHomeStep1: "點一下瀏覽器工具列的「分享」按鈕。",
+  addToHomeStep2: "向下捲動，選擇「加入主畫面」。",
+  addToHomeStep3: "點一下「加入」，CityMaker 就會出現在主畫面。",
+  addToHomeNote:
+    "這是把網頁版加到主畫面，並非從 App Store 下載的應用程式，開啟時仍需連線。",
 };
 export const messages: Record<Locale, Messages> = {
   en,

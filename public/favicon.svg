@@ -1,1 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="18" fill="#284f43"/><path d="M12 31 32 15 52 31H46V49H18V31Z" fill="#e9b987"/><path d="M27 36H37V49H27Z" fill="#284f43"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="CityMaker">
+  <rect width="64" height="64" rx="17" fill="#284f43"/>
+  <path d="m32 55-23-12 23-12 23 12-23 12Z" fill="#d8dec4"/>
+  <path d="m32 50.5-18.5-9.7L32 31l18.5 9.8L32 50.5Z" fill="#f5f3df"/>
+
+  <path d="m13.5 40.8 4-2.1L36 48.4l-4 2.1-18.5-9.7Z" fill="#b7c49d"/>
+  <path d="m46.5 38.7 4 2.1L32 50.5l-4-2.1 18.5-9.7Z" fill="#b7c49d"/>
+
+  <path d="m17 35 8-4.2 8 4.2-8 4.2-8-4.2Z" fill="#e7ad70"/>
+  <path d="m17 35 8 4.2V47l-8-4.2V35Z" fill="#c87750"/>
+  <path d="m25 39.2 8-4.2v7.8L25 47v-7.8Z" fill="#a95843"/>
+
+  <path d="m35 29 7-3.7 7 3.7-7 3.7-7-3.7Z" fill="#f2d39b"/>
+  <path d="m35 29 7 3.7v11.8l-7-3.7V29Z" fill="#d9a86f"/>
+  <path d="m42 32.7 7-3.7v11.8l-7 3.7V32.7Z" fill="#bd7f58"/>
+
+  <path d="m24 18.5 8-4.2 8 4.2-8 4.2-8-4.2Z" fill="#ffe1a4"/>
+  <path d="m24 18.5 8 4.2v20.5L24 39V18.5Z" fill="#e9b987"/>
+  <path d="m32 22.7 8-4.2V39l-8 4.2V22.7Z" fill="#c8895e"/>
+
+  <path d="M27 25.2v3.4M27 32v3.4M37 25.2v3.4M37 32v3.4" stroke="#f8e4ba" stroke-width="2" stroke-linecap="round" opacity=".78"/>
+  <path d="M38 46.6 32 50l-6-3.4V43l6 3.4 6-3.4v3.6Z" fill="#284f43" opacity=".9"/>
+</svg>

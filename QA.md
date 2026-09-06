@@ -37,6 +37,7 @@
 - The city rail scrolls within the viewport at 360px rather than widening the document, keeps the selected city inside its own bounds, and its arrow keys move focus without moving the board.
 - Weather button cycles clear → cloudy → rain → snow → fog → off with the localized state in its accessible name, persists the choice across reloads through IndexedDB, tints `--scene` per state, and keeps the gallery's model contexts free of weather. Reduce motion parks weather on one static frame (frame counter stays flat); rain without reduce-motion streams frames. The button fits the 360px mobile bottom bar without document overflow.
 - Per-city headings in the development gallery.
+- Home screen availability by launch environment: iPhone and iPad browsers (including desktop-class iPadOS user agents) are offered the steps; a desktop Mac with the same user agent but no touch points, an embedded WeChat webview, Android Chrome, and any already-standalone launch are not.
 
 ## Visual checks
 
@@ -44,7 +45,7 @@ Artifacts cover the English desktop game, both Chinese variants, mobile game and
 
 ## Boundaries
 
-Browser automation uses Chromium with a software WebGL renderer. Phone tests emulate touch and viewport size; they do not establish physical-phone GPU performance, native Safari behavior, battery use, or Android/iOS hardware compatibility. No deployment, account synchronization, native packaging, or installable/offline service worker is included. Continuous weather rendering (~30 fps, board view only) was not measured for battery or thermal impact on physical hardware; it stops when the tab is hidden, when Reduce motion is on, and after transitions to clear finish; off stops effects immediately.
+Browser automation uses Chromium with a software WebGL renderer. Phone tests emulate touch and viewport size; they do not establish physical-phone GPU performance, native Safari behavior, battery use, or Android/iOS hardware compatibility. No deployment, account synchronization, native packaging, or offline service worker is included. The Add to Home Screen walkthrough was verified as user-agent logic and as rendering in a Chromium phone viewport only: the actual share sheet, the installed icon, and the standalone launch were never exercised on a physical iPhone or iPad, and `navigator.standalone` cannot be reproduced in Chromium. Continuous weather rendering (~30 fps, board view only) was not measured for battery or thermal impact on physical hardware; it stops when the tab is hidden, when Reduce motion is on, and after transitions to clear finish; off stops effects immediately.
 
 The permanent contract checks URL syntax only. The eight-city expansion additionally checked all 79 distinct new reference URLs by HTTP GET with redirects: 58 returned 200 and 21 returned access restrictions (202/403/406); no 404 or connection failures remained. See [reference-checks.json](docs/qa/reference-checks.json) for each building, final URL and result. Restricted pages still require a browser/network environment that can access their content; they are not claimed as successfully fetched. On 2026-09-05, all ten distinct Shanghai/Shenzhen reference URLs returned HTTP 200 after redirects. Model distinctness is a judgment made by inspecting `/?gallery`, not an assertion — the automated bounds test would accept two identical silhouettes.
 

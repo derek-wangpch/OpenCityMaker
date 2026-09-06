@@ -877,6 +877,44 @@ footer button {
 .help-illustration svg:nth-child(4) {
   width: 15px;
 }
+/* Share-sheet walkthrough in the Add to Home Screen dialog. */
+.install-steps {
+  list-style: none;
+  counter-reset: step;
+  margin: 18px 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.install-steps li {
+  counter-increment: step;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #eef1e4;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #56643f;
+}
+.install-steps li::before {
+  content: counter(step);
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff9ee;
+  font-size: 11px;
+  display: grid;
+  place-items: center;
+}
+.install-steps svg {
+  flex: none;
+  color: #769263;
+}
 .model-view {
   height: 280px;
   background: #e9eddf;

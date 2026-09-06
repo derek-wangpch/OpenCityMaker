@@ -235,6 +235,22 @@ html.mobile-app body {
   font-size: 11px;
   color: #56634f;
 }
+/* Offered only where the share sheet can actually reach the Home Screen. */
+.mobile-install {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 10px;
+  padding: 11px 10px;
+  background: #ffffff8c;
+  border: 1px dashed #cfd6c3;
+  border-radius: 12px;
+  font-size: 11px;
+  color: #56634f;
+  flex: none;
+}
 .mobile-footer {
   display: flex;
   align-items: center;

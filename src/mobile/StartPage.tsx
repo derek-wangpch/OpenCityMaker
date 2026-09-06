@@ -8,14 +8,17 @@ import {
   House,
   MapPin,
   Plus,
+  Share,
   Trophy,
 } from "lucide-react";
 import { cities } from "../cities/packs";
-import type { CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 import type { CityPack, Locale } from "../cities/types";
 import type { GameController } from "../game/useGame";
 import { usePreviews } from "../scene/useThumbnails";
 import type { Route } from "../useHashRoute";
+import { browserHomeScreen } from "../homeScreen";
+import { AddToHome } from "./AddToHome";
 /** Cover skyline: the three top landmarks, tallest in the middle. */
 const skyline = (city: CityPack) => {
   const b = city.buildings;
@@ -40,6 +43,9 @@ export function StartPage({
     setLocale,
   } = game;
   const preview = usePreviews(city, skyline, "portrait", 3);
+  // Read once: the answer belongs to how this document was opened.
+  const [homeScreen] = useState(browserHomeScreen);
+  const [howToInstall, setHowToInstall] = useState(false);
   const inProgress =
     current.session.moves > 0 && current.run.status === "playing";
   return (
@@ -136,6 +142,16 @@ export function StartPage({
           {t.how}
         </button>
       </div>
+      {homeScreen === "available" && (
+        <button
+          className="mobile-install"
+          onClick={() => setHowToInstall(true)}
+        >
+          <Share size={14} />
+          {t.addToHome}
+        </button>
+      )}
+      {howToInstall && <AddToHome t={t} close={() => setHowToInstall(false)} />}
       <footer className="mobile-footer">
         <span>
           <span className={`save-dot ${stored ? "" : "warning"}`} />

@@ -75,6 +75,7 @@ npm run test:e2e
 - 每次有效移动后可以撤销一次，重新开始不会清除图鉴和最高分。
 - 切换城市会保留各自独立的棋盘和进度。
 - 打开地标图鉴可以查看已经发现和尚未发现的建筑。
+- iPhone 和 iPad 用户可以在手机首页点击「添加到主屏幕」，按提示通过浏览器的分享菜单把 CityMaker 放到主屏幕；之后它会以独立图标全屏竖屏启动，并读取与浏览器相同的存档。已经从主屏幕启动，或在微信等内置浏览器中打开时，该按钮会自动隐藏。
 
 ## 添加一座城市
 
@@ -102,6 +103,8 @@ npm run test:e2e
 ## 存档与隐私
 
 网页版本使用浏览器内的 `citymaker` IndexedDB 数据库保存进度和战绩。存档不会跨设备同步，也不会发送到服务器。首次运行新版时，旧的 `citymaker:v1` localStorage 存档会自动迁移，并保留原数据作为备份。
+
+主屏幕图标只是网页版的快捷方式：项目未使用 Service Worker，因此启动时仍需联网，也没有离线缓存。图标、名称和启动配色来自 `public/manifest.webmanifest`、`apple-touch-icon` 与 `index.html` 中的 Apple 元标签；`npm run build:icons` 会从 `public/favicon.svg` 重新生成 PNG 图标。
 
 ## 微信小游戏原型
 
