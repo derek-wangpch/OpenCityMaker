@@ -134,9 +134,14 @@ html.mobile-app body {
   line-height: 1;
   letter-spacing: 4px;
   white-space: nowrap;
-  color: var(--accent);
+  color: var(--accent-ui);
   opacity: 0.09;
   user-select: none;
+}
+/* On the dark scene a raw accent at 9% sinks into the background, so lift it. */
+html[data-theme="dark"] .mobile-cover-watermark {
+  color: color-mix(in srgb, var(--accent) 45%, var(--text-strong));
+  opacity: 0.16;
 }
 /* Reuse the transparent portraits as flat, city-colored skyline masks. */
 .mobile-cover-building {
