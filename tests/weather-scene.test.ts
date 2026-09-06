@@ -98,3 +98,40 @@ it("restores clear lighting, provides depth fog, and parks reduced-motion effect
   expect(scene.children).not.toContain(weather.group);
   kit.dispose();
 });
+
+it("composes dark moonlight with weather instead of replacing its base", () => {
+  vi.spyOn(performance, "now").mockReturnValue(0);
+  const gradient = { addColorStop() {} };
+  vi.stubGlobal("document", {
+    createElement: () => ({
+      getContext: () => ({
+        createRadialGradient: () => gradient,
+        createLinearGradient: () => gradient,
+        fillRect() {},
+      }),
+    }),
+  });
+  const scene = new T.Scene();
+  const kit = new ModelKit();
+  const hemi = new T.HemisphereLight(0xffffff, 0xffffff, 1.8);
+  const sun = new T.DirectionalLight(0xffffff, 2.6);
+  const renderer = {
+    toneMappingExposure: 1.05,
+    getPixelRatio: () => 1,
+  } as T.WebGLRenderer;
+  const weather = new WeatherSystem(scene, kit, hemi, sun, renderer);
+  weather.setBase({ hemi: 1.5, sun: 1.68, exposure: 0.96 }, "dark");
+  weather.set("rain", "#e6ecdf", true, "dark");
+  expect(hemi.intensity).toBeCloseTo(1.5 * 0.85);
+  expect(sun.intensity).toBeCloseTo(1.68 * 0.38);
+  expect(renderer.toneMappingExposure).toBeCloseTo(0.96 * 0.96);
+
+  weather.set("fog", "#e6ecdf", true, "dark");
+  expect(scene.fog).toBeInstanceOf(T.Fog);
+  expect((scene.fog as T.Fog).color.getHexString()).not.toBe("e3e8de");
+  weather.dispose();
+  expect(hemi.intensity).toBe(1.5);
+  expect(sun.intensity).toBe(1.68);
+  expect(renderer.toneMappingExposure).toBe(0.96);
+  kit.dispose();
+});

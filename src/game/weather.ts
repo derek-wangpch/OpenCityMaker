@@ -49,6 +49,18 @@ export function skyTint(background: string, weather: Weather): string {
   return mixHex(background, color, mix);
 }
 
+/** A city-tinted moonlit sky. Weather keeps its identity without returning to daylight. */
+export function sceneSkyTint(
+  background: string,
+  weather: Weather,
+  theme: "light" | "dark",
+): string {
+  const weathered = skyTint(background, weather);
+  if (theme === "light") return weathered;
+  const night = weather === "snow" || weather === "fog" ? "#1d2932" : "#10191f";
+  return mixHex(weathered, night, weather === "snow" ? 0.68 : 0.78);
+}
+
 /** Per-channel sRGB mix of two #rrggbb colors, rounded. */
 export function mixHex(a: string, b: string, t: number): string {
   const parse = (c: string) => [

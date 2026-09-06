@@ -4,6 +4,11 @@ import { thumbnailKey } from "../src/scene/render";
 it("keeps previews of the same model in different cities apart", () => {
   expect(thumbnailKey("beijing", "x")).not.toBe(thumbnailKey("hongkong", "x"));
 });
+it("keeps light and dark previews in separate cache entries", () => {
+  expect(thumbnailKey("beijing", "x", "model", "light")).not.toBe(
+    thumbnailKey("beijing", "x", "model", "dark"),
+  );
+});
 it("gives every building in every city its own preview key", () => {
   const keys = cities.flatMap((city) =>
     city.buildings.map((b) => thumbnailKey(city.id, b.model)),

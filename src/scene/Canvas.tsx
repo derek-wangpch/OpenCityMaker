@@ -3,6 +3,7 @@ import type { CityPack } from "../cities/types";
 import type { Direction, Movement } from "../game/engine";
 import type { Weather } from "../game/weather";
 import { SceneView } from "./render";
+import { useTheme } from "../theme";
 export function BoardCanvas({
   city,
   board,
@@ -26,14 +27,16 @@ export function BoardCanvas({
   fallback: string;
   label: string;
 }) {
+  const { resolved: theme } = useTheme();
   const ref = useRef<HTMLCanvasElement>(null),
     view = useRef<SceneView | null>(null),
     start = useRef<{ x: number; y: number } | null>(null),
-    mounted = useRef(false);
+    mounted = useRef(false),
+    lastTheme = useRef(theme);
   const [error, setError] = useState(false);
   useEffect(() => {
     try {
-      view.current = new SceneView(ref.current!, "board");
+      view.current = new SceneView(ref.current!, "board", true, theme);
     } catch {
       setError(true);
     }
@@ -47,16 +50,19 @@ export function BoardCanvas({
     // A fresh mount already draws the settled board, so the pending events of
     // the last move must not be replayed: leaving the board (atlas tab, page
     // change) and coming back would otherwise look like another move.
+    const themeChanged = mounted.current && lastTheme.current !== theme;
     view.current?.board(
       city,
       board,
-      mounted.current ? events : [],
+      mounted.current && !themeChanged ? events : [],
       reduced,
       labels,
       weather,
+      theme,
     );
     mounted.current = true;
-  }, [city, board, events, reduced, labels, weather]);
+    lastTheme.current = theme;
+  }, [city, board, events, reduced, labels, weather, theme]);
   return (
     <div className="board-canvas" role="group" aria-label={label}>
       <canvas
@@ -104,6 +110,7 @@ export function ModelCanvas({
   fallback: string;
   label: string;
 }) {
+  const { resolved: theme } = useTheme();
   const ref = useRef<HTMLCanvasElement>(null),
     view = useRef<SceneView | null>(null),
     drag = useRef<number | null>(null),
@@ -111,13 +118,16 @@ export function ModelCanvas({
   const [error, setError] = useState(false);
   useEffect(() => {
     try {
-      view.current = new SceneView(ref.current!, "model");
-      view.current.model(city, value);
+      view.current = new SceneView(ref.current!, "model", true, theme);
+      view.current.model(city, value, angle.current, theme);
     } catch {
       setError(true);
     }
     return () => view.current?.dispose();
   }, [city, value]);
+  useEffect(() => {
+    view.current?.model(city, value, angle.current, theme);
+  }, [city, value, theme]);
   return (
     <div className="model-view">
       <canvas

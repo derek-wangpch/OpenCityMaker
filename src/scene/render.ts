@@ -4,6 +4,7 @@ import type { Building, CityPack } from "../cities/types";
 import type { Movement } from "../game/engine";
 import { WeatherSystem } from "./weather";
 import type { Weather } from "../game/weather";
+import type { ResolvedTheme } from "../theme";
 export type SceneMode = "board" | "model" | "portrait";
 /** Orthographic frustum per mode: [width, minimum height] in world units. */
 const FRUSTUM: Record<SceneMode, [number, number]> = {
@@ -11,6 +12,38 @@ const FRUSTUM: Record<SceneMode, [number, number]> = {
   model: [3.8, 3.8],
   portrait: [3, 3.9],
 };
+export const SCENE_THEME = {
+  light: {
+    hemiSky: "#fff7e6",
+    hemiGround: "#789484",
+    hemi: 1.8,
+    sunColor: "#fff1d7",
+    sun: 2.6,
+    exposure: 1.05,
+    shadow: 0.13,
+    boardBase: "#9caa92",
+    boardRim: "#d6d8c4",
+    boardTile: "#d4dcc6",
+    modelTile: "#c3c5ad",
+    labelBackground: "#faf5e8",
+    labelText: "#375447",
+  },
+  dark: {
+    hemiSky: "#8fa8bf",
+    hemiGround: "#182421",
+    hemi: 1.5,
+    sunColor: "#f2bd86",
+    sun: 1.68,
+    exposure: 0.96,
+    shadow: 0.2,
+    boardBase: "#34433d",
+    boardRim: "#637269",
+    boardTile: "#53635a",
+    modelTile: "#4b5a52",
+    labelBackground: "#25312d",
+    labelText: "#eef0df",
+  },
+} as const;
 export class SceneView {
   renderer: T.WebGLRenderer;
   scene = new T.Scene();
@@ -29,6 +62,7 @@ export class SceneView {
   private lastWeatherDraw = 0;
   private hemi = new T.HemisphereLight("#fff7e6", "#789484", 1.8);
   private sun = new T.DirectionalLight("#fff1d7", 2.6);
+  private theme: ResolvedTheme = "light";
   private visibility = () => {
     if (document.hidden) cancelAnimationFrame(this.frame);
     else this.draw();
@@ -37,6 +71,7 @@ export class SceneView {
     public canvas: HTMLCanvasElement,
     public mode: SceneMode,
     transparent = true,
+    theme: ResolvedTheme = "light",
   ) {
     this.renderer = new T.WebGLRenderer({
       canvas,
@@ -78,6 +113,7 @@ export class SceneView {
             this.renderer,
           )
         : null;
+    this.setTheme(theme);
     if (mode === "portrait") {
       // Nearly head-on elevation with a hint of roof, so a row of portraits
       // reads as a skyline standing on one ground line.
@@ -91,6 +127,30 @@ export class SceneView {
     this.observer.observe(canvas);
     document.addEventListener("visibilitychange", this.visibility);
     this.resize();
+  }
+  setTheme(theme: ResolvedTheme) {
+    if (this.theme === theme) return;
+    this.disposeLabels();
+    this.theme = theme;
+    const palette = SCENE_THEME[theme];
+    this.hemi.color.set(palette.hemiSky);
+    this.hemi.groundColor.set(palette.hemiGround);
+    this.hemi.intensity = palette.hemi;
+    this.sun.color.set(palette.sunColor);
+    this.sun.intensity = palette.sun;
+    this.renderer.toneMappingExposure = palette.exposure;
+    this.shadowMaterial.opacity = palette.shadow;
+    this.weather?.setBase(
+      { hemi: palette.hemi, sun: palette.sun, exposure: palette.exposure },
+      theme,
+    );
+  }
+  private disposeLabels() {
+    this.textures.forEach((material) => {
+      material.map?.dispose();
+      material.dispose();
+    });
+    this.textures.clear();
   }
   resize() {
     const w = this.canvas.clientWidth || this.canvas.width || 256,
@@ -135,11 +195,12 @@ export class SceneView {
       canvas.width = 128;
       canvas.height = 56;
       const ctx = canvas.getContext("2d")!;
-      ctx.fillStyle = "#faf5e8";
+      const palette = SCENE_THEME[this.theme];
+      ctx.fillStyle = palette.labelBackground;
       ctx.beginPath();
       ctx.roundRect(0, 0, 128, 56, 15);
       ctx.fill();
-      ctx.fillStyle = "#375447";
+      ctx.fillStyle = palette.labelText;
       ctx.font = "bold 40px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -184,19 +245,22 @@ export class SceneView {
     reduced = false,
     labels = true,
     weather: Weather = "clear",
+    theme: ResolvedTheme = "light",
   ) {
+    this.setTheme(theme);
+    const palette = SCENE_THEME[theme];
     this.root.clear();
     this.animation = undefined;
-    this.weather?.set(weather, city.palette.background, reduced);
-    this.kit.box(this.root, 7.9, 0.22, 7.9, "#9caa92", 0, -0.29);
-    this.kit.box(this.root, 7.98, 0.09, 7.98, "#d6d8c4", 0, -0.13);
+    this.weather?.set(weather, city.palette.background, reduced, theme);
+    this.kit.box(this.root, 7.9, 0.22, 7.9, palette.boardBase, 0, -0.29);
+    this.kit.box(this.root, 7.98, 0.09, 7.98, palette.boardRim, 0, -0.13);
     for (let i = 0; i < 16; i++)
       this.kit.box(
         this.root,
         1.76,
         0.14,
         1.76,
-        "#d4dcc6",
+        palette.boardTile,
         ((i % 4) - 1.5) * 1.88,
         -0.065,
         (Math.floor(i / 4) - 1.5) * 1.88,
@@ -291,7 +355,13 @@ export class SceneView {
       if (typeof o.userData.index === "number") return o.userData.index;
     return null;
   }
-  model(city: CityPack, value: number, rotation = 0) {
+  model(
+    city: CityPack,
+    value: number,
+    rotation = 0,
+    theme: ResolvedTheme = this.theme,
+  ) {
+    this.setTheme(theme);
     this.root.clear();
     this.content = null;
     this.animation = undefined;
@@ -300,7 +370,15 @@ export class SceneView {
     model.rotation.y = rotation;
     this.root.add(model);
     if (!portrait)
-      this.kit.box(this.root, 1.68, 0.12, 1.68, "#c3c5ad", 0, -0.135);
+      this.kit.box(
+        this.root,
+        1.68,
+        0.12,
+        1.68,
+        SCENE_THEME[theme].modelTile,
+        0,
+        -0.135,
+      );
     this.draw();
   }
   rotate(angle: number) {
@@ -314,10 +392,7 @@ export class SceneView {
     document.removeEventListener("visibilitychange", this.visibility);
     this.weather?.dispose();
     this.kit.dispose();
-    this.textures.forEach((m) => {
-      m.map?.dispose();
-      m.dispose();
-    });
+    this.disposeLabels();
     this.shadowMaterial.dispose();
     this.renderer.dispose();
     this.renderer.forceContextLoss();
@@ -335,7 +410,9 @@ export const thumbnailKey = (
   cityId: string,
   model: string,
   style: PreviewStyle = "model",
-) => (style === "model" ? "" : style + ":") + cityId + ":" + model;
+  theme: ResolvedTheme = "light",
+) =>
+  `${theme}:` + (style === "model" ? "" : style + ":") + cityId + ":" + model;
 function snapshot(): Record<string, string> {
   const result: Record<string, string> = {};
   thumbnails.forEach((url, key) => (result[key] = url));
@@ -345,6 +422,7 @@ export interface PreviewOptions {
   /** Which of a city's buildings to render. Defaults to all of them. */
   select?: (city: CityPack) => Building[];
   style?: PreviewStyle;
+  theme?: ResolvedTheme;
 }
 const everyBuilding = (city: CityPack) => city.buildings;
 /**
@@ -354,13 +432,13 @@ const everyBuilding = (city: CityPack) => city.buildings;
  */
 function renderCities(
   packs: CityPack[],
-  { select = everyBuilding, style = "model" }: PreviewOptions,
+  { select = everyBuilding, style = "model", theme = "light" }: PreviewOptions,
 ): boolean {
   const jobs = packs
     .map((city) => ({
       city,
       missing: select(city).filter(
-        (b) => !thumbnails.has(thumbnailKey(city.id, b.model, style)),
+        (b) => !thumbnails.has(thumbnailKey(city.id, b.model, style, theme)),
       ),
     }))
     .filter((job) => job.missing.length);
@@ -369,17 +447,17 @@ function renderCities(
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
-  const view = new SceneView(canvas, style);
+  const view = new SceneView(canvas, style, true, theme);
   view.renderer.setPixelRatio(1);
   view.renderer.setSize(width, height, false);
   try {
     for (const { city, missing } of jobs) {
       for (const building of missing) {
-        view.model(city, building.value);
+        view.model(city, building.value, 0, theme);
         // Static previews must also work when the page initially loads in a background tab.
         view.renderer.render(view.scene, view.camera);
         thumbnails.set(
-          thumbnailKey(city.id, building.model, style),
+          thumbnailKey(city.id, building.model, style, theme),
           canvas.toDataURL("image/png"),
         );
       }

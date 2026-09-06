@@ -42,6 +42,7 @@ import type { GameRepository } from "./game/repository";
 import { AtlasGrid, isLocalTest } from "./AtlasGrid";
 import { BoardTable, EndOverlay, LiveRegion } from "./BoardExtras";
 import { GameModal } from "./GameModal";
+import { ThemeButton } from "./ThemeButton";
 /** Wide-screen layout: one scrolling page with the board, sidebar and atlas. */
 const WEATHER_ICONS: Record<Weather, typeof CloudSun> = {
   off: CloudOff,
@@ -181,6 +182,7 @@ export function DesktopGame({
             </select>
             <ChevronDown size={13} />
           </label>
+          <ThemeButton t={t} />
           <button
             className="icon-button help-button"
             onClick={() => setModal("help")}

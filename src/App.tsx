@@ -8,11 +8,12 @@ import {
   type GameRepository,
 } from "./game/repository";
 import { useGame } from "./game/useGame";
-import { skyTint } from "./game/weather";
+import { sceneSkyTint } from "./game/weather";
 import { MOBILE_QUERY, useMediaQuery } from "./useMediaQuery";
 import { DesktopGame } from "./DesktopGame";
 import { MobileApp } from "./mobile/MobileApp";
 import { browserLocale } from "./game/locale";
+import { useTheme } from "./theme";
 validatePacks(cities, Object.keys(modelFactories));
 function initialSave(): Save {
   const save = readSave(
@@ -69,6 +70,7 @@ function GameRoot({
   repository: GameRepository;
 }) {
   const game = useGame(initial, repository);
+  const { resolved: theme } = useTheme();
   // The model gallery is a QA sheet that always uses the wide layout.
   const mobile =
     useMediaQuery(MOBILE_QUERY) &&
@@ -82,7 +84,7 @@ function GameRoot({
           "--accent": city.palette.accent,
           // The CSS sky is the scene backdrop; it follows the weather mood so
           // scene fog and particles never sit behind an untouched sky.
-          "--scene": skyTint(city.palette.background, weather),
+          "--scene": sceneSkyTint(city.palette.background, weather, theme),
         } as React.CSSProperties
       }
     >

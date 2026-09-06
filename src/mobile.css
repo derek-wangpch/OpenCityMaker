@@ -19,7 +19,7 @@ html.mobile-app body {
   height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: #f5f3eb;
+  background: var(--page);
 }
 .mobile-page {
   flex: 1;
@@ -59,7 +59,7 @@ html.mobile-app body {
 }
 .mobile-topbar-meta {
   font-size: 10px;
-  color: #6e7e66;
+  color: var(--text-muted);
   letter-spacing: 0.3px;
   white-space: nowrap;
 }
@@ -69,6 +69,14 @@ html.mobile-app body {
   align-items: center;
   justify-content: space-between;
   min-height: 52px;
+  flex: none;
+}
+.mobile-start-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.mobile-start-actions .theme-button {
   flex: none;
 }
 .mobile-start .brand {
@@ -98,12 +106,12 @@ html.mobile-app body {
     ),
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--scene) 70%, #fffdf6) 0%,
+      color-mix(in srgb, var(--scene) 70%, var(--surface-raised)) 0%,
       var(--scene) 100%
     );
   box-shadow:
-    0 0 0 1px #324c3414 inset,
-    0 10px 24px #324c3414;
+    0 0 0 1px var(--border) inset,
+    0 10px 24px var(--shadow);
 }
 .mobile-cover::after {
   /* Ground line the buildings stand on. */
@@ -170,7 +178,7 @@ html.mobile-app body {
   margin: 0;
   font-size: 13px;
   line-height: 1.7;
-  color: #6b7a66;
+  color: var(--text-muted);
   max-width: 34ch;
 }
 .mobile-stats {
@@ -187,7 +195,7 @@ html.mobile-app body {
   font-size: 9px;
   letter-spacing: 1px;
   font-weight: 600;
-  color: #69795f;
+  color: var(--text-muted);
 }
 .mobile-stats dd {
   margin: 0;
@@ -200,7 +208,7 @@ html.mobile-app body {
 }
 .mobile-stats dd span {
   font-size: 13px;
-  color: #8a9480;
+  color: var(--text-soft);
 }
 .mobile-ctas {
   display: flex;
@@ -229,11 +237,11 @@ html.mobile-app body {
   align-items: center;
   gap: 6px;
   padding: 12px 6px;
-  background: #ffffff8c;
-  border: 1px solid #dfe3d5;
+  background: var(--surface-glass);
+  border: 1px solid var(--border);
   border-radius: 12px;
   font-size: 11px;
-  color: #56634f;
+  color: var(--text);
 }
 /* Offered only where the share sheet can actually reach the Home Screen. */
 .mobile-install {
@@ -244,11 +252,11 @@ html.mobile-app body {
   width: 100%;
   margin-top: 10px;
   padding: 11px 10px;
-  background: #ffffff8c;
-  border: 1px dashed #cfd6c3;
+  background: var(--surface-glass);
+  border: 1px dashed var(--border-strong);
   border-radius: 12px;
   font-size: 11px;
-  color: #56634f;
+  color: var(--text);
   flex: none;
 }
 .mobile-footer {
@@ -258,7 +266,7 @@ html.mobile-app body {
   gap: 12px;
   margin-top: 18px;
   font-size: 9px;
-  color: #7d8973;
+  color: var(--text-soft);
   flex: none;
 }
 .mobile-footer > span {
@@ -270,7 +278,7 @@ html.mobile-app body {
   font-size: 9px;
   background: none;
   padding: 0;
-  color: #7d8973;
+  color: var(--text-muted);
   text-decoration: underline;
 }
 /* ---------- city list ---------- */
@@ -288,17 +296,17 @@ html.mobile-app body {
   position: relative;
   text-align: left;
   background:
-    linear-gradient(100deg, #fffdf6 48%, transparent 100%),
+    linear-gradient(100deg, var(--surface-raised) 48%, transparent 100%),
     linear-gradient(
       100deg,
-      color-mix(in srgb, var(--accent) 6%, #fffdf6),
-      color-mix(in srgb, var(--accent) 22%, #fffdf6)
+      color-mix(in srgb, var(--accent) 6%, var(--surface-raised)),
+      color-mix(in srgb, var(--accent) 22%, var(--surface-raised))
     );
-  border: 1px solid #d9dfcd;
+  border: 1px solid var(--border);
   border-radius: 17px;
   overflow: hidden;
   padding: 0;
-  box-shadow: 0 3px 6px #324c3410;
+  box-shadow: 0 3px 6px var(--shadow);
 }
 /* The city's crowning landmark, bleeding off the right edge behind the copy. */
 .city-card-art {
@@ -308,7 +316,7 @@ html.mobile-app body {
   width: 168px;
   height: auto;
   pointer-events: none;
-  filter: drop-shadow(0 6px 10px #324c3420);
+  filter: drop-shadow(0 6px 10px var(--shadow));
   -webkit-mask-image: linear-gradient(95deg, transparent 8%, #000 45%);
   mask-image: linear-gradient(95deg, transparent 8%, #000 45%);
 }
@@ -349,7 +357,7 @@ html.mobile-app body {
 }
 .city-card-subtitle {
   font-size: 11px;
-  color: #6b7a66;
+  color: var(--text-muted);
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -361,7 +369,7 @@ html.mobile-app body {
   gap: 16px;
   margin-top: 4px;
   font-size: 11px;
-  color: #56634f;
+  color: var(--text);
   font-weight: 500;
 }
 .city-card-meta > span {
@@ -370,7 +378,7 @@ html.mobile-app body {
   gap: 4px;
 }
 .city-card-meta span span {
-  color: #8a9480;
+  color: var(--text-soft);
   font-weight: 400;
 }
 /* ---------- game ---------- */
@@ -458,7 +466,7 @@ html.mobile-app body {
 }
 .mobile-next-name small {
   font-size: 10px;
-  color: #788369;
+  color: var(--text-muted);
 }
 .mobile-bottombar .board-actions {
   margin-left: 0;

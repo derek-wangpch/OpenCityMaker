@@ -5,6 +5,7 @@ import {
   nextWeather,
   randomWeather,
   readWeather,
+  sceneSkyTint,
   skyTint,
 } from "../src/game/weather";
 import { freshCity, readSave, writeSave, type Save } from "../src/game/storage";
@@ -59,6 +60,14 @@ describe("sky tinting", () => {
     expect(mixHex("#000000", "#ffffff", 0.5)).toBe("#808080");
     expect(mixHex("#ffffff", "#000000", 2)).toBe("#000000");
     expect(mixHex("#102030", "#102030", 0.9)).toBe("#102030");
+  });
+  it("keeps every dark weather sky moonlit and city-tinted", () => {
+    const light = sceneSkyTint("#e6ecdf", "clear", "light");
+    const dark = sceneSkyTint("#e6ecdf", "clear", "dark");
+    expect(light).toBe("#e6ecdf");
+    expect(dark).toBe("#3f4749");
+    expect(sceneSkyTint("#f4edda", "clear", "dark")).not.toBe(dark);
+    expect(sceneSkyTint("#e6ecdf", "snow", "dark")).not.toBe(dark);
   });
 });
 describe("weather persistence", () => {

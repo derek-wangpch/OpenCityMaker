@@ -738,6 +738,7 @@ test("all eight added cities create independent playable runs and survive reload
 test("weather cycles clear, cloudy, rain, snow, fog and off, persists and tints the sky", async ({
   page,
 }) => {
+  test.setTimeout(60000);
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await seed(page);

@@ -8,28 +8,31 @@ import {
   thumbnailKey,
   type PreviewStyle,
 } from "./render";
+import { useTheme } from "../theme";
 /**
  * Preview images for building cards. The active city renders synchronously;
  * `all` schedules every other city during idle time for the atlas / gallery.
  */
 export function useThumbnails(city: CityPack, all = true) {
+  const { resolved: theme } = useTheme();
   const [thumbnails, setThumbnails] = useState<Record<string, string>>({});
   useEffect(() => {
     try {
-      setThumbnails(getThumbnails([city]));
+      setThumbnails(getThumbnails([city], { theme }));
     } catch {
       /* Board displays a localized WebGL fallback. */
     }
-  }, [city]);
+  }, [city, theme]);
   useEffect(
-    () => (all ? scheduleThumbnails(cities, setThumbnails) : undefined),
-    [all],
+    () =>
+      all ? scheduleThumbnails(cities, setThumbnails, { theme }) : undefined,
+    [all, theme],
   );
   const thumb = (cityId: string, building: Building, className = "") =>
-    thumbnails[thumbnailKey(cityId, building.model)] ? (
+    thumbnails[thumbnailKey(cityId, building.model, "model", theme)] ? (
       <img
         className={className}
-        src={thumbnails[thumbnailKey(cityId, building.model)]}
+        src={thumbnails[thumbnailKey(cityId, building.model, "model", theme)]}
         alt=""
         draggable={false}
         decoding="async"
@@ -56,19 +59,21 @@ export function usePreviews(
   style: PreviewStyle = "model",
   perSlice = 1,
 ) {
+  const { resolved: theme } = useTheme();
   const [thumbnails, setThumbnails] = useState<Record<string, string>>({});
   useEffect(() => {
     try {
-      setThumbnails(getThumbnails([city], { select, style }));
+      setThumbnails(getThumbnails([city], { select, style, theme }));
     } catch {
       /* Pages simply render without art when WebGL is unavailable. */
     }
     return scheduleThumbnails(cities, setThumbnails, {
       select,
       style,
+      theme,
       perSlice,
     });
-  }, [city, select, style, perSlice]);
+  }, [city, select, style, perSlice, theme]);
   return (c: CityPack, building: Building): string | undefined =>
-    thumbnails[thumbnailKey(c.id, building.model, style)];
+    thumbnails[thumbnailKey(c.id, building.model, style, theme)];
 }

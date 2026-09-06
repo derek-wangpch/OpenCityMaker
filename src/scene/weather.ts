@@ -1,6 +1,7 @@
 import * as T from "three";
 import type { ModelKit } from "./kit";
-import { mixHex, skyTint, type Weather } from "../game/weather";
+import { mixHex, sceneSkyTint, type Weather } from "../game/weather";
+import type { ResolvedTheme } from "../theme";
 /**
  * Diorama weather for the board view: a few cheap, deterministic particle
  * fields over the island plus the light/fog mood that sells them. The group is
@@ -62,6 +63,7 @@ export class WeatherSystem {
   private atmosphereMaterials: T.SpriteMaterial[] = [];
   private snowTexture: T.CanvasTexture;
   private base: { hemi: number; sun: number; exposure: number };
+  private theme: ResolvedTheme = "light";
   private fogKey = "";
   private weights: Record<Weather, number> = {
     clear: 1,
@@ -141,6 +143,15 @@ export class WeatherSystem {
     this.puffs.renderOrder = 2;
     this.clouds.renderOrder = 1;
     this.scene.add(this.group);
+  }
+  /** Theme lighting is the base; weather multipliers are composed over it. */
+  setBase(
+    base: { hemi: number; sun: number; exposure: number },
+    theme: ResolvedTheme,
+  ) {
+    this.base = base;
+    this.theme = theme;
+    this.applyMood();
   }
   /** Rain streak falls fastest, snow drifts, fog and clouds wander slowly. */
   private static fall(i: number, salt: number, base: number, spread: number) {
@@ -277,11 +288,17 @@ export class WeatherSystem {
    * board rebuild. With `reduced`, particles are placed at one fixed phase and
    * never move (update() then reports inactive).
    */
-  set(kind: Weather, background: string, reduced: boolean) {
+  set(
+    kind: Weather,
+    background: string,
+    reduced: boolean,
+    theme: ResolvedTheme = "light",
+  ) {
     const changed = !this.initialized || kind !== this.kind;
     this.kind = kind;
     this.reduced = reduced;
-    this.fogKey = skyTint(background, "fog");
+    this.theme = theme;
+    this.fogKey = sceneSkyTint(background, "fog", theme);
     if (!this.initialized || reduced || kind === "off") {
       for (const key of Object.keys(this.weights) as Weather[])
         this.weights[key] = key === kind ? 1 : 0;
@@ -313,9 +330,9 @@ export class WeatherSystem {
     this.clouds.children.forEach((cloud) => {
       const material = (cloud as T.Sprite).material;
       material.color
-        .set("#ffffff")
+        .set(this.theme === "dark" ? "#a7b4bd" : "#ffffff")
         .lerp(
-          new T.Color("#8196a8"),
+          new T.Color(this.theme === "dark" ? "#4e6170" : "#8196a8"),
           cloudAlpha ? (w.rain * 0.78) / cloudAlpha : 0,
         );
       material.opacity = cloudAlpha;
@@ -342,7 +359,11 @@ export class WeatherSystem {
       this.scene.fog = fog;
       this.puffs.children.forEach((puff) => {
         (puff as T.Sprite).material.color.set(
-          mixHex(this.fogKey, "#ffffff", 0.6),
+          mixHex(
+            this.fogKey,
+            this.theme === "dark" ? "#aab8c0" : "#ffffff",
+            0.6,
+          ),
         );
       });
     } else this.scene.fog = null;

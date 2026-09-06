@@ -17,6 +17,7 @@ import { usePreviews } from "../scene/useThumbnails";
 import type { Route } from "../useHashRoute";
 import { browserHomeScreen } from "../homeScreen";
 import { AddToHome } from "./AddToHome";
+import { ThemeButton } from "../ThemeButton";
 /** Cover skyline: the three top landmarks, tallest in the middle. */
 const skyline = (city: CityPack) => {
   const b = city.buildings;
@@ -59,19 +60,22 @@ export function StartPage({
           />
           CityMaker
         </span>
-        <label className="language">
-          <Globe2 size={16} />
-          <select
-            aria-label={t.language}
-            value={locale}
-            onChange={(e) => setLocale(e.target.value as Locale)}
-          >
-            <option value="en">English</option>
-            <option value="zh-CN">简体中文</option>
-            <option value="zh-HK">繁體中文</option>
-          </select>
-          <ChevronDown size={13} />
-        </label>
+        <div className="mobile-start-actions">
+          <label className="language">
+            <Globe2 size={16} />
+            <select
+              aria-label={t.language}
+              value={locale}
+              onChange={(e) => setLocale(e.target.value as Locale)}
+            >
+              <option value="en">English</option>
+              <option value="zh-CN">简体中文</option>
+              <option value="zh-HK">繁體中文</option>
+            </select>
+            <ChevronDown size={13} />
+          </label>
+          <ThemeButton t={t} />
+        </div>
       </div>
       <div className="mobile-city-hero">
         <div className="mobile-cover" aria-hidden="true">
