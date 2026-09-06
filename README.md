@@ -1,6 +1,31 @@
 # CityMaker
 
+<p align="center">
+  <a href="https://citymaker.0to1app.com">Play online</a> ·
+  <a href="README.zh-CN.md">简体中文</a>
+</p>
+
 A browser-based 2048 puzzle made from original, procedural Three.js architecture. Build twelve cities from traditional homes to modern landmarks: Beijing, Hong Kong, Shanghai, Shenzhen, Tokyo, Singapore, Dubai, Sydney, New York, Paris, London, and Rome. Each city has eleven tiers, for 132 original models, with independent saves and English, Simplified Chinese, and Traditional Chinese text. No account or backend is required.
+
+<p align="center">
+  <a href="https://citymaker.0to1app.com">
+    <img src="docs/images/citymaker-game.png" alt="A high-level Hong Kong game board in CityMaker" width="100%">
+  </a>
+</p>
+
+## Screenshots
+
+The landmark atlas presents every city's progression from vernacular architecture to a recognizable skyline. The interface also adapts into a focused mobile layout for play and city switching.
+
+<p align="center">
+  <img src="docs/images/citymaker-gallery.png" alt="Paris landmark atlas in CityMaker" width="100%">
+</p>
+
+<p align="center">
+  <img src="docs/images/citymaker-mobile-game.png" alt="CityMaker mobile game board" width="32%">
+  &nbsp;&nbsp;
+  <img src="docs/images/citymaker-mobile-cities.png" alt="CityMaker mobile city selection" width="32%">
+</p>
 
 ## Run locally
 
