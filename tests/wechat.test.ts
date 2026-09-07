@@ -164,3 +164,14 @@ it("extends a four-city v1 save and cycles through the shared twelve-city roster
   expect(last.state.city).toBe(0);
   expect(last.state.progress[3]).toEqual(original.state.progress[3]);
 });
+
+it("keeps the prototype's original undo-after-win behavior", () => {
+  const game = new Game(memory());
+  game.current.run.board = [1024, 1024, ...Array(14).fill(0)];
+  game.move("left");
+  expect(game.current.run.status).toBe("won");
+  game.undo();
+  expect(game.current.run.status).toBe("playing");
+  expect(game.current.run.board.slice(0, 2)).toEqual([1024, 1024]);
+  expect(game.current.run.hasWon).toBeFalsy();
+});

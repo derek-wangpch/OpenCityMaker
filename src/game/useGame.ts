@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { cities } from "../cities/packs";
-import type { Building, Locale } from "../cities/types";
-import { move, undo, type Direction, type Movement } from "./engine";
+import { buildingForValue, type Building, type Locale } from "../cities/types";
+import {
+  continueRun,
+  move,
+  undo,
+  VALUES,
+  type Direction,
+  type Movement,
+} from "./engine";
 import { freshCity, type Save } from "./storage";
 import { nextWeather, randomWeather, readWeather } from "./weather";
 import type { GameRepository } from "./repository";
@@ -42,6 +49,10 @@ export function useGame(initial: Save, repository: GameRepository) {
       city.buildings.findIndex((b) => b.value === highest),
     );
   const next = city.buildings.find((b) => b.value > highest);
+  const challengeValue =
+    current.run.hasWon || current.run.board.some((v) => v >= 2048)
+      ? Math.max(2048, ...current.run.board) * 2
+      : null;
   useEffect(() => {
     let active = true;
     setStored(null);
@@ -124,7 +135,7 @@ export function useGame(initial: Save, repository: GameRepository) {
     busyUntil.current = performance.now() + (reduced ? 0 : 325);
     setEvents(result.events);
     const discoveries = result.run.board.filter(
-      (v) => v && !entry.discovered.includes(v),
+      (v) => VALUES.includes(v) && !entry.discovered.includes(v),
     );
     const updated = {
       ...before,
@@ -141,7 +152,7 @@ export function useGame(initial: Save, repository: GameRepository) {
           discovered: [
             ...new Set([
               ...entry.discovered,
-              ...result.run.board.filter(Boolean),
+              ...result.run.board.filter((v) => VALUES.includes(v)),
             ]),
           ],
         },
@@ -157,8 +168,23 @@ export function useGame(initial: Save, repository: GameRepository) {
   }
   /** Open a building's atlas card, e.g. from tapping its model on the board. */
   function inspect(value: number) {
-    const building = city.buildings.find((b) => b.value === value);
+    const building = buildingForValue(city, value);
     if (building) setModal(building);
+  }
+  function keepBuilding() {
+    const before = latest.current;
+    const entry = before.cities[before.city];
+    const run = continueRun(entry.run);
+    if (run === entry.run) return;
+    const updated = {
+      ...before,
+      cities: { ...before.cities, [before.city]: { ...entry, run } },
+    };
+    latest.current = updated;
+    busyUntil.current = 0;
+    setEvents(EMPTY_EVENTS);
+    setSave(updated);
+    setAnnouncement(t.continueBuilding);
   }
   function doUndo() {
     busyUntil.current = 0;
@@ -209,6 +235,8 @@ export function useGame(initial: Save, repository: GameRepository) {
     current,
     locale,
     t,
+    challengeValue,
+    keepBuilding,
     highest,
     highestIndex,
     next,

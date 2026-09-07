@@ -493,3 +493,10 @@ html[data-theme="dark"] .mobile-cover-watermark {
 .mobile-atlas .atlas-card > img {
   height: 125px;
 }
+
+/* Victory consumes its own row; the board canvas can never sit behind it. */
+.mobile-game > .victory-slot {
+  flex: none;
+  margin: 0 calc(env(safe-area-inset-right, 0px) + 12px) 12px
+    calc(env(safe-area-inset-left, 0px) + 12px);
+}

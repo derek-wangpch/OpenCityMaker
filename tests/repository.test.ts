@@ -2,7 +2,7 @@ import { IDBFactory } from "fake-indexeddb";
 import { describe, it, expect } from "vitest";
 import { IndexedDbRepository } from "../src/game/repository";
 import { freshCity, type Save } from "../src/game/storage";
-import { move, undo } from "../src/game/engine";
+import { continueRun, move, undo } from "../src/game/engine";
 const ids = ["beijing", "hongkong"];
 function setup(raw: string | null = null) {
   const factory = new IDBFactory();
@@ -88,7 +88,7 @@ describe("IndexedDB progress and history", () => {
     expect(await repo.history()).toHaveLength(1);
     repo.close();
   });
-  it("upserts terminal records and undo retracts the same result", async () => {
+  it("upserts terminal records and undo preserves the achievement", async () => {
     const { repo } = setup();
     await repo.load();
     const save = initial();
@@ -107,7 +107,7 @@ describe("IndexedDB progress and history", () => {
     expect(await repo.history()).toEqual([won]);
     save.cities.beijing.run = undo(save.cities.beijing.run);
     await repo.save(save);
-    expect(await repo.history()).toHaveLength(0);
+    expect(await repo.history()).toHaveLength(1);
     save.cities.beijing.run = move(
       save.cities.beijing.run,
       "left",
@@ -138,4 +138,63 @@ describe("IndexedDB progress and history", () => {
     await expect(repo.save(initial())).rejects.toThrow("unavailable");
     repo.close();
   });
+});
+
+it("keeps one winning record through continuation, loss, and restart", async () => {
+  const { repo } = setup();
+  await repo.load();
+  const save = initial();
+  const city = save.cities.beijing;
+  city.run.board = [1024, 1024, ...Array(14).fill(0)];
+  city.run = move(city.run, "left", () => 0).run;
+  await repo.save(save);
+  city.run = continueRun(city.run);
+  city.run.board = [2048, 2048, ...Array(14).fill(0)];
+  city.run = move(city.run, "left", () => 0).run;
+  city.session.moves = 2;
+  await repo.save(save);
+  expect((await repo.load()).cities.beijing.run).toEqual(city.run);
+  expect(await repo.history()).toMatchObject([
+    {
+      id: city.session.id,
+      outcome: "won",
+      endedAt: null,
+      highest: 4096,
+      score: 6144,
+      moves: 2,
+    },
+  ]);
+  city.run.board = [4096, 4, 2, 4, 4, 2, 4, 2, 2, 4, 2, 4, 4, 2, 4, 2];
+  city.run.status = "lost";
+  await repo.save(save);
+  const [finished] = await repo.history();
+  expect(finished.outcome).toBe("won");
+  expect(finished.endedAt).not.toBeNull();
+  await repo.save(initial());
+  expect(await repo.history()).toEqual([finished]);
+  repo.close();
+});
+it("finalizes a continued winning game when restarting without a deadlock", async () => {
+  const { repo } = setup();
+  await repo.load();
+  const save = initial();
+  const city = save.cities.beijing;
+  city.run = {
+    ...city.run,
+    board: [8192, 2, ...Array(14).fill(0)],
+    hasWon: true,
+    continued: true,
+    score: 30000,
+  };
+  await repo.save(save);
+  await repo.save(initial());
+  const [record] = await repo.history();
+  expect(record).toMatchObject({
+    id: city.session.id,
+    outcome: "won",
+    score: 30000,
+    highest: 8192,
+  });
+  expect(record.endedAt).not.toBeNull();
+  repo.close();
 });

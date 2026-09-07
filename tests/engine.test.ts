@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
+  continueRun,
+  isTileValue,
   getStatus,
   move,
   newRun,
@@ -117,5 +119,74 @@ describe("2048 rules", () => {
         expect(result.events.length).toBe(input.filter(Boolean).length);
       }
     }
+  });
+});
+
+describe("continued cities", () => {
+  it("acknowledges a win without changing the board, score, or undo", () => {
+    const won = move(run([1024, 1024]), "left", () => 0).run;
+    const continued = continueRun(won);
+    expect(continued).toEqual({
+      ...won,
+      hasWon: true,
+      continued: true,
+      status: "playing",
+    });
+    expect(continueRun(continued)).toBe(continued);
+    expect(move(continued, "right", () => 0).run.status).toBe("playing");
+  });
+  it("merges extended values once, awards points, and never celebrates again", () => {
+    const continued = {
+      ...run([2048, 2048, 4096, 4096]),
+      hasWon: true,
+      continued: true,
+    };
+    const first = move(continued, "left", () => 0);
+    expect(first.run.board.slice(0, 4)).toEqual([4096, 8192, 2, 0]);
+    expect(first.run.score).toBe(12288);
+    expect(first.run.status).toBe("playing");
+    expect(
+      move({ ...continued, board: board([8192, 8192]) }, "left", () => 0).run
+        .board[0],
+    ).toBe(16384);
+    expect(undo(first.run)).toEqual(continued);
+  });
+  it("preserves achievement through undo and resets it for a new run", () => {
+    const won = move(run([1024, 1024]), "left", () => 0).run;
+    expect(undo(won)).toMatchObject({ hasWon: true, status: "won" });
+    expect(undo(continueRun(won))).toMatchObject({
+      hasWon: true,
+      continued: true,
+      status: "playing",
+    });
+    expect(newRun().hasWon).toBeFalsy();
+    expect(newRun().continued).toBeFalsy();
+  });
+  it("detects deadlocks after winning and does not spawn on invalid moves", () => {
+    const dead = [4096, 4, 2, 4, 4, 2, 4, 2, 2, 4, 2, 4, 4, 2, 4, 2];
+    expect(continueRun({ ...run(dead), status: "won" }).status).toBe("lost");
+    expect(getStatus([4096, 4096, ...dead.slice(2)], true)).toBe("playing");
+    const random = () => {
+      throw new Error("Unexpected spawn");
+    };
+    expect(
+      move({ ...run([4096, 2]), hasWon: true, continued: true }, "left", random)
+        .changed,
+    ).toBe(false);
+  });
+  it("accepts safe powers of two without 32-bit truncation or rounded-log false positives", () => {
+    for (const value of [2, 4096, 8192, 2 ** 40, 2 ** 52])
+      expect(isTileValue(value)).toBe(true);
+    for (const value of [
+      0,
+      3,
+      4097,
+      2 ** 50 + 1,
+      2 ** 53,
+      Infinity,
+      NaN,
+      "4096",
+    ])
+      expect(isTileValue(value)).toBe(false);
   });
 });

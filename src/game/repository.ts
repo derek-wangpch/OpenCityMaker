@@ -38,7 +38,8 @@ function battle(city: string, value: CitySave, now: number): BattleRecord {
     city,
     startedAt: value.session.startedAt,
     endedAt: value.run.status === "playing" ? null : now,
-    outcome: value.run.status,
+    outcome:
+      value.run.hasWon || value.run.status === "won" ? "won" : value.run.status,
     score: value.run.score,
     highest: Math.max(...value.run.board),
     moves: value.session.moves,
@@ -151,8 +152,8 @@ export class IndexedDbRepository implements GameRepository {
           const old = previous?.cities[city];
           if (old && old.session.id !== entry.session.id) {
             const record = battle(city, old, now);
-            if (record.outcome === "playing") {
-              record.outcome = "restarted";
+            if (record.endedAt === null) {
+              if (record.outcome === "playing") record.outcome = "restarted";
               record.endedAt = now;
             }
             // Untouched fresh boards are not battles; imported played boards still count.
@@ -170,7 +171,8 @@ export class IndexedDbRepository implements GameRepository {
           const existing = runs.get(record.id);
           existing.onsuccess = () => {
             if (
-              record.outcome !== "playing" &&
+              record.endedAt !== null &&
+              existing.result?.endedAt != null &&
               existing.result?.outcome === record.outcome
             )
               record.endedAt = existing.result.endedAt;
@@ -194,7 +196,9 @@ export class IndexedDbRepository implements GameRepository {
         resolve(
           (request.result as BattleRecord[])
             .filter((r) => r.outcome !== "playing")
-            .sort((a, b) => (b.endedAt ?? 0) - (a.endedAt ?? 0)),
+            .sort(
+              (a, b) => (b.endedAt ?? b.startedAt) - (a.endedAt ?? a.startedAt),
+            ),
         );
       request.onerror = () => reject(request.error);
     });

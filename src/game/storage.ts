@@ -1,4 +1,11 @@
-import { getStatus, newRun, VALUES, type Run, type Snapshot } from "./engine";
+import {
+  getStatus,
+  isTileValue,
+  newRun,
+  VALUES,
+  type Run,
+  type Snapshot,
+} from "./engine";
 import type { Locale } from "../cities/types";
 import { readWeather, type Weather } from "./weather";
 export const SAVE_KEY = "citymaker:v1";
@@ -74,7 +81,7 @@ function snapshot(v: unknown): v is Snapshot {
     Array.isArray(v.board) &&
     v.board.length === 16 &&
     v.board.filter(Boolean).length >= 2 &&
-    v.board.every((x) => x === 0 || VALUES.includes(x)) &&
+    v.board.every((x) => x === 0 || isTileValue(x)) &&
     scoreValid(v.score)
   );
 }
@@ -103,11 +110,20 @@ export function readSave(
       for (const id of ids) {
         const value = data.cities[id];
         if (!record(value) || !snapshot(value.run)) continue;
-        const rawRun = value.run as Snapshot & { undo?: unknown };
+        const rawRun = value.run as Snapshot & {
+          undo?: unknown;
+          hasWon?: unknown;
+          continued?: unknown;
+        };
+        const hasWon =
+          rawRun.hasWon === true || rawRun.board.some((v) => v >= 2048);
+        const continued = hasWon && rawRun.continued === true;
         const run: Run = {
+          ...(hasWon ? { hasWon: true } : {}),
+          ...(continued ? { continued: true } : {}),
           board: [...rawRun.board],
           score: rawRun.score,
-          status: getStatus(rawRun.board),
+          status: getStatus(rawRun.board, continued, hasWon),
           undo: snapshot(rawRun.undo) ? rawRun.undo : null,
         };
         const discovered = Array.isArray(value.discovered)
@@ -133,7 +149,10 @@ export function readSave(
               : newSession(),
           best: Math.max(run.score, scoreValid(value.best) ? value.best : 0),
           discovered: [
-            ...new Set([...discovered, ...run.board.filter(Boolean)]),
+            ...new Set([
+              ...discovered,
+              ...run.board.filter(Boolean).map((v) => Math.min(v, 2048)),
+            ]),
           ],
         };
       }

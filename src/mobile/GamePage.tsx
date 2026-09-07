@@ -15,7 +15,7 @@ import {
   Undo2,
 } from "lucide-react";
 import { BoardCanvas } from "../scene/Canvas";
-import { BoardTable, EndOverlay } from "../BoardExtras";
+import { BoardTable, EndOverlay, VictoryNotice } from "../BoardExtras";
 import { UNDO_ENABLED, type GameController } from "../game/useGame";
 import type { Weather } from "../game/weather";
 import type { Route } from "../useHashRoute";
@@ -41,6 +41,7 @@ export function GamePage({
     locale,
     t,
     next,
+    challengeValue,
     events,
     reduced,
     showLabels,
@@ -112,15 +113,23 @@ export function GamePage({
         <BoardTable game={game} />
         <EndOverlay game={game} />
       </div>
+      <VictoryNotice game={game} />
       <div className="mobile-bottombar">
         <div className="mobile-next">
           <span className="eyebrow">
             <Sparkles size={11} />
-            {next ? t.next : t.complete}
+            {challengeValue ? t.nextChallenge : next ? t.next : t.complete}
           </span>
           <span className="mobile-next-name">
-            <strong>{(next ?? city.buildings[10]).name[locale]}</strong>
-            <small>{next?.value ?? 2048}</small>
+            <strong>
+              {
+                (challengeValue
+                  ? city.buildings[10]
+                  : (next ?? city.buildings[10])
+                ).name[locale]
+              }
+            </strong>
+            <small>{challengeValue ?? next?.value ?? 2048}</small>
           </span>
         </div>
         <div className="board-actions">
