@@ -37,7 +37,12 @@ import {
 } from "./game/useGame";
 import type { GameRepository } from "./game/repository";
 import { AtlasGrid, isLocalTest } from "./AtlasGrid";
-import { BoardTable, EndOverlay, LiveRegion } from "./BoardExtras";
+import {
+  BoardTable,
+  EndOverlay,
+  LiveRegion,
+  VictoryNotice,
+} from "./BoardExtras";
 import { GameModal } from "./GameModal";
 import { ThemeButton } from "./ThemeButton";
 import { BoardRotationControls } from "./BoardRotationControls";
@@ -68,6 +73,7 @@ export function DesktopGame({
     locale,
     t,
     highestIndex,
+    challengeValue,
     next,
     modal,
     setModal,
@@ -355,6 +361,7 @@ export function DesktopGame({
               <BoardRotationControls game={game} />
               <BoardTable game={game} />
               <EndOverlay game={game} />
+              <VictoryNotice game={game} />
               <div className="board-bottom">
                 <div className="board-instruction">
                   <span>{current.run.score === 0 ? t.start : t.startSub}</span>
@@ -392,46 +399,82 @@ export function DesktopGame({
               <section className="discovery-card">
                 <div className="eyebrow">
                   <Sparkles size={14} />
-                  {next ? t.next : t.complete}
+                  {challengeValue
+                    ? t.nextChallenge
+                    : next
+                      ? t.next
+                      : t.complete}
                 </div>
                 <button
                   className="discovery-image"
-                  aria-label={`${t.preview}: ${(next ?? city.buildings[10]).name[locale]}`}
-                  onClick={() => setModal(next ?? city.buildings[10])}
+                  aria-label={`${t.preview}: ${(challengeValue ? city.buildings[10] : (next ?? city.buildings[10])).name[locale]}`}
+                  onClick={() =>
+                    challengeValue
+                      ? inspect(challengeValue)
+                      : setModal(next ?? city.buildings[10])
+                  }
                 >
-                  {thumb(city.id, next ?? city.buildings[10])}
-                  <span className="value-tag">{next?.value ?? 2048}</span>
+                  {thumb(
+                    city.id,
+                    challengeValue
+                      ? city.buildings[10]
+                      : (next ?? city.buildings[10]),
+                  )}
+                  <span className="value-tag">
+                    {challengeValue ?? next?.value ?? 2048}
+                  </span>
                 </button>
                 <span className="landmark-step">
                   {t.tier}{" "}
                   {String(
-                    next ? city.buildings.indexOf(next) + 1 : 11,
+                    challengeValue
+                      ? Math.log2(challengeValue)
+                      : next
+                        ? city.buildings.indexOf(next) + 1
+                        : 11,
                   ).padStart(2, "0")}
                 </span>
-                <h2>{(next ?? city.buildings[10]).name[locale]}</h2>
-                <p>{t.mergeHint}</p>
-                <div className="merge-equation">
-                  {thumb(
-                    city.id,
-                    city.buildings[
-                      Math.max(
-                        0,
-                        (next ? city.buildings.indexOf(next) : 10) - 1,
-                      )
-                    ],
+                <h2>
+                  {
+                    (challengeValue
+                      ? city.buildings[10]
+                      : (next ?? city.buildings[10])
+                    ).name[locale]
+                  }
+                </h2>
+                <p>{challengeValue ? t.challengeHint : t.mergeHint}</p>
+                <div
+                  className={`merge-equation${challengeValue ? " extended" : ""}`}
+                >
+                  {challengeValue ? (
+                    <span>{challengeValue / 2}</span>
+                  ) : (
+                    thumb(
+                      city.id,
+                      city.buildings[
+                        Math.max(
+                          0,
+                          (next ? city.buildings.indexOf(next) : 10) - 1,
+                        )
+                      ],
+                    )
                   )}
                   <Plus size={14} />
-                  {thumb(
-                    city.id,
-                    city.buildings[
-                      Math.max(
-                        0,
-                        (next ? city.buildings.indexOf(next) : 10) - 1,
-                      )
-                    ],
+                  {challengeValue ? (
+                    <span>{challengeValue / 2}</span>
+                  ) : (
+                    thumb(
+                      city.id,
+                      city.buildings[
+                        Math.max(
+                          0,
+                          (next ? city.buildings.indexOf(next) : 10) - 1,
+                        )
+                      ],
+                    )
                   )}
                   <ArrowRight size={16} />
-                  <span>{next?.value ?? 2048}</span>
+                  <span>{challengeValue ?? next?.value ?? 2048}</span>
                 </div>
               </section>
               <section className="collection-card">

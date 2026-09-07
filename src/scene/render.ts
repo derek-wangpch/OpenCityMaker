@@ -1,4 +1,5 @@
 import * as T from "three";
+import { tileAccent, showTileLabel } from "../game/tiers";
 import { ModelKit, createBuilding } from "./models";
 import type { Building, CityPack } from "../cities/types";
 import type { Movement } from "../game/engine";
@@ -240,12 +241,12 @@ export class SceneView {
       canvas.height = 56;
       const ctx = canvas.getContext("2d")!;
       const palette = SCENE_THEME[this.theme];
-      ctx.fillStyle = palette.labelBackground;
+      ctx.fillStyle = tileAccent(value) ?? palette.labelBackground;
       ctx.beginPath();
       ctx.roundRect(0, 0, 128, 56, 15);
       ctx.fill();
-      ctx.fillStyle = palette.labelText;
-      ctx.font = "bold 40px sans-serif";
+      ctx.fillStyle = tileAccent(value) ? "#182b2c" : palette.labelText;
+      ctx.font = `bold ${Math.min(40, 180 / String(value).length)}px sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(String(value), 64, 29);
@@ -285,7 +286,7 @@ export class SceneView {
       (Math.floor(index / 4) - 1.5) * 1.88,
     );
     g.userData.index = index;
-    if (labels) g.add(this.label(value));
+    if (showTileLabel(value, labels)) g.add(this.label(value));
     return g;
   }
   board(

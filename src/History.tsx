@@ -1,3 +1,4 @@
+import { buildingForValue } from "./cities/types";
 import { useEffect, useState } from "react";
 import { cities } from "./cities/packs";
 import type { Locale } from "./cities/types";
@@ -84,8 +85,9 @@ export function History({
                     <dt>{t.highestBuilding}</dt>
                     <dd
                       title={
-                        city?.buildings.find((b) => b.value === record.highest)
-                          ?.name[locale]
+                        city
+                          ? buildingForValue(city, record.highest)?.name[locale]
+                          : undefined
                       }
                     >
                       {record.highest}
@@ -103,7 +105,9 @@ export function History({
                   </span>
                   <span>
                     {t.endedAt}:{" "}
-                    {new Date(record.endedAt!).toLocaleString(locale)}
+                    {record.endedAt === null
+                      ? t.stillBuilding
+                      : new Date(record.endedAt).toLocaleString(locale)}
                   </span>
                 </div>
               </article>

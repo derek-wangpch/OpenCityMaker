@@ -242,6 +242,64 @@ test("rotation cancels a held gesture and does not replay it on release", async 
   await checkMove(page, "left");
 });
 
+for (const [width, height] of [
+  [1440, 900],
+  [360, 640],
+]) {
+  test(`rotation stays accessible through victory and continuation at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height });
+    await seed(page, 0, [2048, 2048, ...Array(14).fill(0)]);
+    await ready(page);
+    const notice = page.locator(".victory-slot");
+    await expect(notice).toBeVisible();
+    const before = (await saved(page)).cities;
+    const assertSeparate = async () => {
+      const controls = (await page.locator(".board-rotation").boundingBox())!;
+      const victory = (await notice.boundingBox())!;
+      expect(controls.y + controls.height).toBeLessThanOrEqual(victory.y);
+      await expect(
+        page.getByRole("button", { name: clockwise, exact: true }),
+      ).toBeInViewport();
+    };
+    await assertSeparate();
+    await page.getByRole("button", { name: clockwise, exact: true }).click();
+    await expect
+      .poll(async () => (await saved(page)).boardRotationStep)
+      .toBe(1);
+    expect((await saved(page)).cities).toEqual(before);
+    await page
+      .getByRole("button", { name: "Inspect board", exact: true })
+      .click();
+    await assertSeparate();
+    await page
+      .getByRole("button", { name: "Show result", exact: true })
+      .click();
+    await assertSeparate();
+    await page
+      .getByRole("button", { name: "Keep building", exact: true })
+      .click();
+    await expect(notice).toHaveCount(0);
+    await expect(page.locator(".board-canvas")).toHaveAttribute(
+      "data-rotation-step",
+      "1",
+    );
+    await page.keyboard.press("ArrowUp");
+    await expect
+      .poll(async () => (await saved(page)).cities.beijing.session.moves)
+      .toBe(1);
+    const run = (await saved(page)).cities.beijing.run;
+    expect(run).toMatchObject({
+      score: 4096,
+      hasWon: true,
+      continued: true,
+      status: "playing",
+    });
+    expect(run.board).toContain(4096);
+  });
+}
+
 test("360px controls, back views, theme and responsive persistence", async ({
   page,
 }) => {

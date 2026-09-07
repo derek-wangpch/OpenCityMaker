@@ -1630,3 +1630,104 @@ footer .history-trigger {
   padding: 25px 0;
   text-align: center;
 }
+
+/* Reserve a bottom row for the notice so the city remains clear and usable. */
+.game-panel:has(> .victory-slot) {
+  max-height: max(420px, calc(100svh - 290px));
+  display: flex;
+  flex-direction: column;
+  padding-top: 90px;
+}
+.game-panel:has(> .victory-slot) > .board-canvas {
+  position: relative;
+  inset: auto;
+  flex: 1;
+  min-height: 0;
+}
+.game-panel:has(> .victory-slot) > .board-bottom {
+  display: none;
+}
+.game-panel:has(> .victory-slot) > .board-rotation {
+  position: static;
+  transform: none;
+  align-self: center;
+  flex: none;
+}
+.game-panel > .victory-slot {
+  flex: none;
+  margin: 12px;
+}
+.victory-slot {
+  min-width: 0;
+}
+.victory-slot .end-overlay.celebration {
+  position: static;
+  width: 100%;
+  margin: 0;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  backdrop-filter: none;
+  text-align: left;
+}
+.victory-slot .end-review {
+  position: static;
+  display: flex;
+  justify-content: flex-end;
+}
+.celebration > div {
+  width: 100%;
+  max-width: none;
+}
+.victory-heading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.celebration h2 {
+  flex: 1;
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.35;
+}
+.celebration .end-icon {
+  color: var(--text-strong);
+  flex: none;
+}
+.victory-dismiss {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin: -6px -8px -6px 0;
+  border-radius: 6px;
+  color: var(--text-muted);
+  background: transparent;
+}
+.victory-dismiss:hover {
+  background: var(--surface-muted);
+}
+.celebration p {
+  margin: 8px 0 12px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.victory-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.victory-actions > button {
+  justify-content: center;
+  margin: 0;
+}
+
+.merge-equation.extended > span {
+  width: auto;
+  min-width: 44px;
+  padding: 0 5px;
+  flex-shrink: 0;
+}

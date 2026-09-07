@@ -1,4 +1,5 @@
-import { ArrowRight, House, Sparkles } from "lucide-react";
+import { buildingForValue } from "./cities/types";
+import { ArrowRight, House, Sparkles, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { UNDO_ENABLED, type GameController } from "./game/useGame";
 /**
@@ -14,7 +15,7 @@ export function BoardTable({ game }: { game: GameController }) {
       {Array.from({ length: 4 }, (_, row) => (
         <div role="row" key={row}>
           {current.run.board.slice(row * 4, row * 4 + 4).map((value, col) => {
-            const building = city.buildings.find((b) => b.value === value);
+            const building = buildingForValue(city, value);
             return (
               <span role="cell" key={col}>
                 {building ? (
@@ -35,9 +36,9 @@ export function BoardTable({ game }: { game: GameController }) {
     </div>
   );
 }
-/** Won / lost panel shown over the board. */
+/** Deadlock recovery stays on the board; victory is rendered outside it. */
 export function EndOverlay({ game }: { game: GameController }) {
-  if (game.current.run.status === "playing") return null;
+  if (game.current.run.status !== "lost") return null;
   return (
     <EndPanel
       key={`${game.city.id}:${game.current.session.id}:${game.current.run.status}`}
@@ -45,8 +46,20 @@ export function EndOverlay({ game }: { game: GameController }) {
     />
   );
 }
+/** Each layout gives the victory notice its own space outside the canvas. */
+export function VictoryNotice({ game }: { game: GameController }) {
+  if (game.current.run.status !== "won") return null;
+  return (
+    <div className="victory-slot">
+      <EndPanel
+        key={`${game.city.id}:${game.current.session.id}`}
+        game={game}
+      />
+    </div>
+  );
+}
 function EndPanel({ game }: { game: GameController }) {
-  const { current, t, restart, doUndo } = game;
+  const { current, t, restart, doUndo, keepBuilding } = game;
   const won = current.run.status === "won";
   const [ready, setReady] = useState(won);
   const [inspecting, setInspecting] = useState(false);
@@ -68,25 +81,47 @@ function EndPanel({ game }: { game: GameController }) {
   return (
     <div className={`end-overlay ${won ? "celebration" : "end-loss"}`}>
       <div>
-        <span className="end-icon">
-          {won ? <Sparkles size={32} /> : <House size={32} />}
-        </span>
-        <h2>{won ? t.won : t.lost}</h2>
-        <p>{won ? t.wonBody : t.lostBody}</p>
-        {!won && (
-          <button className="secondary" onClick={() => setInspecting(true)}>
-            {t.inspectBoard}
+        <div className={won ? "victory-heading" : undefined}>
+          <span className="end-icon">
+            {won ? <Sparkles size={20} /> : <House size={32} />}
+          </span>
+          <h2>{won ? t.won : t.lost}</h2>
+          {won && (
+            <button
+              className="victory-dismiss"
+              aria-label={t.inspectBoard}
+              title={t.inspectBoard}
+              onClick={() => setInspecting(true)}
+            >
+              <X size={16} />
+            </button>
+          )}
+        </div>
+        <p>
+          {won ? t.wonBody : current.run.hasWon ? t.completedBody : t.lostBody}
+        </p>
+        <div className={won ? "victory-actions" : undefined}>
+          {!won && (
+            <button className="secondary" onClick={() => setInspecting(true)}>
+              {t.inspectBoard}
+            </button>
+          )}
+          {won && (
+            <button className="primary" onClick={keepBuilding}>
+              {t.continueBuilding}
+              <ArrowRight size={16} />
+            </button>
+          )}
+          <button className={won ? "secondary" : "primary"} onClick={restart}>
+            {t.again}
+            <ArrowRight size={16} />
           </button>
-        )}
-        <button className="primary" onClick={restart}>
-          {t.again}
-          <ArrowRight size={16} />
-        </button>
-        {UNDO_ENABLED && current.run.undo && (
-          <button className="text-button" onClick={doUndo}>
-            {t.undo}
-          </button>
-        )}
+          {UNDO_ENABLED && current.run.undo && (
+            <button className="text-button" onClick={doUndo}>
+              {t.undo}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

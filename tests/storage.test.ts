@@ -227,3 +227,43 @@ describe("session ids without a secure context", () => {
     expect(ids[0]).not.toBe(ids[1]);
   });
 });
+
+it("restores continued high tiles and undo without expanding the landmark collection", () => {
+  const city = freshCity();
+  city.run = {
+    board: [8192, 4096, ...Array(14).fill(0)],
+    score: 24000,
+    status: "playing",
+    hasWon: true,
+    continued: true,
+    undo: { board: [4096, 4096, 4096, ...Array(13).fill(0)], score: 15808 },
+  };
+  city.discovered = [2, 4, 2048, 4096, 8192];
+  const save = readSave(
+    memory(JSON.stringify({ version: 1, cities: { beijing: city } })),
+    ids,
+  );
+  expect(save.cities.beijing.run).toEqual(city.run);
+  expect(save.cities.beijing.discovered).toEqual([2, 4, 2048]);
+});
+it("offers continuation for old wins and restores acknowledged wins after undo", () => {
+  const city = freshCity();
+  city.run.board = [2048, 2, ...Array(14).fill(0)];
+  const decode = () =>
+    readSave(
+      memory(JSON.stringify({ version: 1, cities: { beijing: city } })),
+      ids,
+    ).cities.beijing.run;
+  expect(decode()).toMatchObject({ hasWon: true, status: "won" });
+  city.run = {
+    ...city.run,
+    board: [1024, 1024, ...Array(14).fill(0)],
+    hasWon: true,
+    continued: true,
+  };
+  expect(decode()).toMatchObject({
+    hasWon: true,
+    continued: true,
+    status: "playing",
+  });
+});

@@ -46,3 +46,6 @@ jobs:
           npx playwright test tests/browser/game.spec.ts
           --grep "keyboard merge|board mirror|restart confirmation|IndexedDB migration"
           --timeout=60000
+
+      - name: Run city weather browser tests
+        run: npx playwright test tests/browser/city-weather.spec.ts --timeout=60000

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Game, STORAGE_KEY } from "../src/wechat/state";
+import { CITY_IDS, Game, STORAGE_KEY } from "../src/wechat/state";
 
 function memory() {
   let value: unknown;
@@ -11,6 +11,39 @@ function memory() {
   };
 }
 describe("WeChat prototype persistence", () => {
+  it.each(["hongkong", "shenzhen", "singapore", "dubai", "sydney"])(
+    "normalizes saved snow and skips it in %s",
+    (city) => {
+      const storage = memory();
+      const original = new Game(storage);
+      original.state.city = CITY_IDS.indexOf(city);
+      original.state.weather = "snow";
+      original.save();
+      const game = new Game(storage);
+      expect(game.state.weather).toBe("clear");
+      expect(game.state.progress).toEqual(original.state.progress);
+      game.state.weather = "rain";
+      game.cycleWeather();
+      expect(game.state.weather).toBe("fog");
+      expect(new Game(storage).state.weather).toBe("fog");
+    },
+  );
+  it("normalizes snow when switching cities and preserves off", () => {
+    const storage = memory();
+    const game = new Game(storage);
+    game.state.weather = "snow";
+    game.nextCity(); // Beijing -> Hong Kong
+    expect(game.state.weather).toBe("clear");
+    expect(new Game(storage).state.weather).toBe("clear");
+    game.state.weather = "off";
+    game.nextCity(); // Hong Kong -> Shanghai
+    expect(game.state.weather).toBe("off");
+    game.state.weather = "rain";
+    game.cycleWeather();
+    expect(game.state.weather).toBe("snow");
+    game.nextCity(); // Shanghai -> Shenzhen
+    expect(game.state.weather).toBe("clear");
+  });
   it("round trips moves and undo, keeps best, and isolates city runs", () => {
     const storage = memory(),
       game = new Game(storage);
@@ -130,4 +163,15 @@ it("extends a four-city v1 save and cycles through the shared twelve-city roster
   last.nextCity();
   expect(last.state.city).toBe(0);
   expect(last.state.progress[3]).toEqual(original.state.progress[3]);
+});
+
+it("keeps the prototype's original undo-after-win behavior", () => {
+  const game = new Game(memory());
+  game.current.run.board = [1024, 1024, ...Array(14).fill(0)];
+  game.move("left");
+  expect(game.current.run.status).toBe("won");
+  game.undo();
+  expect(game.current.run.status).toBe("playing");
+  expect(game.current.run.board.slice(0, 2)).toEqual([1024, 1024]);
+  expect(game.current.run.hasWon).toBeFalsy();
 });

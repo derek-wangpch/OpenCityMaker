@@ -41,8 +41,9 @@ async function load(page: Page) {
   await page.goto("/");
   await expect(page.locator(".discovery-image img")).toBeVisible();
 }
-const saved = async (page: Page) => {
-  await expect(page.locator(".save-dot")).not.toHaveClass(/warning/);
+const saved = async (page: Page, waitForIndicator = true) => {
+  if (waitForIndicator)
+    await expect(page.locator(".save-dot")).not.toHaveClass(/warning/);
   return page.evaluate(
     () =>
       new Promise<any>((resolve, reject) => {
@@ -919,5 +920,243 @@ for (const width of [1440, 390]) {
     ).toHaveCount(0);
     await page.getByRole("button", { name: "Build again" }).click();
     await expect(page.locator(".end-overlay, .end-review")).toHaveCount(0);
+  });
+}
+
+test("continue a completed city across reload, city switch, and phone layout", async ({
+  page,
+}) => {
+  test.setTimeout(90000);
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await seed(page, [2048, 2048, 8192, 16384, ...Array(12).fill(0)], {
+    weather: "off",
+    cities: {
+      beijing: {
+        run: {
+          board: [2048, 2048, 8192, 16384, ...Array(12).fill(0)],
+          score: 10000,
+          status: "won",
+          undo: null,
+        },
+        best: 10000,
+        discovered: [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048],
+      },
+    },
+  });
+  await load(page);
+  const before = await saved(page);
+  await page
+    .getByRole("button", { name: "Keep building", exact: true })
+    .click();
+  await expect(page.locator(".end-overlay")).toHaveCount(0);
+  await page.keyboard.press("ArrowLeft");
+  await expect(page.getByTestId("score")).toHaveText("14,096");
+  const after = await saved(page);
+  expect(after.cities.beijing.run.board).toContain(4096);
+  expect(after.cities.beijing.session.id).toBe(
+    before.cities.beijing.session.id,
+  );
+  expect(after.cities.beijing.session.moves).toBe(1);
+  expect(after.cities.beijing.run).toMatchObject({
+    status: "playing",
+    hasWon: true,
+    continued: true,
+  });
+  await expect(page.locator(".collection-heading")).toContainText("11 / 11");
+  await expect(page.locator(".discovery-card")).toContainText("32768");
+  await page.getByRole("button", { name: "02 Hong Kong" }).click();
+  await page.getByRole("button", { name: "01 Beijing" }).click();
+  expect((await saved(page)).cities.beijing.run.board).toEqual(
+    after.cities.beijing.run.board,
+  );
+  await page.reload();
+  await expect(page.getByTestId("score")).toHaveText("14,096");
+  await expect(page.locator(".end-overlay")).toHaveCount(0);
+  const card = page.locator(".board-mirror button").filter({ hasText: "4096" });
+  await card.focus();
+  await card.press("Enter");
+  await expect(page.locator(".viewer-meta")).toContainText("4096");
+  await expect(page.getByRole("dialog")).not.toContainText(
+    "Merge buildings during play to discover",
+  );
+  await page.getByRole("button", { name: "Close", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Match history", exact: true })
+    .click();
+  await expect(page.locator(".history-row")).toHaveCount(1);
+  await expect(page.locator(".history-row")).toContainText("Completed");
+  await expect(page.locator(".history-row")).toContainText("Still building");
+  await page.getByRole("button", { name: "Close", exact: true }).click();
+  await page.screenshot({
+    path: "artifacts/screenshots/ui/continued-desktop.png",
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await expect(page.locator(".mobile-next")).toContainText("32768");
+  await expect(page.locator(".end-overlay")).toHaveCount(0);
+  await page.screenshot({
+    path: "artifacts/screenshots/ui/continued-mobile.png",
+  });
+  await page.keyboard.press("ArrowRight");
+  await expect
+    .poll(async () => (await saved(page, false)).cities.beijing.session.moves)
+    .toBe(2);
+  expect(errors).toEqual([]);
+});
+
+test("continued dead city keeps its achievement and restart clears continuation", async ({
+  page,
+}) => {
+  const dead = [4096, 4, 2, 4, 4, 2, 4, 2, 2, 4, 2, 4, 4, 2, 4, 2];
+  await seed(page, dead, {
+    cities: {
+      beijing: {
+        run: {
+          board: dead,
+          score: 5000,
+          hasWon: true,
+          continued: true,
+          status: "playing",
+          undo: null,
+        },
+        best: 5000,
+        discovered: [2, 4, 2048],
+      },
+    },
+  });
+  await load(page);
+  await expect(page.locator(".end-overlay")).toContainText(
+    "Your city is complete",
+  );
+  await page.getByRole("button", { name: "Build again", exact: true }).click();
+  await expect(page.locator(".end-overlay")).toHaveCount(0);
+  const run = (await saved(page)).cities.beijing.run;
+  expect(run.status).toBe("playing");
+  expect(run.hasWon).toBeFalsy();
+  expect(run.continued).toBeFalsy();
+  await page
+    .getByRole("button", { name: "Match history", exact: true })
+    .click();
+  await expect(page.locator(".history-row")).toContainText("Completed");
+  await expect(page.locator(".history-row")).not.toContainText(
+    "Still building",
+  );
+});
+
+test("phone victory offers Chinese continuation and accepts a board swipe", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await seed(page, [1024, 1024, ...Array(14).fill(0)], {
+    locale: "zh-CN",
+    weather: "off",
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: "开始建城", exact: true }).click();
+  await expect(page.locator(".mobile-game")).toBeVisible();
+  const swipe = async (dx: number, dy: number) => {
+    const canvas = await page.locator(".board-canvas canvas").boundingBox();
+    const x = canvas!.x + canvas!.width / 2,
+      y = canvas!.y + canvas!.height / 2;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x + dx, y + dy, { steps: 4 });
+    await page.mouse.up();
+  };
+  await swipe(-60, -60);
+  await expect(page.locator(".end-overlay")).toContainText("挑战4096");
+  await expect(
+    page.getByRole("button", { name: "再次建城", exact: true }),
+  ).toBeVisible();
+  await page.screenshot({
+    path: "artifacts/screenshots/ui/continued-mobile-win-cn.png",
+  });
+  await page.getByRole("button", { name: "继续建城", exact: true }).click();
+  await swipe(60, 60);
+  await expect
+    .poll(async () => (await saved(page, false)).cities.beijing.session.moves)
+    .toBe(2);
+  await expect(page.locator(".end-overlay")).toHaveCount(0);
+});
+
+for (const [width, height, colorScheme] of [
+  [1440, 1100, "light"],
+  [1440, 900, "dark"],
+  [390, 844, "dark"],
+  [360, 640, "light"],
+] as const) {
+  test(`victory stays outside the board at ${width}px in ${colorScheme} mode`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height });
+    await page.emulateMedia({ colorScheme });
+    await seed(page, [2048, 2, ...Array(14).fill(0)], {
+      locale: "zh-CN",
+      weather: "off",
+    });
+    await page.goto("/");
+    if (width < 740)
+      await page.getByRole("button", { name: "开始建城", exact: true }).click();
+    await expect(page.locator(".victory-slot .celebration")).toBeVisible();
+    await expect(page.locator("html")).toHaveAttribute(
+      "data-theme",
+      colorScheme,
+    );
+    const assertSeparate = async () => {
+      const canvas = (await page.locator(".board-canvas").boundingBox())!;
+      const notice = (await page.locator(".victory-slot").boundingBox())!;
+      expect(canvas.width).toBeGreaterThan(0);
+      expect(canvas.height).toBeGreaterThan(100);
+      const intersects =
+        canvas.x < notice.x + notice.width &&
+        canvas.x + canvas.width > notice.x &&
+        canvas.y < notice.y + notice.height &&
+        canvas.y + canvas.height > notice.y;
+      expect(intersects).toBe(false);
+      expect(notice.y).toBeGreaterThanOrEqual(canvas.y + canvas.height);
+      if (width >= 740) {
+        const panel = (await page.locator(".game-panel").boundingBox())!;
+        expect(notice.y + notice.height).toBeLessThanOrEqual(panel.y + panel.height);
+      }
+      expect(notice.x).toBeGreaterThanOrEqual(0);
+      expect(notice.x + notice.width).toBeLessThanOrEqual(width);
+      expect(notice.y + notice.height).toBeLessThanOrEqual(height);
+    };
+    await assertSeparate();
+    await expect(page.locator(".celebration")).toHaveCSS(
+      "backdrop-filter",
+      "none",
+    );
+    // Wait for the entrance animation to finish before checking the icon.
+    await page.locator(".celebration .end-icon").evaluate(async (icon) => {
+      await Promise.all(icon.getAnimations().map((animation) => animation.finished));
+    });
+    await expect(page.locator(".celebration .end-icon")).toHaveCSS("opacity", "1");
+    await expect(page.locator(".celebration .end-icon")).toHaveCSS(
+      "color", colorScheme === "dark" ? "rgb(242, 242, 233)" : "rgb(53, 74, 59)",
+    );
+    await page.screenshot({
+      path: `artifacts/screenshots/ui/victory-outside-${width}-${colorScheme}.png`,
+    });
+    const boardBefore = (await saved(page, false)).cities.beijing.run.board;
+    await page.getByRole("button", { name: "查看棋盘", exact: true }).click();
+    await expect(page.locator(".celebration")).toHaveCount(0);
+    await assertSeparate();
+    await page.getByRole("button", { name: "查看结算", exact: true }).click();
+    await expect(page.locator(".celebration")).toBeVisible();
+    await assertSeparate();
+    await page.getByRole("button", { name: "继续建城", exact: true }).click();
+    await expect(page.locator(".victory-slot")).toHaveCount(0);
+    await expect
+      .poll(async () => (await saved(page, false)).cities.beijing.run.continued)
+      .toBe(true);
+    expect((await saved(page, false)).cities.beijing.run.board).toEqual(
+      boardBefore,
+    );
+    await page.keyboard.press("ArrowRight");
+    await expect
+      .poll(async () => (await saved(page, false)).cities.beijing.session.moves)
+      .toBe(1);
   });
 }

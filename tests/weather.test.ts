@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   WEATHERS,
+  cityWeathers,
   mixHex,
   nextWeather,
   randomWeather,
@@ -20,6 +21,57 @@ function memory(raw: string | null = null) {
   };
 }
 describe("weather state machine", () => {
+  it.each(["hongkong", "shenzhen", "singapore", "dubai", "sydney"])(
+    "%s skips snow in both manual and automatic weather",
+    (city) => {
+      expect(cityWeathers(city)).toEqual([
+        "clear",
+        "cloudy",
+        "rain",
+        "fog",
+        "off",
+      ]);
+      let current = nextWeather("clear", city);
+      const cycle = [current];
+      while (current !== "clear") {
+        current = nextWeather(current, city);
+        cycle.push(current);
+      }
+      expect(cycle).toEqual(["cloudy", "rain", "fog", "off", "clear"]);
+      for (const weather of WEATHERS) {
+        const results = new Set(
+          Array.from({ length: 100 }, (_, i) =>
+            randomWeather(weather, city, () => i / 100),
+          ),
+        );
+        expect(results).toEqual(
+          new Set(
+            weather === "off"
+              ? ["off"]
+              : cityWeathers(city).filter((w) => w !== weather && w !== "off"),
+          ),
+        );
+      }
+      expect(readWeather("snow", city)).toBe("clear");
+      expect(nextWeather("snow", city)).toBe("clear");
+      expect(readWeather("off", city)).toBe("off");
+      expect(readWeather("storm", city)).toBeUndefined();
+    },
+  );
+  it.each([
+    "beijing",
+    "shanghai",
+    "tokyo",
+    "newyork",
+    "paris",
+    "london",
+    "rome",
+  ])("%s retains snow in its weather options", (city) => {
+    expect(cityWeathers(city)).toEqual(WEATHERS);
+    expect(nextWeather("rain", city)).toBe("snow");
+    expect(readWeather("snow", city)).toBe("snow");
+    expect(randomWeather("clear", city, () => 0.5)).toBe("snow");
+  });
   it("cycles all weather modes through off and back to clear", () => {
     expect(WEATHERS).toEqual(["clear", "cloudy", "rain", "snow", "fog", "off"]);
     let state = nextWeather("clear");
@@ -29,14 +81,14 @@ describe("weather state machine", () => {
       order.push(state);
     }
     expect(order).toEqual(["cloudy", "rain", "snow", "fog", "off", "clear"]);
-    expect(randomWeather("rain", () => 0)).toBe("clear");
-    expect(randomWeather("rain", () => 0.99)).toBe("fog");
+    expect(randomWeather("rain", "beijing", () => 0)).toBe("clear");
+    expect(randomWeather("rain", "beijing", () => 0.99)).toBe("fog");
   });
   it("validates stored values and defaults everything else to clear", () => {
     expect(readWeather("off")).toBe("off");
     expect(randomWeather("off")).toBe("off");
     for (let i = 0; i < 100; i++)
-      expect(randomWeather("clear", () => i / 100)).not.toBe("off");
+      expect(randomWeather("clear", "beijing", () => i / 100)).not.toBe("off");
     expect(readWeather("rain")).toBe("rain");
     expect(readWeather("storm")).toBeUndefined();
     expect(readWeather(3)).toBeUndefined();
@@ -78,6 +130,25 @@ describe("weather persistence", () => {
     cities: { beijing: freshCity() },
     weather: "snow",
   };
+  it("normalizes legacy city weather without changing progress or the backup", () => {
+    const original: Save = {
+      ...save,
+      city: "hongkong",
+      cities: { hongkong: freshCity() },
+    };
+    const storage = memory(JSON.stringify(original));
+    expect(readSave(storage, ids)).toEqual({ ...original, weather: "clear" });
+    expect(JSON.parse(storage.getItem()!)).toEqual(original);
+    for (const weather of ["rain", "fog", "off"] as const) {
+      const allowed = { ...original, weather };
+      expect(readSave(memory(JSON.stringify(allowed)), ids)).toEqual(allowed);
+    }
+    expect(
+      readSave(memory(JSON.stringify({ ...original, city: "unknown" })), [
+        "hongkong",
+      ]).weather,
+    ).toBe("clear");
+  });
   it("remembers the weather only when it is a known value", () => {
     const storage = memory();
     writeSave(storage, { ...save, weather: "off" });
