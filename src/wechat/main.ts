@@ -163,7 +163,10 @@ function weatherTick() {
   if (!visible || modal || game.state.weather === "off") return;
   ticks++;
   if (ticks % 700 === 0) {
-    game.state.weather = randomWeather(game.state.weather ?? "clear");
+    game.state.weather = randomWeather(
+      game.state.weather ?? "clear",
+      cities[game.state.city].id,
+    );
     game.save();
   }
   advanceWeather();

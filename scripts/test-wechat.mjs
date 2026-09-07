@@ -112,15 +112,56 @@ assert(texts.length > 0);
 // Cycle every weather mode and check the persisted state and repainted label.
 assert.equal(value.weather, undefined);
 for (const [kind, label] of [
-  ["cloudy", "多云"], ["rain", "雨"], ["snow", "雪"],
-  ["fog", "雾"], ["off", "关闭"], ["clear", "晴"],
+  ["cloudy", "多云"],
+  ["rain", "雨"],
+  ["snow", "雪"],
+  ["fog", "雾"],
+  ["off", "关闭"],
+  ["clear", "晴"],
 ]) {
   texts = [];
   gesture(touch(348, 107), touch(348, 107));
   assert.equal(value.weather, kind);
   assert(texts.includes(label));
 }
+// Switching out of snowy Beijing normalizes Hong Kong before the next draw/save.
+for (let i = 0; i < 3; i++) gesture(touch(348, 107), touch(348, 107));
+assert.equal(value.weather, "snow");
+gesture(touch(320, 600), touch(320, 600));
+assert.equal(value.city, 1);
+assert.equal(value.weather, "clear");
+for (const kind of ["cloudy", "rain", "fog", "off"]) {
+  gesture(touch(348, 107), touch(348, 107));
+  assert.equal(value.weather, kind);
+}
+callbacks.Hide();
+
+// Exercise the actual automatic timer in Singapore. With all weather modes,
+// random=0.5 would choose snow; the city's filtered choices must select rain.
+value.city = 5;
+value.weather = "clear";
+const pending = [];
+vm.runInNewContext(
+  source,
+  {
+    wx,
+    Math: Object.assign(Object.create(Math), { random: () => 0.5 }),
+    setTimeout: (callback) => {
+      pending.push(callback);
+      return pending.length;
+    },
+  },
+  { timeout: 5000 },
+);
+for (let i = 0; i < 700; i++) {
+  assert.equal(pending.length, 1);
+  pending.shift()();
+}
+assert.equal(value.city, 5);
+assert.equal(value.weather, "rain");
 callbacks.Hide(); // any pending weather tick chain must end so Node can exit
+pending.shift()();
+assert.equal(pending.length, 0);
 console.log(
-  "Built bundle passed: wx-only boot, swipe/merge, undo, restart cancel/confirm, city persistence, hide/show/resize, weather chip.",
+  "Built bundle passed: wx-only boot, swipe/merge, undo, restart cancel/confirm, city persistence, hide/show/resize, city-specific manual and automatic weather.",
 );

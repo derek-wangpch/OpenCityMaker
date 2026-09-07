@@ -95,10 +95,10 @@ export function readSave(
     if (["en", "zh-CN", "zh-HK"].includes(String(data.locale)))
       base.locale = data.locale as Locale;
     if (typeof data.showLabels === "boolean") base.showLabels = data.showLabels;
-    const weather = readWeather(data.weather);
-    if (weather) base.weather = weather;
     if (typeof data.city === "string" && ids.includes(data.city))
       base.city = data.city;
+    const weather = readWeather(data.weather, base.city);
+    if (weather) base.weather = weather;
     if (record(data.cities))
       for (const id of ids) {
         const value = data.cities[id];
