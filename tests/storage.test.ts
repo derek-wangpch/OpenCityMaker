@@ -20,6 +20,25 @@ function memory(raw: string | null = null): StorageLike {
   };
 }
 describe("local persistence", () => {
+  it("remembers eight rotation presets and tolerates old or invalid preferences", () => {
+    const save: Save = {
+      version: 1,
+      city: "beijing",
+      locale: "en",
+      cities: { beijing: freshCity() },
+    };
+    for (let step = 0; step < 8; step++) {
+      const stored = { ...save, boardRotationStep: step };
+      expect(readSave(memory(JSON.stringify(stored)), ids)).toEqual(stored);
+    }
+    for (const invalid of [undefined, null, -1, 8, 0.5, "4", true, {}]) {
+      const restored = readSave(
+        memory(JSON.stringify({ ...save, boardRotationStep: invalid })),
+        ids,
+      );
+      expect(restored).toEqual(save);
+    }
+  });
   it("round-trips city runs, undo, discoveries, locale and best independently", () => {
     const beijing = freshCity();
     beijing.run = move(beijing.run, "right", () => 0).run;

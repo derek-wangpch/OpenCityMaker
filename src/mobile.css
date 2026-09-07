@@ -428,6 +428,9 @@ html[data-theme="dark"] .mobile-cover-watermark {
 .mobile-board .board-canvas {
   inset: 0;
 }
+.mobile-board .board-rotation {
+  bottom: 14px;
+}
 .mobile-board .end-overlay {
   inset: 0;
 }

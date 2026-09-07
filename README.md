@@ -47,8 +47,9 @@ npm run test:e2e
 
 ## Play
 
-- A 4×4 board starts with two homes. Slide all tiles using arrow keys, WASD, the four on-screen diagonal arrows, or a diagonal touch swipe.
-- The isometric board projects **left as ↖**, **up as ↗**, **down as ↙**, and **right as ↘**. Touch follows these screen diagonals; keyboard arrows use the corresponding logical board axes.
+- A 4×4 board starts with two homes. Slide all tiles using arrow keys, WASD, the on-screen arrows, or a swipe along the visible grid.
+- At the original view, **left projects as ↖**, **up as ↗**, **down as ↙**, and **right as ↘**. The two rotation buttons turn the view clockwise or counterclockwise by 45°; eight clicks return to the original view. Swipes, keyboard controls and on-screen arrows follow the current view.
+- Rotation is available during play and merge animations. It does not move tiles, spawn homes, change the score or count as a move. The chosen angle is remembered on this browser across reloads and cities.
 - Equal buildings merge once per move. Each valid move spawns a 2 (90%) or 4 (10%) on a uniformly selected empty cell. Invalid moves do not spawn anything.
 - Scores add the values of merged buildings. Reaching 2048 wins and completes that run; a board without legal moves loses.
 - Undo restores the immediately preceding board and score once. Discoveries and personal bests are retained. A subsequent valid move enables undo again.

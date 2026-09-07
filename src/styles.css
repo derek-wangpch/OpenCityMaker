@@ -437,6 +437,39 @@ h1 {
 .board-actions button:hover {
   background: var(--surface-raised);
 }
+.board-rotation {
+  position: absolute;
+  z-index: 2;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-glass);
+  color: var(--text-muted);
+}
+.board-rotation button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+}
+.board-rotation button:hover {
+  background: var(--surface-raised);
+  color: var(--text);
+}
+.board-rotation > span {
+  font-size: 11px;
+  min-width: 28px;
+  text-align: center;
+}
 .board-canvas {
   position: absolute;
   inset: 90px 0 70px;
@@ -1613,6 +1646,12 @@ footer .history-trigger {
 }
 .game-panel:has(> .victory-slot) > .board-bottom {
   display: none;
+}
+.game-panel:has(> .victory-slot) > .board-rotation {
+  position: static;
+  transform: none;
+  align-self: center;
+  flex: none;
 }
 .game-panel > .victory-slot {
   flex: none;

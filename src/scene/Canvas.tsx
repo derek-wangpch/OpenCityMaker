@@ -4,6 +4,7 @@ import type { Direction, Movement } from "../game/engine";
 import type { Weather } from "../game/weather";
 import { SceneView } from "./render";
 import { useTheme } from "../theme";
+import { swipeDirection } from "../game/boardRotation";
 export function BoardCanvas({
   city,
   board,
@@ -11,6 +12,7 @@ export function BoardCanvas({
   reduced,
   labels,
   weather,
+  rotationStep = 0,
   onMove,
   onSelect,
   fallback,
@@ -22,6 +24,7 @@ export function BoardCanvas({
   reduced: boolean;
   labels: boolean;
   weather: Weather;
+  rotationStep?: number;
   onMove: (d: Direction) => void;
   onSelect?: (value: number) => void;
   fallback: string;
@@ -30,13 +33,24 @@ export function BoardCanvas({
   const { resolved: theme } = useTheme();
   const ref = useRef<HTMLCanvasElement>(null),
     view = useRef<SceneView | null>(null),
-    start = useRef<{ x: number; y: number } | null>(null),
+    start = useRef<{
+      x: number;
+      y: number;
+      pointerId: number;
+      rotationStep: number;
+    } | null>(null),
     mounted = useRef(false),
     lastTheme = useRef(theme);
   const [error, setError] = useState(false);
   useEffect(() => {
     try {
-      view.current = new SceneView(ref.current!, "board", true, theme);
+      view.current = new SceneView(
+        ref.current!,
+        "board",
+        true,
+        theme,
+        rotationStep,
+      );
     } catch {
       setError(true);
     }
@@ -46,6 +60,10 @@ export function BoardCanvas({
       mounted.current = false;
     };
   }, []);
+  useEffect(() => {
+    start.current = null;
+    view.current?.setBoardRotation(rotationStep);
+  }, [rotationStep]);
   useEffect(() => {
     // A fresh mount already draws the settled board, so the pending events of
     // the last move must not be replayed: leaving the board (atlas tab, page
@@ -64,22 +82,41 @@ export function BoardCanvas({
     lastTheme.current = theme;
   }, [city, board, events, reduced, labels, weather, theme]);
   return (
-    <div className="board-canvas" role="group" aria-label={label}>
+    <div
+      className="board-canvas"
+      role="group"
+      aria-label={label}
+      data-rotation-step={rotationStep}
+    >
       <canvas
         ref={ref}
         aria-hidden="true"
         onPointerDown={(e) => {
-          if (e.button !== 0) return;
-          start.current = { x: e.clientX, y: e.clientY };
+          if (e.button !== 0 || !e.isPrimary || start.current) return;
+          start.current = {
+            x: e.clientX,
+            y: e.clientY,
+            pointerId: e.pointerId,
+            rotationStep,
+          };
           e.currentTarget.setPointerCapture(e.pointerId);
         }}
-        onPointerCancel={() => {
-          start.current = null;
+        onPointerCancel={(e) => {
+          if (start.current?.pointerId === e.pointerId) start.current = null;
+        }}
+        onLostPointerCapture={(e) => {
+          if (start.current?.pointerId === e.pointerId) start.current = null;
         }}
         onPointerUp={(e) => {
-          if (!start.current) return;
-          const dx = e.clientX - start.current.x,
-            dy = e.clientY - start.current.y;
+          if (
+            !start.current ||
+            start.current.pointerId !== e.pointerId ||
+            start.current.rotationStep !== rotationStep
+          )
+            return;
+          const { x, y } = start.current;
+          const dx = e.clientX - x,
+            dy = e.clientY - y;
           start.current = null;
           // Too short to be a swipe: treat it as tapping the building itself
           // and open its atlas card.
@@ -88,7 +125,10 @@ export function BoardCanvas({
             if (index != null && board[index]) onSelect?.(board[index]);
             return;
           }
-          onMove(dy < 0 ? (dx < 0 ? "left" : "up") : dx < 0 ? "down" : "right");
+          const direction = view.current
+            ? view.current.swipe(x, y, e.clientX, e.clientY)
+            : swipeDirection(dx, dy, rotationStep);
+          if (direction) onMove(direction);
         }}
       />
       {error && (

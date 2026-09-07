@@ -6,8 +6,15 @@ import type { Movement } from "../game/engine";
 import { WeatherSystem } from "./weather";
 import type { Weather } from "../game/weather";
 import type { ResolvedTheme } from "../theme";
+import {
+  BOARD_CAMERA,
+  ORIGINAL_CAMERA_DISTANCE,
+  boardCameraPosition,
+  boardFieldOfView,
+  swipeDirection,
+} from "../game/boardRotation";
 export type SceneMode = "board" | "model" | "portrait";
-/** Orthographic frustum per mode: [width, minimum height] in world units. */
+/** Framing at the viewing target: [width, minimum height] in world units. */
 const FRUSTUM: Record<SceneMode, [number, number]> = {
   board: [11.7, 9.9],
   model: [3.8, 3.8],
@@ -48,7 +55,7 @@ export const SCENE_THEME = {
 export class SceneView {
   renderer: T.WebGLRenderer;
   scene = new T.Scene();
-  camera = new T.OrthographicCamera();
+  camera: T.OrthographicCamera | T.PerspectiveCamera;
   kit = new ModelKit();
   root = new T.Group();
   observer?: ResizeObserver;
@@ -58,9 +65,12 @@ export class SceneView {
   private textures = new Map<number, T.SpriteMaterial>();
   private content: T.Group | null = null;
   private raycaster = new T.Raycaster();
+  private boardPlane = new T.Plane(new T.Vector3(0, 1, 0), 0);
+  private viewHeight = FRUSTUM.board[1];
   private shadowMaterial = new T.ShadowMaterial({ opacity: 0.13 });
   private weather: WeatherSystem | null;
   private lastWeatherDraw = 0;
+  private rotationStep = 0;
   private hemi = new T.HemisphereLight("#fff7e6", "#789484", 1.8);
   private sun = new T.DirectionalLight("#fff1d7", 2.6);
   private theme: ResolvedTheme = "light";
@@ -73,7 +83,10 @@ export class SceneView {
     public mode: SceneMode,
     transparent = true,
     theme: ResolvedTheme = "light",
+    rotationStep = 0,
   ) {
+    this.camera =
+      mode === "board" ? new T.PerspectiveCamera() : new T.OrthographicCamera();
     this.renderer = new T.WebGLRenderer({
       canvas,
       antialias: true,
@@ -112,6 +125,7 @@ export class SceneView {
             this.hemi,
             this.sun,
             this.renderer,
+            BOARD_CAMERA.distance - ORIGINAL_CAMERA_DISTANCE,
           )
         : null;
     this.setTheme(theme);
@@ -120,14 +134,38 @@ export class SceneView {
       // reads as a skyline standing on one ground line.
       this.camera.position.set(1.6, 3.6, 12);
       this.camera.lookAt(0, 1.3, 0);
+    } else if (mode === "board") {
+      this.rotationStep = rotationStep;
+      this.applyBoardCamera();
     } else {
       this.camera.position.set(9, 11, 12);
-      this.camera.lookAt(0, mode === "board" ? 0.4 : 0.85, 0);
+      this.camera.lookAt(0, 0.85, 0);
     }
     this.observer = new ResizeObserver(() => this.resize());
     this.observer.observe(canvas);
     document.addEventListener("visibilitychange", this.visibility);
     this.resize();
+  }
+  private applyBoardCamera() {
+    const position = boardCameraPosition(this.rotationStep);
+    this.camera.position.set(position.x, position.y, position.z);
+    this.camera.lookAt(0, BOARD_CAMERA.targetY, 0);
+    this.camera.updateMatrixWorld();
+  }
+  setBoardRotation(step: number) {
+    if (this.mode !== "board" || this.rotationStep === step) return;
+    this.rotationStep = step;
+    this.applyBoardCamera();
+    this.root.traverse((object) => {
+      if (object instanceof T.Sprite) this.positionLabel(object);
+    });
+    this.draw();
+  }
+  private positionLabel(sprite: T.Sprite) {
+    // Keep the badge on the near edge of its own plot, including from behind.
+    // Rotate its original offset by precisely the same orbit as the camera.
+    const angle = (this.rotationStep * Math.PI) / 4;
+    sprite.position.set(0.78 * Math.sin(angle), 0.08, 0.78 * Math.cos(angle));
   }
   setTheme(theme: ResolvedTheme) {
     if (this.theme === theme) return;
@@ -160,12 +198,18 @@ export class SceneView {
     const aspect = w / h;
     const [width, minHeight] = FRUSTUM[this.mode];
     const height = Math.max(minHeight, width / aspect);
-    this.camera.left = (-height * aspect) / 2;
-    this.camera.right = (height * aspect) / 2;
-    this.camera.top = height / 2;
-    this.camera.bottom = -height / 2;
+    this.viewHeight = height;
+    if (this.camera instanceof T.PerspectiveCamera) {
+      this.camera.aspect = aspect;
+      this.camera.fov = boardFieldOfView(height);
+    } else {
+      this.camera.left = (-height * aspect) / 2;
+      this.camera.right = (height * aspect) / 2;
+      this.camera.top = height / 2;
+      this.camera.bottom = -height / 2;
+    }
     this.camera.near = 0.1;
-    this.camera.far = 100;
+    this.camera.far = this.mode === "board" ? 200 : 100;
     this.camera.updateProjectionMatrix();
     this.root.traverse((object) => {
       if (object instanceof T.Sprite) this.sizeLabel(object);
@@ -210,22 +254,28 @@ export class SceneView {
       texture.colorSpace = T.SRGBColorSpace;
       this.textures.set(
         value,
-        new T.SpriteMaterial({ map: texture, depthTest: false }),
+        new T.SpriteMaterial({
+          map: texture,
+          depthTest: false,
+          sizeAttenuation: false,
+        }),
       );
     }
     const sprite = new T.Sprite(this.textures.get(value)!);
-    sprite.position.set(0, 0.08, 0.78);
+    this.positionLabel(sprite);
     this.sizeLabel(sprite);
     sprite.renderOrder = 4;
     return sprite;
   }
   private sizeLabel(sprite: T.Sprite) {
-    const width = Math.max(
+    const referenceWidth = Math.max(
       0.58,
-      ((this.camera.top - this.camera.bottom) /
-        (this.canvas.clientHeight || 400)) *
-        30,
+      (this.viewHeight / (this.canvas.clientHeight || 400)) * 30,
     );
+    // Keep number badges readable at the same pixel size on near and far rows.
+    const width =
+      referenceWidth /
+      (this.camera instanceof T.PerspectiveCamera ? BOARD_CAMERA.distance : 1);
     sprite.scale.set(width, (width * 56) / 128, 1);
   }
   private plot(city: CityPack, value: number, index: number, labels = true) {
@@ -253,8 +303,26 @@ export class SceneView {
     this.root.clear();
     this.animation = undefined;
     this.weather?.set(weather, city.palette.background, reduced, theme);
-    this.kit.box(this.root, 7.9, 0.22, 7.9, palette.boardBase, 0, -0.29);
-    this.kit.box(this.root, 7.98, 0.09, 7.98, palette.boardRim, 0, -0.13);
+    // Match both layers so an aligned view has one straight outer silhouette.
+    const boardSize = 7.98;
+    this.kit.box(
+      this.root,
+      boardSize,
+      0.22,
+      boardSize,
+      palette.boardBase,
+      0,
+      -0.29,
+    );
+    this.kit.box(
+      this.root,
+      boardSize,
+      0.09,
+      boardSize,
+      palette.boardRim,
+      0,
+      -0.13,
+    );
     for (let i = 0; i < 16; i++)
       this.kit.box(
         this.root,
@@ -355,6 +423,30 @@ export class SceneView {
     for (let o = hit?.object as T.Object3D | null; o; o = o.parent)
       if (typeof o.userData.index === "number") return o.userData.index;
     return null;
+  }
+  /** Use the grid axes near the finger, including at the far side of the board. */
+  swipe(fromX: number, fromY: number, toX: number, toY: number) {
+    const rect = this.canvas.getBoundingClientRect();
+    let origin;
+    if (rect.width && rect.height) {
+      this.raycaster.setFromCamera(
+        new T.Vector2(
+          ((fromX - rect.left) / rect.width) * 2 - 1,
+          -((fromY - rect.top) / rect.height) * 2 + 1,
+        ),
+        this.camera,
+      );
+      const point = this.raycaster.ray.intersectPlane(
+        this.boardPlane,
+        new T.Vector3(),
+      );
+      if (point)
+        origin = {
+          x: T.MathUtils.clamp(point.x, -3.99, 3.99),
+          z: T.MathUtils.clamp(point.z, -3.99, 3.99),
+        };
+    }
+    return swipeDirection(toX - fromX, toY - fromY, this.rotationStep, origin);
   }
   model(
     city: CityPack,
