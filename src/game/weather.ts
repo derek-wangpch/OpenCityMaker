@@ -12,24 +12,44 @@ export const WEATHERS = [
 ] as const;
 export type Weather = (typeof WEATHERS)[number];
 
-/** Toolbar order: sunny default, clouds, rain, snow, fog, off, then around again. */
-export const nextWeather = (w: Weather): Weather =>
-  WEATHERS[(WEATHERS.indexOf(w) + 1) % WEATHERS.length];
+// Typical urban weather, rather than rare historical or nearby mountain snow.
+const SNOW_FREE_CITIES = new Set([
+  "hongkong",
+  "shenzhen",
+  "singapore",
+  "dubai",
+  "sydney",
+]);
+const WITHOUT_SNOW = WEATHERS.filter((weather) => weather !== "snow");
+
+export function cityWeathers(city?: string): readonly Weather[] {
+  return city && SNOW_FREE_CITIES.has(city) ? WITHOUT_SNOW : WEATHERS;
+}
+
+/** Toolbar order follows the city's supported weather, including off. */
+export function nextWeather(w: Weather, city?: string): Weather {
+  const choices = cityWeathers(city);
+  return choices[(choices.indexOf(w) + 1) % choices.length];
+}
 
 /** Pick a different weather for the automatic changeover. */
-export function randomWeather(current: Weather, random = Math.random): Weather {
+export function randomWeather(
+  current: Weather,
+  city?: string,
+  random = Math.random,
+): Weather {
   if (current === "off") return "off";
-  const choices = WEATHERS.filter(
+  const choices = cityWeathers(city).filter(
     (weather) => weather !== "off" && weather !== current,
   );
   return choices[Math.floor(random() * choices.length)] ?? "clear";
 }
 
-/** Saved values are whitelisted; anything else falls back to clear. */
-export function readWeather(v: unknown): Weather | undefined {
-  return typeof v === "string" && (WEATHERS as readonly string[]).includes(v)
-    ? (v as Weather)
-    : undefined;
+/** Unknown saves are ignored; weather unsupported by the city resets to clear. */
+export function readWeather(v: unknown, city?: string): Weather | undefined {
+  if (typeof v !== "string" || !(WEATHERS as readonly string[]).includes(v))
+    return undefined;
+  return cityWeathers(city).includes(v as Weather) ? (v as Weather) : "clear";
 }
 
 /** Sky tint mixed over the city background. Clear is a pass-through. */

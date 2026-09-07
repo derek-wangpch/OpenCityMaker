@@ -7,6 +7,7 @@
 - Uniform empty-cell selection; exact 90% spawn boundary; full-board spawn behavior.
 - Score accumulation, immutable input, single-step undo, win detection, and horizontal/vertical escape from loss.
 - Mass conservation over 100 generated boards in all four directions.
+- City-specific manual and automatic weather choices, normalization of saved snow and city switches, and preservation of off; all twelve cities covered by rule tests.
 - Per-city save round trips, undo restoration, corrupt/version-mismatched/blocked storage, invalid values, stale status, and discovery recovery.
 - All city translations, tier order, references, model keys, duplicate pack IDs, and finite model bounds for all 132 buildings across twelve shipped cities.
 - Model keys are globally unique, carry their city's prefix, and leave no orphan factories; `validatePacks` rejects a pack pair that shares a key.

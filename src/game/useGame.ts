@@ -3,7 +3,7 @@ import { cities } from "../cities/packs";
 import type { Building, Locale } from "../cities/types";
 import { move, undo, type Direction, type Movement } from "./engine";
 import { freshCity, type Save } from "./storage";
-import { nextWeather, randomWeather } from "./weather";
+import { nextWeather, randomWeather, readWeather } from "./weather";
 import type { GameRepository } from "./repository";
 import { messages } from "../i18n";
 const EMPTY_EVENTS: Movement[] = [];
@@ -35,7 +35,7 @@ export function useGame(initial: Save, repository: GameRepository) {
     locale = save.locale,
     t = messages[locale],
     showLabels = save.showLabels ?? false,
-    weather = save.weather ?? "clear";
+    weather = readWeather(save.weather, city.id) ?? "clear";
   const highest = Math.max(...current.discovered),
     highestIndex = Math.max(
       0,
@@ -73,7 +73,7 @@ export function useGame(initial: Save, repository: GameRepository) {
           setEvents(EMPTY_EVENTS);
           setSave((prev) => ({
             ...prev,
-            weather: randomWeather(prev.weather ?? "clear"),
+            weather: randomWeather(prev.weather ?? "clear", prev.city),
           }));
           schedule();
         },
@@ -92,6 +92,7 @@ export function useGame(initial: Save, repository: GameRepository) {
     setSave((prev) => ({
       ...prev,
       city: id,
+      weather: readWeather(prev.weather, id),
       cities: { ...prev.cities, [id]: prev.cities[id] ?? freshCity() },
     }));
   }
@@ -108,7 +109,7 @@ export function useGame(initial: Save, repository: GameRepository) {
     setEvents(EMPTY_EVENTS);
     setSave((prev) => ({
       ...prev,
-      weather: nextWeather(prev.weather ?? "clear"),
+      weather: nextWeather(prev.weather ?? "clear", prev.city),
     }));
   }
   function play(direction: Direction) {

@@ -61,7 +61,7 @@ export class Game {
         Number(raw.city) < CITY_IDS.length
           ? Number(raw.city)
           : 0;
-      const weather = readWeather(raw.weather);
+      const weather = readWeather(raw.weather, CITY_IDS[this.state.city]);
       if (weather) this.state.weather = weather;
       this.state.progress = CITY_IDS.map((_, i) => {
         const p: unknown = (raw.progress as unknown[])[i];
@@ -113,10 +113,17 @@ export class Game {
   }
   nextCity() {
     this.state.city = (this.state.city + 1) % CITY_IDS.length;
+    this.state.weather = readWeather(
+      this.state.weather,
+      CITY_IDS[this.state.city],
+    );
     this.save();
   }
   cycleWeather() {
-    this.state.weather = nextWeather(this.state.weather ?? "clear");
+    this.state.weather = nextWeather(
+      this.state.weather ?? "clear",
+      CITY_IDS[this.state.city],
+    );
     this.save();
   }
 }
