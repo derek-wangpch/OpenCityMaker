@@ -2,7 +2,7 @@ import type { Locale } from "./cities/types";
 const en = {
   history: "Match history",
   historyHint:
-    "Completed and restarted games. Undoing a finish updates the same record. Earlier games cannot be reconstructed from the old save.",
+    "Completed and restarted games. Continuing a completed city updates the same record and keeps your achievement.",
   historyEmpty: "No finished games yet. Keep building!",
   historyError: "History could not be read. Please try again.",
   historyWon: "Completed",
@@ -36,7 +36,7 @@ const en = {
   how: "How to play",
   helpTitle: "Small moves. Great cities.",
   helpBody:
-    "Slide the whole board along an arrow. Two matching buildings merge into the next landmark. Each building can merge once per move. A new home appears after every valid move. Reach 2048 to complete your city!",
+    "Slide the whole board along an arrow. Two matching buildings merge into the next landmark. Each building can merge once per move. A new home appears after every valid move. Reach 2048 to complete your city, then keep building toward 4096 and beyond!",
   controls: "Swipe diagonally · Arrow keys or WASD",
   journey: "THE JOURNEY TO 2048",
   start: "A city starts with a home.",
@@ -51,13 +51,19 @@ const en = {
   close: "Close",
   won: "A skyline to call your own.",
   wonBody:
-    "You reached 2048 and completed this city. Every great skyline started with a little home.",
+    "You reached 2048 and completed this city. Keep building to reach 4096 and beyond.",
   lost: "Every city has a new beginning.",
   lostBody:
     "No moves left: the board is full and no horizontally or vertically adjacent tiles have the same value.",
   inspectBoard: "Inspect board",
   showResult: "Show result",
   again: "Build again",
+  continueBuilding: "Keep building",
+  nextChallenge: "NEXT CHALLENGE",
+  challengeHint: "Merge matching numbers to reach the next level.",
+  completedBody:
+    "No moves left. Your city is complete, and your final score has been recorded.",
+  stillBuilding: "Still building",
   rotate: "Drag to rotate · ← → keys",
   reference: "Architectural reference",
   interpretation:
@@ -125,7 +131,7 @@ export type Messages = typeof en;
 const cn: Messages = {
   history: "战绩历史",
   historyHint:
-    "记录已结束和主动重开的对局；撤销终局会更新同一条记录。旧存档无法还原过去的战绩。",
+    "记录通关、结束和主动重开的对局；通关后继续建城会更新同一条战绩，并保留通关成绩。",
   historyEmpty: "还没有结束的对局，继续建城吧！",
   historyError: "无法读取战绩，请重试。",
   historyWon: "已通关",
@@ -159,7 +165,7 @@ const cn: Messages = {
   how: "玩法",
   helpTitle: "小小一步，宏伟城市。",
   helpBody:
-    "沿箭头方向滑动整个棋盘。两个相同建筑会合并为下一级地标，每个建筑每步只能合并一次。每次有效移动后会出现一座新房屋。达到2048，完成你的城市！",
+    "沿箭头方向滑动整个棋盘。两个相同建筑会合并为下一级地标，每个建筑每步只能合并一次。每次有效移动后会出现一座新房屋。达到2048即可通关，之后可以继续挑战4096和更高数字！",
   controls: "斜向滑动 · 方向键或 WASD",
   journey: "通往2048之旅",
   start: "一座城市，从小屋开始。",
@@ -172,13 +178,18 @@ const cn: Messages = {
   confirm: "重新开始",
   close: "关闭",
   won: "属于你的天际线。",
-  wonBody: "你达到了2048，完成了这座城市。每一片伟大的天际线，都始于一座小屋。",
+  wonBody: "你达到了2048，完成了这座城市。你可以继续建城，挑战4096和更高数字。",
   lost: "每座城市，都有新的开始。",
   lostBody:
     "棋盘已满，且上下左右相邻的格子都没有相同数字，无法继续移动或合并。",
   inspectBoard: "查看棋盘",
   showResult: "查看结算",
   again: "再次建城",
+  continueBuilding: "继续建城",
+  nextChallenge: "下一个挑战",
+  challengeHint: "合并相同数字的建筑，挑战更高等级。",
+  completedBody: "已经无路可走。这座城市已通关，最终成绩已记录。",
+  stillBuilding: "继续建城中",
   rotate: "拖动旋转 · ← → 键",
   reference: "建筑参考",
   interpretation: "原创微缩建筑 · 艺术编排，非历史年表。",
@@ -241,9 +252,14 @@ const cn: Messages = {
 };
 const tw: Messages = {
   ...cn,
+  continueBuilding: "繼續建城",
+  nextChallenge: "下一個挑戰",
+  challengeHint: "合併相同數字的建築，挑戰更高等級。",
+  completedBody: "已經無路可走。這座城市已通關，最終成績已記錄。",
+  stillBuilding: "繼續建城中",
   history: "戰績歷史",
   historyHint:
-    "記錄已結束和主動重開的對局；復原終局會更新同一筆記錄。舊存檔無法還原過去的戰績。",
+    "記錄通關、結束和主動重開的對局；通關後繼續建城會更新同一筆戰績，並保留通關成績。",
   historyEmpty: "還沒有結束的對局，繼續建城吧！",
   historyError: "無法讀取戰績，請重試。",
   historyWon: "已通關",
@@ -277,7 +293,7 @@ const tw: Messages = {
   unlocked: "已發現",
   helpTitle: "小小一步，宏偉城市。",
   helpBody:
-    "沿箭頭方向滑動整個棋盤。兩個相同建築會合併為下一級地標，每個建築每步只能合併一次。每次有效移動後會出現一座新房屋。達到2048，完成你的城市！",
+    "沿箭頭方向滑動整個棋盤。兩個相同建築會合併為下一級地標，每個建築每步只能合併一次。每次有效移動後會出現一座新房屋。達到2048即可通關，之後可以繼續挑戰4096和更高數字！",
   controls: "斜向滑動 · 方向鍵或 WASD",
   start: "一座城市，從小屋開始。",
   startSub: "讓兩座相遇，見證城市生長。",
@@ -289,7 +305,7 @@ const tw: Messages = {
   confirm: "重新開始",
   close: "關閉",
   won: "屬於你的天際線。",
-  wonBody: "你達到了2048，完成了這座城市。每一片偉大的天際線，都始於一座小屋。",
+  wonBody: "你達到了2048，完成了這座城市。你可以繼續建城，挑戰4096和更高數字。",
   lost: "每座城市，都有新的開始。",
   lostBody:
     "棋盤已滿，且上下左右相鄰的格子都沒有相同數字，無法繼續移動或合併。",

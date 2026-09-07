@@ -104,7 +104,9 @@ export class Game {
     this.save();
   }
   undo() {
-    this.current.run = undo(this.current.run);
+    // The prototype keeps its original win/undo flow; web continuation is separate.
+    const { hasWon: _hasWon, continued: _continued, ...run } = this.current.run;
+    this.current.run = undo(run);
     this.save();
   }
   restart() {

@@ -80,7 +80,7 @@ export function GameModal({
             <span>{t.rotate}</span>
           </div>
           <p>{modal.description[locale]}</p>
-          {!current.discovered.includes(modal.value) && (
+          {!current.discovered.includes(Math.min(modal.value, 2048)) && (
             <p className="muted">
               <LockKeyhole size={13} /> {t.atlasEmpty}
             </p>
