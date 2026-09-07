@@ -49,6 +49,7 @@ export function GameModal({
             <Landmark />
           </div>
           <p>{t.helpBody}</p>
+          <p>{t.undoHint}</p>
           <p className="muted">{t.controls}</p>
           <button className="primary" onClick={() => setModal(null)}>
             {t.play}

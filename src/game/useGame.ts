@@ -7,11 +7,8 @@ import { nextWeather, randomWeather, readWeather } from "./weather";
 import type { GameRepository } from "./repository";
 import { messages } from "../i18n";
 const EMPTY_EVENTS: Movement[] = [];
-/**
- * Undoing the last move is disabled for now. The engine still records the
- * snapshot (saves stay compatible), only the controls are hidden.
- */
-export const UNDO_ENABLED: boolean = false;
+/** One undo is available after each valid move, including a finishing move. */
+export const UNDO_ENABLED: boolean = true;
 export type GameModalState = "help" | "restart" | "history" | Building | null;
 /**
  * Game state shared by every layout (desktop page, mobile pages). Layout-specific
@@ -161,25 +158,29 @@ export function useGame(initial: Save, repository: GameRepository) {
     if (building) setModal(building);
   }
   function doUndo() {
+    const before = latest.current,
+      entry = before.cities[before.city],
+      run = undo(entry.run);
+    if (run === entry.run) return;
     busyUntil.current = 0;
     setEvents(EMPTY_EVENTS);
-    setSave((prev) => ({
-      ...prev,
+    const updated = {
+      ...before,
       cities: {
-        ...prev.cities,
-        [prev.city]: {
-          ...prev.cities[prev.city],
-          run: undo(prev.cities[prev.city].run),
+        ...before.cities,
+        [before.city]: {
+          ...entry,
+          run,
           session: {
-            ...prev.cities[prev.city].session,
-            moves:
-              prev.cities[prev.city].session.undoMoves ??
-              prev.cities[prev.city].session.moves,
+            ...entry.session,
+            moves: entry.session.undoMoves ?? entry.session.moves,
             undoMoves: null,
           },
         },
       },
-    }));
+    };
+    latest.current = updated;
+    setSave(updated);
     setAnnouncement(t.undo);
   }
   function restart() {

@@ -51,7 +51,7 @@ npm run test:e2e
 - The isometric board projects **left as ↖**, **up as ↗**, **down as ↙**, and **right as ↘**. Touch follows these screen diagonals; keyboard arrows use the corresponding logical board axes.
 - Equal buildings merge once per move. Each valid move spawns a 2 (90%) or 4 (10%) on a uniformly selected empty cell. Invalid moves do not spawn anything.
 - Scores add the values of merged buildings. Reaching 2048 wins and completes that run; a board without legal moves loses.
-- Undo restores the immediately preceding board and score once. Discoveries and personal bests are retained. A subsequent valid move enables undo again.
+- The **Undo** button in the desktop and mobile board toolbar restores the immediately preceding board, score and move count once, even after winning or losing. Discoveries and personal bests are retained. A subsequent valid move enables undo again; new games start with undo disabled.
 - Switching cities preserves each city's run. Restart asks for confirmation and preserves collection and best score. The city rail scrolls horizontally; arrow keys and Home/End move between cities without moving the board.
 - The atlas previews all eleven buildings of the selected city, marks discoveries, and supports dragging or arrow-key rotation in the detail viewer. Previews do not unlock buildings.
 - English, Simplified Chinese, and Traditional Chinese are available. Reduced motion follows the OS by default and can be changed for the current visit.

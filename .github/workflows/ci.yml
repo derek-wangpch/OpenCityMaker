@@ -49,3 +49,8 @@ jobs:
 
       - name: Run city weather browser tests
         run: npx playwright test tests/browser/city-weather.spec.ts --timeout=60000
+
+      - name: Run undo browser tests
+        run: >-
+          npx playwright test tests/browser/undo.spec.ts tests/browser/game.spec.ts
+          --grep "undo|loss leaves time" --timeout=60000

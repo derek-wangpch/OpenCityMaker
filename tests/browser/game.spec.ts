@@ -65,12 +65,11 @@ test("keyboard merge, discovery, city independence and reload", async ({
   await expect(page.locator(".collection-heading")).toContainText("2");
   const after = await saved(page);
   expect(after.cities.beijing.run.board).toContain(4);
-  // Undo is hidden for now: the snapshot is still recorded, but no control
-  // exposes it.
+  // Each valid move enables the single-step undo control.
   expect(after.cities.beijing.run.undo).not.toBeNull();
   await expect(
     page.getByRole("button", { name: "Undo", exact: true }),
-  ).toHaveCount(0);
+  ).toBeEnabled();
   expect(after.cities.beijing.best).toBe(4);
   expect(after.cities.beijing.discovered).toContain(4);
   await page.getByRole("button", { name: "02 Hong Kong" }).click();
@@ -641,8 +640,6 @@ test("Hong Kong dense skyline and keyboard after clicking controls at 360px", as
   });
 });
 
-// Undo is hidden in the UI for now, so the terminal-undo round trip is covered
-// by tests/repository.test.ts instead of here.
 test("IndexedDB migration, match history and reload", async ({ page }) => {
   await seed(page, [1024, 1024, ...Array(14).fill(0)]);
   await load(page);
@@ -663,9 +660,21 @@ test("IndexedDB migration, match history and reload", async ({ page }) => {
     path: "artifacts/screenshots/ui/history-desktop.png",
   });
   await page.keyboard.press("Escape");
-  await expect(
-    page.getByRole("button", { name: "Undo", exact: true }),
-  ).toHaveCount(0);
+  await page
+    .locator(".end-overlay")
+    .getByRole("button", { name: "Undo", exact: true })
+    .click();
+  await expect(page.locator(".end-overlay")).toHaveCount(0);
+  expect((await saved(page)).cities.beijing.run.board).toEqual(
+    migrated.cities.beijing.run.board,
+  );
+  await page
+    .getByRole("button", { name: "Match history", exact: true })
+    .click();
+  await expect(page.locator(".history-row")).toHaveCount(0);
+  await page.keyboard.press("Escape");
+  await page.keyboard.press("ArrowLeft");
+  await expect(page.locator(".end-overlay")).toBeVisible();
   await page.getByRole("button", { name: "Build again" }).click();
   await saved(page);
   await page.reload();
@@ -898,10 +907,20 @@ for (const width of [1440, 390]) {
     await expect(page.locator(".end-overlay")).toHaveCount(0);
     await page.getByRole("button", { name: "Show result" }).click();
     await expect(page.locator(".end-loss")).toBeVisible();
-    // Undo is hidden for now, so restarting is the only way out of the panel.
+    await page
+      .locator(".end-loss")
+      .getByRole("button", { name: "Undo", exact: true })
+      .click();
+    await expect(page.locator(".end-overlay, .end-review")).toHaveCount(0);
+    await expect(page.getByRole("table").getByRole("cell").first()).toHaveText(
+      "Empty",
+    );
     await expect(
       page.getByRole("button", { name: "Undo", exact: true }),
-    ).toHaveCount(0);
+    ).toBeDisabled();
+    await page.keyboard.press("ArrowLeft");
+    await page.clock.runFor(1600);
+    await expect(page.locator(".end-loss")).toBeVisible();
     await page.getByRole("button", { name: "Build again" }).click();
     await expect(page.locator(".end-overlay, .end-review")).toHaveCount(0);
   });
