@@ -44,5 +44,5 @@ jobs:
       - name: Run browser smoke tests
         run: >-
           npx playwright test tests/browser/game.spec.ts
-          --grep "keyboard merge|board mirror|restart confirmation|IndexedDB migration"
+          --grep "keyboard merge|board mirror|restart confirmation|IndexedDB migration|continuation"
           --timeout=60000

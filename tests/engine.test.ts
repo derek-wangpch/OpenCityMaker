@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
+  continueRun,
   getStatus,
   move,
   newRun,
@@ -87,6 +88,80 @@ describe("2048 rules", () => {
     expect(result.run.status).toBe("won");
     expect(result.run.score).toBe(2048);
     expect(move(result.run, "right").changed).toBe(false);
+  });
+  it("resumes a won run without changing its board, score or undo", () => {
+    const won = move(run([1024, 1024]), "left", () => 0).run;
+    const continued = continueRun(won);
+    expect(continued).toEqual({ ...won, status: "playing", keepPlaying: true });
+    expect(continued.board).toBe(won.board);
+    expect(continued.undo).toBe(won.undo);
+    expect(won.status).toBe("won");
+    const moved = move(continued, "right", () => 0);
+    expect(moved.changed).toBe(true);
+    expect(moved.run.status).toBe("playing");
+    expect(moved.run.keepPlaying).toBe(true);
+    expect(moved.run.score).toBe(won.score);
+    expect(moved.run.board).toContain(2048);
+  });
+  it("only accepts continue for a won run and starts new runs without it", () => {
+    for (const status of ["playing", "lost"] as const) {
+      const initial = { ...run([2, 4]), status };
+      expect(continueRun(initial)).toBe(initial);
+    }
+    expect(newRun(() => 0).keepPlaying).not.toBe(true);
+  });
+  it("keeps the continue choice through undo and later 2048 merges", () => {
+    const initial = run([1024, 1024]);
+    const continued = continueRun(move(initial, "left", () => 0).run);
+    const reverted = undo(continued);
+    expect(reverted).toEqual({ ...initial, keepPlaying: true });
+    const wonAgain = move(reverted, "left", () => 0).run;
+    expect(wonAgain.status).toBe("playing");
+    expect(wonAgain.keepPlaying).toBe(true);
+    expect(undo(move(wonAgain, "right", () => 0).run)).toEqual({
+      ...wonAgain,
+      undo: null,
+    });
+    const another = move(
+      { ...run([2048, 1024, 1024]), keepPlaying: true },
+      "left",
+      () => 0,
+    ).run;
+    expect(another.board.slice(0, 3)).toEqual([2048, 2048, 2]);
+    expect(another.status).toBe("playing");
+    expect(another.score).toBe(2048);
+  });
+  it.each([
+    ["left", [1, 2], [0, 1]],
+    ["right", [1, 2], [2, 3]],
+    ["up", [4, 8], [0, 4]],
+    ["down", [4, 8], [8, 12]],
+  ] as const)(
+    "moves 2048 tiles %s without merging them",
+    (direction, from, to) => {
+      const input = Array(16).fill(0);
+      const expected = Array(16).fill(0);
+      for (const index of from) input[index] = 2048;
+      for (const index of to) expected[index] = 2048;
+      const result = slide(input, direction);
+      expect(result.board).toEqual(expected);
+      expect(result.points).toBe(0);
+      expect(result.events).toHaveLength(2);
+      expect(result.events.every((event) => !event.merged)).toBe(true);
+    },
+  );
+  it("detects a loss when only adjacent 2048 tiles remain on a full board", () => {
+    const dead = [2, 4, 2, 4, 4, 2, 4, 2, 2, 4, 2, 4, 4, 2, 4, 2];
+    for (const neighbor of [1, 4]) {
+      const capped = [...dead];
+      capped[0] = capped[neighbor] = 2048;
+      expect(getStatus(capped)).toBe("won");
+      expect(getStatus(capped, true)).toBe("lost");
+      const continued = continueRun({ ...run(capped), status: "won" });
+      expect(continued.status).toBe("lost");
+      expect(move(continued, "right").changed).toBe(false);
+    }
+    expect(getStatus(Array(16).fill(2048), true)).toBe("lost");
   });
   it("distinguishes a dead board from available horizontal/vertical merges", () => {
     const dead = [2, 4, 2, 4, 4, 2, 4, 2, 2, 4, 2, 4, 4, 2, 4, 2];

@@ -46,7 +46,7 @@ export function EndOverlay({ game }: { game: GameController }) {
   );
 }
 function EndPanel({ game }: { game: GameController }) {
-  const { current, t, restart, doUndo } = game;
+  const { current, t, restart, doUndo, keepPlaying } = game;
   const won = current.run.status === "won";
   const [ready, setReady] = useState(won);
   const [inspecting, setInspecting] = useState(false);
@@ -78,7 +78,13 @@ function EndPanel({ game }: { game: GameController }) {
             {t.inspectBoard}
           </button>
         )}
-        <button className="primary" onClick={restart}>
+        {won && (
+          <button className="primary" onClick={keepPlaying}>
+            {t.keepPlaying}
+            <ArrowRight size={16} />
+          </button>
+        )}
+        <button className={won ? "text-button" : "primary"} onClick={restart}>
           {t.again}
           <ArrowRight size={16} />
         </button>

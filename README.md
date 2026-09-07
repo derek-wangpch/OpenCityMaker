@@ -50,7 +50,7 @@ npm run test:e2e
 - A 4×4 board starts with two homes. Slide all tiles using arrow keys, WASD, the four on-screen diagonal arrows, or a diagonal touch swipe.
 - The isometric board projects **left as ↖**, **up as ↗**, **down as ↙**, and **right as ↘**. Touch follows these screen diagonals; keyboard arrows use the corresponding logical board axes.
 - Equal buildings merge once per move. Each valid move spawns a 2 (90%) or 4 (10%) on a uniformly selected empty cell. Invalid moves do not spawn anything.
-- Scores add the values of merged buildings. Reaching 2048 wins and completes that run; a board without legal moves loses.
+- Scores add the values of merged buildings. Reaching 2048 shows a victory screen; choose **Keep playing** to continue the same run. Buildings stop at 2048 and cannot merge into higher tiers. A board without legal moves loses, including when its only matching neighbors are 2048 buildings.
 - Undo restores the immediately preceding board and score once. Discoveries and personal bests are retained. A subsequent valid move enables undo again.
 - Switching cities preserves each city's run. Restart asks for confirmation and preserves collection and best score. The city rail scrolls horizontally; arrow keys and Home/End move between cities without moving the board.
 - The atlas previews all eleven buildings of the selected city, marks discoveries, and supports dragging or arrow-key rotation in the detail viewer. Previews do not unlock buildings.

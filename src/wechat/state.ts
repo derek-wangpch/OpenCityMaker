@@ -1,5 +1,6 @@
 import { cities } from "../cities/packs";
 import {
+  continueRun,
   getStatus,
   move,
   newRun,
@@ -66,13 +67,18 @@ export class Game {
       this.state.progress = CITY_IDS.map((_, i) => {
         const p: unknown = (raw.progress as unknown[])[i];
         if (!record(p) || !snapshot(p.run)) return fresh();
-        const r = p.run as typeof p.run & { undo?: unknown };
+        const r = p.run as typeof p.run & {
+          undo?: unknown;
+          keepPlaying?: unknown;
+        };
+        const keepPlaying = r.keepPlaying === true;
         return {
           best: Math.max(score(p.best) ? p.best : 0, r.score),
           run: {
             board: [...r.board],
             score: r.score,
-            status: getStatus(r.board),
+            status: getStatus(r.board, keepPlaying),
+            ...(keepPlaying ? { keepPlaying: true } : {}),
             undo: snapshot(r.undo)
               ? { board: [...r.undo.board], score: r.undo.score }
               : null,
@@ -105,6 +111,12 @@ export class Game {
   }
   undo() {
     this.current.run = undo(this.current.run);
+    this.save();
+  }
+  continue() {
+    const run = continueRun(this.current.run);
+    if (run === this.current.run) return;
+    this.current.run = run;
     this.save();
   }
   restart() {

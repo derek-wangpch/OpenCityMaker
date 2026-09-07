@@ -35,8 +35,10 @@ async function load(page: Page) {
   await page.goto("/");
   await expect(page.locator(".discovery-image img")).toBeVisible();
 }
-const saved = async (page: Page) => {
-  await expect(page.locator(".save-dot")).not.toHaveClass(/warning/);
+const saved = async (page: Page, waitForIndicator = true) => {
+  // The mobile play page has no save indicator; its callers poll the record.
+  if (waitForIndicator)
+    await expect(page.locator(".save-dot")).not.toHaveClass(/warning/);
   return page.evaluate(
     () =>
       new Promise<any>((resolve, reject) => {
@@ -491,6 +493,189 @@ test("crowded mixed-height board, win and terminal input", async ({ page }) => {
   await page.screenshot({ path: "artifacts/screenshots/ui/win.png" });
   await page.getByRole("button", { name: "Build again" }).click();
   await expect(page.locator(".end-overlay")).toHaveCount(0);
+});
+test("2048 continuation preserves the run, persists and allows another 2048", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await seed(
+    page,
+    [1024, 1024, 0, 0, 1024, 0, 0, 0, 1024, 0, 0, 0, 0, 0, 0, 0],
+    { weather: "off" },
+  );
+  // Fix spawn positions so the second merge and capped tiles are predictable.
+  await page.addInitScript(() => (Math.random = () => 0));
+  await load(page);
+  await page.keyboard.press("ArrowLeft");
+  const overlay = page.locator(".end-overlay");
+  await expect(overlay).toContainText("You reached 2048");
+  await expect(
+    overlay.getByRole("button", { name: "Keep playing" }),
+  ).toBeVisible();
+  await expect(
+    overlay.getByRole("button", { name: "Build again" }),
+  ).toBeVisible();
+  await page.screenshot({
+    path: "artifacts/screenshots/ui/continuation-desktop.png",
+  });
+  const won = (await saved(page)).cities.beijing;
+  expect(won.run.score).toBe(2048);
+  expect(won.run.undo).not.toBeNull();
+  expect(won.session.moves).toBe(1);
+  expect(won.discovered).toContain(2048);
+  // The win still stops input until the player chooses to continue.
+  await page.keyboard.press("ArrowDown");
+  expect((await saved(page)).cities.beijing).toEqual(won);
+  await overlay.getByRole("button", { name: "Keep playing" }).click();
+  await expect(overlay).toHaveCount(0);
+  const continued = (await saved(page)).cities.beijing;
+  expect(continued).toEqual({
+    ...won,
+    run: { ...won.run, status: "playing", keepPlaying: true },
+  });
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByTestId("score")).toHaveText("4,096");
+  const second = (await saved(page)).cities.beijing;
+  expect(
+    second.run.board.filter((value: number) => value === 2048),
+  ).toHaveLength(2);
+  expect(second.run.status).toBe("playing");
+  expect(second.run.keepPlaying).toBe(true);
+  expect(second.session.moves).toBe(won.session.moves + 1);
+  await expect(overlay).toHaveCount(0);
+  // These adjacent 2048 tiles must slide separately rather than become 4096.
+  await page.keyboard.press("ArrowUp");
+  await expect
+    .poll(async () => (await saved(page)).cities.beijing.session.moves)
+    .toBe(won.session.moves + 2);
+  const after = (await saved(page)).cities.beijing;
+  expect(
+    after.run.board.filter((value: number) => value === 2048),
+  ).toHaveLength(2);
+  expect(Math.max(...after.run.board)).toBe(2048);
+  expect(after.run.score).toBe(4096);
+  await page.getByRole("button", { name: "02 Hong Kong" }).click();
+  await expect(page.locator("h1")).toContainText("Hong Kong");
+  expect((await saved(page)).cities.hongkong.run.keepPlaying).not.toBe(true);
+  await page.getByRole("button", { name: "01 Beijing" }).click();
+  await expect(page.locator("h1")).toContainText("Beijing");
+  expect((await saved(page)).cities.beijing).toEqual(after);
+  await expect(overlay).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByTestId("score")).toHaveText("4,096");
+  expect((await saved(page)).cities.beijing).toEqual(after);
+  await expect(overlay).toHaveCount(0);
+  await page.keyboard.press("ArrowRight");
+  await expect
+    .poll(async () => (await saved(page)).cities.beijing.session.moves)
+    .toBe(after.session.moves + 1);
+  expect((await saved(page)).cities.beijing.run.keepPlaying).toBe(true);
+  await expect(overlay).toHaveCount(0);
+});
+test("mobile 2048 continuation requires a tap before swipes resume", async ({
+  browser,
+}) => {
+  const context = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    deviceScaleFactor: 1,
+    isMobile: true,
+    hasTouch: true,
+    reducedMotion: "reduce",
+  });
+  const page = await context.newPage();
+  await seed(page, [1024, 1024, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2], {
+    weather: "off",
+  });
+  await page.goto("/#/play");
+  await expect(page.locator(".board-canvas canvas")).toBeVisible();
+  const session = await context.newCDPSession(page);
+  const swipe = async (direction: "left" | "right") => {
+    const box = (await page.locator(".board-canvas canvas").boundingBox())!;
+    const points = [
+      { x: box.x + 240, y: box.y + 150 },
+      { x: box.x + 100, y: box.y + 70 },
+    ];
+    if (direction === "right") points.reverse();
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchStart",
+      touchPoints: [points[0]],
+    });
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchMove",
+      touchPoints: [points[1]],
+    });
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchEnd",
+      touchPoints: [],
+    });
+  };
+  await swipe("left");
+  const overlay = page.locator(".end-overlay");
+  await expect(overlay).toContainText("You reached 2048");
+  await expect
+    .poll(async () => (await saved(page, false)).cities.beijing.run.status)
+    .toBe("won");
+  const won = (await saved(page, false)).cities.beijing;
+  await page.screenshot({
+    path: "artifacts/screenshots/ui/continuation-mobile.png",
+  });
+  await swipe("right");
+  await page.keyboard.press("ArrowRight");
+  expect((await saved(page, false)).cities.beijing).toEqual(won);
+  await overlay.getByRole("button", { name: "Keep playing" }).tap();
+  await expect(overlay).toHaveCount(0);
+  await expect
+    .poll(async () => (await saved(page, false)).cities.beijing)
+    .toEqual({
+      ...won,
+      run: { ...won.run, status: "playing", keepPlaying: true },
+    });
+  await swipe("right");
+  await expect
+    .poll(async () => (await saved(page, false)).cities.beijing.session.moves)
+    .toBe(won.session.moves + 1);
+  const after = (await saved(page, false)).cities.beijing;
+  expect(after.run.board).not.toEqual(won.run.board);
+  expect(after.run.keepPlaying).toBe(true);
+  await page.reload();
+  await expect(page.locator(".board-canvas canvas")).toBeVisible();
+  await expect(overlay).toHaveCount(0);
+  await expect
+    .poll(async () => (await saved(page, false)).cities.beijing)
+    .toEqual(after);
+  await swipe("left");
+  await expect
+    .poll(async () => (await saved(page, false)).cities.beijing.session.moves)
+    .toBe(after.session.moves + 1);
+  await expect(overlay).toHaveCount(0);
+  await context.close();
+});
+test("2048 continuation detects a dead board with adjacent capped tiles", async ({
+  page,
+}) => {
+  await seed(page, [2048, 2048, 2, 4, 4, 2, 4, 2, 2, 4, 2, 4, 4, 2, 4, 2], {
+    weather: "off",
+  });
+  await load(page);
+  await expect(page.locator(".end-overlay")).toContainText("You reached 2048");
+  const won = (await saved(page)).cities.beijing;
+  await page.getByRole("button", { name: "Keep playing", exact: true }).click();
+  await expect(page.locator(".end-loss")).toContainText("No moves left");
+  const lost = (await saved(page)).cities.beijing;
+  expect(lost).toEqual({
+    ...won,
+    run: { ...won.run, status: "lost", keepPlaying: true },
+  });
+  await expect(
+    page.getByRole("button", { name: "Keep playing", exact: true }),
+  ).toHaveCount(0);
+  await page.keyboard.press("ArrowLeft");
+  expect((await saved(page)).cities.beijing).toEqual(lost);
+  await page.getByRole("button", { name: "Build again" }).click();
+  await expect(page.locator(".end-overlay")).toHaveCount(0);
+  const restarted = (await saved(page)).cities.beijing;
+  expect(restarted.run.keepPlaying).not.toBe(true);
+  expect(restarted.session.id).not.toBe(won.session.id);
 });
 test("dead-board recovery and corrupt-storage recovery", async ({ page }) => {
   await seed(page, [2, 4, 2, 4, 4, 2, 4, 2, 2, 4, 2, 4, 4, 2, 4, 2]);

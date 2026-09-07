@@ -103,12 +103,17 @@ export function readSave(
       for (const id of ids) {
         const value = data.cities[id];
         if (!record(value) || !snapshot(value.run)) continue;
-        const rawRun = value.run as Snapshot & { undo?: unknown };
+        const rawRun = value.run as Snapshot & {
+          undo?: unknown;
+          keepPlaying?: unknown;
+        };
+        const keepPlaying = rawRun.keepPlaying === true;
         const run: Run = {
           board: [...rawRun.board],
           score: rawRun.score,
-          status: getStatus(rawRun.board),
+          status: getStatus(rawRun.board, keepPlaying),
           undo: snapshot(rawRun.undo) ? rawRun.undo : null,
+          ...(keepPlaying ? { keepPlaying: true } : {}),
         };
         const discovered = Array.isArray(value.discovered)
           ? value.discovered.filter((v) => VALUES.includes(v))

@@ -1,7 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { cities } from "../cities/packs";
 import type { Building, Locale } from "../cities/types";
-import { move, undo, type Direction, type Movement } from "./engine";
+import {
+  continueRun,
+  move,
+  undo,
+  type Direction,
+  type Movement,
+} from "./engine";
 import { freshCity, type Save } from "./storage";
 import { nextWeather, randomWeather } from "./weather";
 import type { GameRepository } from "./repository";
@@ -159,6 +165,24 @@ export function useGame(initial: Save, repository: GameRepository) {
     const building = city.buildings.find((b) => b.value === value);
     if (building) setModal(building);
   }
+  function keepPlaying() {
+    const before = latest.current,
+      entry = before.cities[before.city],
+      run = continueRun(entry.run);
+    if (run === entry.run) return;
+    busyUntil.current = 0;
+    setEvents(EMPTY_EVENTS);
+    const updated = {
+      ...before,
+      cities: {
+        ...before.cities,
+        [before.city]: { ...entry, run },
+      },
+    };
+    latest.current = updated;
+    setSave(updated);
+    setAnnouncement(run.status === "playing" ? t.statusPlaying : "");
+  }
   function doUndo() {
     busyUntil.current = 0;
     setEvents(EMPTY_EVENTS);
@@ -226,6 +250,7 @@ export function useGame(initial: Save, repository: GameRepository) {
     setLocale,
     play,
     inspect,
+    keepPlaying,
     doUndo,
     restart,
   };

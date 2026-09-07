@@ -80,6 +80,86 @@ describe("WeChat prototype persistence", () => {
     expect(game.state.progress[0].run.board).not.toContain(8192);
     expect(game.state.progress[1].run.status).toBe("won");
   });
+  it("continues a won run, persists the choice, and keeps tiles capped at 2048", () => {
+    const storage = memory(),
+      game = new Game(storage);
+    game.current.run = {
+      board: [2048, 2048, 2, 2, ...Array(12).fill(0)],
+      score: 4096,
+      status: "won",
+      undo: { board: [1024, 1024, ...Array(14).fill(0)], score: 2048 },
+    };
+    game.current.best = 4096;
+    game.save();
+    const won = structuredClone(game.current.run);
+    game.move("left");
+    expect(game.current.run).toEqual(won);
+    game.continue();
+    expect(game.current.run).toEqual({
+      ...won,
+      status: "playing",
+      keepPlaying: true,
+    });
+    const restored = new Game(storage);
+    expect(restored.current.run).toEqual(game.current.run);
+    restored.move("left");
+    expect(restored.current.run.board.slice(0, 3)).toEqual([2048, 2048, 4]);
+    expect(restored.current.run.board.every((value) => value <= 2048)).toBe(
+      true,
+    );
+    expect(restored.current.run.score).toBe(4100);
+    expect(restored.current.run.status).toBe("playing");
+    restored.undo();
+    expect(restored.current.run.board).toEqual(won.board);
+    expect(restored.current.run.keepPlaying).toBe(true);
+    expect(restored.current.run.status).toBe("playing");
+    restored.nextCity();
+    expect(restored.current.run.keepPlaying).toBeUndefined();
+    expect(restored.state.progress[0].run.keepPlaying).toBe(true);
+    for (let i = 1; i < restored.state.progress.length; i++)
+      restored.nextCity();
+    restored.restart();
+    expect(restored.current.run.keepPlaying).toBeUndefined();
+    expect(restored.current.best).toBe(4100);
+    expect(new Game(storage).current.run).toEqual(restored.current.run);
+  });
+  it.each([undefined, false, 1, "true", {}, []])(
+    "does not bypass the victory prompt for an invalid continuation flag: %j",
+    (keepPlaying) => {
+      const game = new Game({
+        getStorageSync: () => ({
+          version: 1,
+          city: 0,
+          progress: [
+            {
+              run: {
+                board: [2048, 2, ...Array(14).fill(0)],
+                score: 2048,
+                status: "playing",
+                keepPlaying,
+              },
+            },
+          ],
+        }),
+        setStorageSync: () => {},
+      });
+      expect(game.current.run.status).toBe("won");
+      expect(game.current.run.keepPlaying).toBeUndefined();
+    },
+  );
+  it("restores an exhausted continued board as lost", () => {
+    const storage = memory(),
+      game = new Game(storage);
+    game.current.run = {
+      board: [2048, 2048, 2, 4, 2, 4, 8, 2, 4, 8, 2, 4, 8, 2, 4, 8],
+      score: 4096,
+      status: "playing",
+      keepPlaying: true,
+      undo: null,
+    };
+    game.save();
+    expect(new Game(storage).current.run.status).toBe("lost");
+  });
   it("remembers the weather only when it is a known value and cycles it", () => {
     const storage = memory(),
       game = new Game(storage);

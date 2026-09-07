@@ -6,6 +6,7 @@
 - Invalid moves and completed runs consume no randomness.
 - Uniform empty-cell selection; exact 90% spawn boundary; full-board spawn behavior.
 - Score accumulation, immutable input, single-step undo, win detection, and horizontal/vertical escape from loss.
+- Explicit continuation after winning, remembered across moves, undo and save reloads; 2048 tiles never merge, and matching 2048 neighbors do not prevent a loss.
 - Mass conservation over 100 generated boards in all four directions.
 - Per-city save round trips, undo restoration, corrupt/version-mismatched/blocked storage, invalid values, stale status, and discovery recovery.
 - All city translations, tier order, references, model keys, duplicate pack IDs, and finite model bounds for all 132 buildings across twelve shipped cities.
@@ -30,7 +31,7 @@
 - Landmark atlas and interactive model rotation by drag and keyboard.
 - Phone touch swipe via Chromium touch events; directional button taps; controls inside a 390×844 viewport.
 - Atlas at 360×740 and all 132 model cards in the development gallery.
-- Dense board with high and low buildings; terminal win; blocked further moves; restart from win/loss.
+- Dense board with high and low buildings; victory blocks moves until Keep playing is clicked; desktop/mobile continuation, persistence and restart from win/loss.
 - Corrupt localStorage reload; unavailable localStorage and WebGL; reduced-motion mode.
 - Legacy save migrated on first load, match history listing a completed run, undo retracting it, re-finishing, restart archiving, reload persistence, localized history text, per-city filtering, and the preserved legacy backup value.
 - Visiting a city absent from the seeded save creates a fresh run that survives a reload alongside the cities the save did contain.

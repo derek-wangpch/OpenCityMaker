@@ -2,7 +2,7 @@ import { IDBFactory } from "fake-indexeddb";
 import { describe, it, expect } from "vitest";
 import { IndexedDbRepository } from "../src/game/repository";
 import { freshCity, type Save } from "../src/game/storage";
-import { move, undo } from "../src/game/engine";
+import { continueRun, move, undo } from "../src/game/engine";
 const ids = ["beijing", "hongkong"];
 function setup(raw: string | null = null) {
   const factory = new IDBFactory();
@@ -130,6 +130,73 @@ describe("IndexedDB progress and history", () => {
     const [lost] = await repo.history();
     await repo.save(initial());
     expect(await repo.history()).toEqual([lost]);
+    repo.close();
+  });
+  it("reopens a won session and records its eventual loss under the same id", async () => {
+    const { repo } = setup();
+    await repo.load();
+    const save = initial();
+    const entry = save.cities.beijing;
+    entry.run = {
+      board: [2048, 2048, 8, 16, 8, 16, 32, 64, 16, 32, 64, 128, 32, 64, 2, 2],
+      score: 4096,
+      status: "won",
+      undo: null,
+    };
+    entry.session.moves = 100;
+    await repo.save(save);
+    expect(await repo.history()).toMatchObject([
+      { id: entry.session.id, outcome: "won" },
+    ]);
+
+    entry.run = continueRun(entry.run);
+    await repo.save(save);
+    expect(await repo.history()).toEqual([]);
+    const loaded = (await repo.load()).cities.beijing;
+    expect(loaded.run).toEqual(entry.run);
+    expect(loaded.session).toEqual(entry.session);
+
+    entry.run = move(loaded.run, "left", () => 0).run;
+    entry.session.moves++;
+    expect(entry.run.status).toBe("lost");
+    await repo.save(save);
+    const records = await repo.history();
+    expect(records).toHaveLength(1);
+    expect(records[0]).toMatchObject({
+      id: entry.session.id,
+      outcome: "lost",
+      score: 4100,
+      highest: 2048,
+      moves: 101,
+      board: entry.run.board,
+    });
+    await repo.save(initial());
+    expect(await repo.history()).toEqual(records);
+    repo.close();
+  });
+  it("archives a restarted continued game with its latest score and moves", async () => {
+    const { repo } = setup();
+    await repo.load();
+    const save = initial();
+    const entry = save.cities.beijing;
+    entry.run.board = [1024, 1024, ...Array(14).fill(0)];
+    entry.run = move(entry.run, "left", () => 0).run;
+    await repo.save(save);
+    entry.run = continueRun(entry.run);
+    entry.run = move(entry.run, "right", () => 0).run;
+    entry.session.moves = 2;
+    await repo.save(save);
+    await repo.save(initial());
+    const records = await repo.history();
+    expect(records).toHaveLength(1);
+    expect(records[0]).toMatchObject({
+      id: entry.session.id,
+      outcome: "restarted",
+      score: entry.run.score,
+      highest: 2048,
+      moves: 2,
+      board: entry.run.board,
+    });
     repo.close();
   });
   it("reports unavailable database operations instead of pretending to save", async () => {

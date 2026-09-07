@@ -112,15 +112,47 @@ assert(texts.length > 0);
 // Cycle every weather mode and check the persisted state and repainted label.
 assert.equal(value.weather, undefined);
 for (const [kind, label] of [
-  ["cloudy", "多云"], ["rain", "雨"], ["snow", "雪"],
-  ["fog", "雾"], ["off", "关闭"], ["clear", "晴"],
+  ["cloudy", "多云"],
+  ["rain", "雨"],
+  ["snow", "雪"],
+  ["fog", "雾"],
+  ["off", "关闭"],
+  ["clear", "晴"],
 ]) {
   texts = [];
   gesture(touch(348, 107), touch(348, 107));
   assert.equal(value.weather, kind);
   assert(texts.includes(label));
 }
+// The victory screen exposes a real touch target that resumes the same board.
+value.progress[0].run = {
+  board: [2048, 2048, 2, 2, ...Array(12).fill(0)],
+  score: 4096,
+  status: "won",
+  undo: { board: [1024, 1024, ...Array(14).fill(0)], score: 2048 },
+};
+texts = [];
+vm.runInNewContext(source, { wx }, { timeout: 5000 });
+assert(texts.includes("继续游戏"));
+const won = structuredClone(value.progress[0].run);
+gesture(touch(250, 250), touch(60, 250));
+assert.deepEqual(value.progress[0].run, won);
+texts = [];
+gesture(touch(70, 600), touch(70, 600));
+assert.deepEqual(value.progress[0].run, {
+  ...won,
+  status: "playing",
+  keepPlaying: true,
+});
+assert(!texts.includes("继续游戏"));
+texts = [];
+vm.runInNewContext(source, { wx }, { timeout: 5000 });
+assert(!texts.includes("继续游戏"));
+gesture(touch(250, 250), touch(60, 250));
+assert.deepEqual(value.progress[0].run.board.slice(0, 3), [2048, 2048, 4]);
+assert.equal(value.progress[0].run.score, 4100);
+assert.equal(value.progress[0].run.status, "playing");
 callbacks.Hide(); // any pending weather tick chain must end so Node can exit
 console.log(
-  "Built bundle passed: wx-only boot, swipe/merge, undo, restart cancel/confirm, city persistence, hide/show/resize, weather chip.",
+  "Built bundle passed: wx-only boot, swipe/merge, undo, restart cancel/confirm, city persistence, hide/show/resize, weather chip, continue after 2048.",
 );

@@ -51,10 +51,11 @@ const en = {
   close: "Close",
   won: "A skyline to call your own.",
   wonBody:
-    "You reached 2048 and completed this city. Every great skyline started with a little home.",
+    "You reached 2048 and completed this city. Keep playing to grow your skyline; 2048 buildings cannot merge any further.",
+  keepPlaying: "Keep playing",
   lost: "Every city has a new beginning.",
   lostBody:
-    "No moves left: the board is full and no horizontally or vertically adjacent tiles have the same value.",
+    "No moves left: the board is full and no matching neighbors below 2048 can merge.",
   inspectBoard: "Inspect board",
   showResult: "Show result",
   again: "Build again",
@@ -172,10 +173,11 @@ const cn: Messages = {
   confirm: "重新开始",
   close: "关闭",
   won: "属于你的天际线。",
-  wonBody: "你达到了2048，完成了这座城市。每一片伟大的天际线，都始于一座小屋。",
+  wonBody:
+    "你达到了2048，完成了这座城市。可以继续游戏，扩展天际线；2048建筑无法再合并。",
+  keepPlaying: "继续游戏",
   lost: "每座城市，都有新的开始。",
-  lostBody:
-    "棋盘已满，且上下左右相邻的格子都没有相同数字，无法继续移动或合并。",
+  lostBody: "棋盘已满，且没有低于2048的相同相邻建筑可以合并，无法继续移动。",
   inspectBoard: "查看棋盘",
   showResult: "查看结算",
   again: "再次建城",
@@ -289,10 +291,11 @@ const tw: Messages = {
   confirm: "重新開始",
   close: "關閉",
   won: "屬於你的天際線。",
-  wonBody: "你達到了2048，完成了這座城市。每一片偉大的天際線，都始於一座小屋。",
+  wonBody:
+    "你達到了2048，完成了這座城市。可以繼續遊戲，擴展天際線；2048建築無法再合併。",
+  keepPlaying: "繼續遊戲",
   lost: "每座城市，都有新的開始。",
-  lostBody:
-    "棋盤已滿，且上下左右相鄰的格子都沒有相同數字，無法繼續移動或合併。",
+  lostBody: "棋盤已滿，且沒有低於2048的相同相鄰建築可以合併，無法繼續移動。",
   inspectBoard: "查看棋盤",
   showResult: "查看結算",
   rotate: "拖動旋轉 · ← → 鍵",

@@ -8,7 +8,7 @@ import {
   type Save,
   type StorageLike,
 } from "../src/game/storage";
-import { move } from "../src/game/engine";
+import { continueRun, move, undo } from "../src/game/engine";
 const ids = ["beijing", "hongkong"];
 function memory(raw: string | null = null): StorageLike {
   let value = raw;
@@ -96,6 +96,78 @@ describe("local persistence", () => {
     expect(restored.cities.beijing.run.status).toBe("playing");
     expect(restored.cities.beijing.run.undo).toBe(null);
     expect(restored.cities.beijing.discovered).not.toContain(3);
+  });
+  it("restores continued runs with their score, undo and session intact", () => {
+    const city = freshCity();
+    city.run = continueRun(
+      move(
+        { ...city.run, board: [1024, 1024, ...Array(14).fill(0)] },
+        "left",
+        () => 0,
+      ).run,
+    );
+    city.session.moves = 10;
+    city.session.undoMoves = 9;
+    const save: Save = {
+      version: 1,
+      city: "beijing",
+      locale: "en",
+      cities: { beijing: city },
+    };
+    const storage = memory();
+    expect(writeSave(storage, save)).toBe(true);
+    const restored = readSave(storage, ids).cities.beijing;
+    expect(restored.run).toEqual(city.run);
+    expect(restored.session).toEqual(city.session);
+    expect(restored.run.status).toBe("playing");
+    expect(move(restored.run, "right", () => 0).run.status).toBe("playing");
+    const reverted = undo(restored.run);
+    expect(reverted.keepPlaying).toBe(true);
+    expect(move(reverted, "left", () => 0).run.status).toBe("playing");
+  });
+  it("requires a strict true continue flag and keeps legacy wins paused", () => {
+    const city = freshCity();
+    for (const keepPlaying of [undefined, false, "true", 1, {}, null]) {
+      const data = {
+        version: 1,
+        cities: {
+          beijing: {
+            ...city,
+            run: {
+              ...city.run,
+              board: [2048, 2, ...Array(14).fill(0)],
+              status: "playing",
+              keepPlaying,
+            },
+          },
+        },
+      };
+      const restored = readSave(memory(JSON.stringify(data)), ids).cities
+        .beijing;
+      expect(restored.run.status).toBe("won");
+      expect(restored.run.keepPlaying).toBeUndefined();
+      expect(move(restored.run, "right").changed).toBe(false);
+    }
+  });
+  it("recomputes a continued dead board as lost despite adjacent 2048 tiles", () => {
+    const city = freshCity();
+    const data = {
+      version: 1,
+      cities: {
+        beijing: {
+          ...city,
+          run: {
+            ...city.run,
+            board: [2048, 2048, 2, 4, 4, 2, 4, 2, 2, 4, 2, 4, 4, 2, 4, 2],
+            status: "playing",
+            keepPlaying: true,
+          },
+        },
+      },
+    };
+    const restored = readSave(memory(JSON.stringify(data)), ids).cities.beijing;
+    expect(restored.run.keepPlaying).toBe(true);
+    expect(restored.run.status).toBe("lost");
   });
   it("rejects impossible board values and non-finite scores", () => {
     const city = freshCity();

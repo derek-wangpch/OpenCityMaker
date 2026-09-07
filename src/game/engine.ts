@@ -8,6 +8,8 @@ export interface Snapshot {
 export interface Run extends Snapshot {
   status: Status;
   undo: Snapshot | null;
+  /** Keep playing after acknowledging the first 2048 tile. */
+  keepPlaying?: boolean;
 }
 export interface Movement {
   from: number;
@@ -22,14 +24,20 @@ export interface MoveResult {
   changed: boolean;
 }
 export const VALUES = Array.from({ length: 11 }, (_, i) => 2 ** (i + 1));
-export function getStatus(board: Board): Status {
-  if (board.includes(2048)) return "won";
+export function getStatus(board: Board, keepPlaying = false): Status {
+  if (!keepPlaying && board.includes(2048)) return "won";
   if (board.includes(0)) return "playing";
   for (let i = 0; i < 16; i++) {
+    if (board[i] >= 2048) continue;
     if (i % 4 < 3 && board[i] === board[i + 1]) return "playing";
     if (i < 12 && board[i] === board[i + 4]) return "playing";
   }
   return "lost";
+}
+export function continueRun(run: Run): Run {
+  return run.status === "won"
+    ? { ...run, keepPlaying: true, status: getStatus(run.board, true) }
+    : run;
 }
 export function spawn(
   board: Board,
@@ -103,9 +111,10 @@ export function move(
   const added = spawn(result.board, random);
   return {
     run: {
+      ...run,
       board: added.board,
       score: run.score + result.points,
-      status: getStatus(added.board),
+      status: getStatus(added.board, run.keepPlaying),
       undo: { board: [...run.board], score: run.score },
     },
     events: result.events,
@@ -116,9 +125,10 @@ export function move(
 export function undo(run: Run): Run {
   return run.undo
     ? {
-        ...run.undo,
+        ...run,
         board: [...run.undo.board],
-        status: getStatus(run.undo.board),
+        score: run.undo.score,
+        status: getStatus(run.undo.board, run.keepPlaying),
         undo: null,
       }
     : run;

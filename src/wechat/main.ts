@@ -248,7 +248,7 @@ function draw() {
   const status = game.current.run.status;
   text(
     status === "won"
-      ? "已合成 2048！可撤销或重新开始"
+      ? "已合成 2048！可继续游戏（最高 2048）"
       : status === "lost"
         ? "没有可移动的格子，可撤销或重开"
         : "上下左右滑动，合并相同建筑",
@@ -256,15 +256,18 @@ function draw() {
     boardY + size + 22,
     14,
   );
-  const bw = (width - 48) / 3;
-  buttons = [
+  const actions = [
     {
       label: game.current.run.undo ? "撤销" : "暂无撤销",
       action: () => game.undo(),
     },
     { label: "重新开始", action: restart },
     { label: "切换城市", action: () => game.nextCity() },
-  ].map((b, i) => ({
+  ];
+  if (status === "won")
+    actions.unshift({ label: "继续游戏", action: () => game.continue() });
+  const bw = (width - 32 - (actions.length - 1) * 8) / actions.length;
+  buttons = actions.map((b, i) => ({
     ...b,
     x: 16 + i * (bw + 8),
     y: boardY + size + 44,
