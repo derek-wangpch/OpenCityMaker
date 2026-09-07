@@ -6,6 +6,7 @@ import { freshCity, type Save } from "./storage";
 import { nextWeather, randomWeather } from "./weather";
 import type { GameRepository } from "./repository";
 import { messages } from "../i18n";
+import { keyboardDirection, normalizeRotation } from "./boardRotation";
 const EMPTY_EVENTS: Movement[] = [];
 /**
  * Undoing the last move is disabled for now. The engine still records the
@@ -35,6 +36,7 @@ export function useGame(initial: Save, repository: GameRepository) {
     locale = save.locale,
     t = messages[locale],
     showLabels = save.showLabels ?? false,
+    boardRotationStep = save.boardRotationStep ?? 0,
     weather = save.weather ?? "clear";
   const highest = Math.max(...current.discovered),
     highestIndex = Math.max(
@@ -102,6 +104,15 @@ export function useGame(initial: Save, repository: GameRepository) {
     // Re-rendering the board replays pending events, so drop them first.
     setEvents(EMPTY_EVENTS);
     setSave((prev) => ({ ...prev, showLabels: !(prev.showLabels ?? false) }));
+  }
+  function rotateBoard(delta: -1 | 1) {
+    // View-only: preserve events so an in-flight merge can finish normally.
+    setSave((prev) => ({
+      ...prev,
+      boardRotationStep: normalizeRotation(
+        (prev.boardRotationStep ?? 0) + delta,
+      ),
+    }));
   }
   function cycleWeather() {
     // Re-rendering the board replays pending events, so drop them first.
@@ -220,6 +231,8 @@ export function useGame(initial: Save, repository: GameRepository) {
     setReduced,
     showLabels,
     toggleLabels,
+    boardRotationStep,
+    rotateBoard,
     weather,
     cycleWeather,
     changeCity,
@@ -232,7 +245,11 @@ export function useGame(initial: Save, repository: GameRepository) {
 }
 export type GameController = ReturnType<typeof useGame>;
 /** Arrow / WASD moves. `enabled` is false while another page or a dialog is open. */
-export function useArrowKeys(enabled: boolean, play: (d: Direction) => void) {
+export function useArrowKeys(
+  enabled: boolean,
+  play: (d: Direction) => void,
+  rotationStep = 0,
+) {
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
@@ -280,7 +297,7 @@ export function useArrowKeys(enabled: boolean, play: (d: Direction) => void) {
         )[e.code];
       if (direction && enabled) {
         e.preventDefault();
-        play(direction);
+        play(keyboardDirection(direction, rotationStep));
       }
     };
     window.addEventListener("keydown", key);

@@ -1,9 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowUpRight,
-  ArrowDownRight,
-  ArrowUpLeft,
-  ArrowDownLeft,
   ArrowRight,
   Check,
   ChevronDown,
@@ -43,6 +40,12 @@ import { AtlasGrid, isLocalTest } from "./AtlasGrid";
 import { BoardTable, EndOverlay, LiveRegion } from "./BoardExtras";
 import { GameModal } from "./GameModal";
 import { ThemeButton } from "./ThemeButton";
+import { BoardRotationControls } from "./BoardRotationControls";
+import {
+  directionGlyph,
+  keyboardDirection,
+  projectDirection,
+} from "./game/boardRotation";
 /** Wide-screen layout: one scrolling page with the board, sidebar and atlas. */
 const WEATHER_ICONS: Record<Weather, typeof CloudSun> = {
   off: CloudOff,
@@ -74,6 +77,7 @@ export function DesktopGame({
     setReduced,
     showLabels,
     toggleLabels,
+    boardRotationStep,
     weather,
     cycleWeather,
     changeCity,
@@ -87,7 +91,7 @@ export function DesktopGame({
   );
   const rail = useRef<HTMLDivElement>(null);
   const { thumb } = useThumbnails(city);
-  useArrowKeys(page === "play" && !modal, play);
+  useArrowKeys(page === "play" && !modal, play, boardRotationStep);
   // Weather is a six-state cycle, so the button announces the state instead
   // of a boolean aria-pressed.
   const WeatherIcon = WEATHER_ICONS[weather],
@@ -342,11 +346,13 @@ export function DesktopGame({
                 reduced={reduced}
                 labels={showLabels}
                 weather={weather}
+                rotationStep={boardRotationStep}
                 onMove={play}
                 onSelect={inspect}
                 fallback={t.webgl}
                 label={t.board}
               />
+              <BoardRotationControls game={game} />
               <BoardTable game={game} />
               <EndOverlay game={game} />
               <div className="board-bottom">
@@ -355,24 +361,30 @@ export function DesktopGame({
                   <small>{t.controls}</small>
                 </div>
                 <div className="direction-pad">
-                  {(
-                    [
-                      ["left", ArrowUpLeft],
-                      ["up", ArrowUpRight],
-                      ["down", ArrowDownLeft],
-                      ["right", ArrowDownRight],
-                    ] as const
-                  ).map(([direction, Icon]) => (
-                    <button
-                      key={direction}
-                      aria-label={t[direction]}
-                      title={t[direction]}
-                      disabled={current.run.status !== "playing"}
-                      onClick={() => play(direction)}
-                    >
-                      <Icon size={19} />
-                    </button>
-                  ))}
+                  {(["left", "up", "down", "right"] as const).map((key) => {
+                    const direction = keyboardDirection(key, boardRotationStep);
+                    const axis = projectDirection(direction, boardRotationStep);
+                    const label = t[key].replace(
+                      /[↖↗↙↘]/u,
+                      directionGlyph(direction, boardRotationStep),
+                    );
+                    return (
+                      <button
+                        key={key}
+                        aria-label={label}
+                        title={label}
+                        disabled={current.run.status !== "playing"}
+                        onClick={() => play(direction)}
+                      >
+                        <ArrowRight
+                          size={19}
+                          style={{
+                            transform: `rotate(${Math.atan2(axis.y, axis.x)}rad)`,
+                          }}
+                        />
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </section>

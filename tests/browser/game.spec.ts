@@ -1,6 +1,12 @@
 import { move, type Direction } from "../../src/game/engine";
 import { test, expect, type Page } from "@playwright/test";
 import { cities } from "../../src/cities/packs";
+import { PerspectiveCamera, Vector3 } from "three";
+import {
+  BOARD_CAMERA,
+  boardCameraPosition,
+  boardFieldOfView,
+} from "../../src/game/boardRotation";
 const initial = [2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 const allModels = cities.length * 11;
 async function seed(
@@ -126,20 +132,29 @@ test("returning from the atlas tab does not replay the last move", async ({
   await page.waitForTimeout(600);
   expect(await page.evaluate(() => (window as any).__frames)).toBeLessThan(3);
 });
-/** Where a board cell lands on screen, following SceneView's fixed camera. */
+/** Project a building's centre using SceneView's default board camera. */
 function project(
   index: number,
   box: { x: number; y: number; width: number; height: number },
 ) {
   const x = ((index % 4) - 1.5) * 1.88,
     z = (Math.floor(index / 4) - 1.5) * 1.88;
-  const right = 0.8 * x - 0.6 * z,
-    up = -0.355 * x - 0.473 * z - 0.04;
   const aspect = box.width / box.height,
     height = Math.max(9.9, 11.7 / aspect);
+  const camera = new PerspectiveCamera(
+    boardFieldOfView(height),
+    aspect,
+    0.1,
+    200,
+  );
+  const position = boardCameraPosition(0);
+  camera.position.set(position.x, position.y, position.z);
+  camera.lookAt(0, BOARD_CAMERA.targetY, 0);
+  camera.updateMatrixWorld();
+  const projected = new Vector3(x, 0.35, z).project(camera);
   return {
-    x: box.x + box.width / 2 + (right / (height * aspect)) * box.width,
-    y: box.y + box.height / 2 - (up / height) * box.height,
+    x: box.x + ((projected.x + 1) / 2) * box.width,
+    y: box.y + ((1 - projected.y) / 2) * box.height,
   };
 }
 // Two far-apart tiles: the back-left corner and the front-right one.

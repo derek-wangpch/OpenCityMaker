@@ -1,6 +1,7 @@
 import { getStatus, newRun, VALUES, type Run, type Snapshot } from "./engine";
 import type { Locale } from "../cities/types";
 import { readWeather, type Weather } from "./weather";
+import { readRotation } from "./boardRotation";
 export const SAVE_KEY = "citymaker:v1";
 export interface Session {
   id: string;
@@ -50,6 +51,8 @@ export interface Save {
   showLabels?: boolean;
   /** Diorama weather. Absent means clear. */
   weather?: Weather;
+  /** Clockwise 45-degree steps from the default camera. Absent means zero. */
+  boardRotationStep?: number;
 }
 export interface StorageLike {
   getItem(key: string): string | null;
@@ -95,6 +98,8 @@ export function readSave(
     if (["en", "zh-CN", "zh-HK"].includes(String(data.locale)))
       base.locale = data.locale as Locale;
     if (typeof data.showLabels === "boolean") base.showLabels = data.showLabels;
+    const rotation = readRotation(data.boardRotationStep);
+    if (rotation !== undefined) base.boardRotationStep = rotation;
     const weather = readWeather(data.weather);
     if (weather) base.weather = weather;
     if (typeof data.city === "string" && ids.includes(data.city))

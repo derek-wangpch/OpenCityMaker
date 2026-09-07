@@ -28,6 +28,26 @@ function initial(): Save {
   };
 }
 describe("IndexedDB progress and history", () => {
+  it("persists rotation across reopening without altering a run or completed history", async () => {
+    const { repo, factory } = setup();
+    const original = initial();
+    original.cities.beijing.run.status = "won";
+    original.cities.beijing.run.board = [2048, 2, ...Array(14).fill(0)];
+    original.cities.beijing.discovered = [2, 2048];
+    await repo.save(original);
+    const history = await repo.history();
+    for (let step = 0; step < 8; step++) {
+      await repo.save({ ...original, boardRotationStep: step });
+    }
+    repo.close();
+    const reopened = new IndexedDbRepository(ids, factory);
+    expect(await reopened.load()).toEqual({
+      ...original,
+      boardRotationStep: 7,
+    });
+    expect(await reopened.history()).toEqual(history);
+    reopened.close();
+  });
   it("migrates once without deleting or overwriting the old backup", async () => {
     const original = initial();
     original.cities.beijing.best = 800;

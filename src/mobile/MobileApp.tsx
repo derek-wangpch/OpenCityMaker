@@ -17,7 +17,11 @@ export function MobileApp({
   repository: GameRepository;
 }) {
   const { route, from, navigate, back } = useHashRoute();
-  useArrowKeys(route === "play" && !game.modal, game.play);
+  useArrowKeys(
+    route === "play" && !game.modal,
+    game.play,
+    game.boardRotationStep,
+  );
   // Lock document scrolling only while the phone shell is mounted.
   useEffect(() => {
     document.documentElement.classList.add("mobile-app");

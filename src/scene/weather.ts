@@ -83,6 +83,7 @@ export class WeatherSystem {
     private hemi: T.HemisphereLight,
     private sun: T.DirectionalLight,
     private renderer: T.WebGLRenderer,
+    private fogDistanceOffset = 0,
   ) {
     this.base = {
       hemi: hemi.intensity,
@@ -350,12 +351,14 @@ export class WeatherSystem {
     this.renderer.toneMappingExposure = this.base.exposure * exposure;
     if (w.fog > 0) {
       // Scaling the linear fog range scales its visible density continuously.
+      const near = 12 + this.fogDistanceOffset;
       const fog =
         this.scene.fog instanceof T.Fog
           ? this.scene.fog
-          : new T.Fog(this.fogKey, 12, 34);
+          : new T.Fog(this.fogKey, near, near + 22);
       fog.color.set(this.fogKey);
-      fog.far = 12 + 22 / w.fog;
+      fog.near = near;
+      fog.far = near + 22 / w.fog;
       this.scene.fog = fog;
       this.puffs.children.forEach((puff) => {
         (puff as T.Sprite).material.color.set(
@@ -401,26 +404,34 @@ export class WeatherSystem {
     );
   }
   /** Keep full cloud silhouettes inside the current canvas framing. */
-  fitClouds(camera: T.OrthographicCamera) {
+  fitClouds(camera: T.OrthographicCamera | T.PerspectiveCamera) {
     if (!this.clouds.visible) return;
     if (this.reduced) this.paintClouds(STATIC_PHASE);
     camera.updateMatrixWorld();
     // Billboards extend beyond their centers. Fit their full rectangle in
     // camera space so the canvas cannot slice off a drifting cloud crown.
     const position = new T.Vector3();
+    const min = new T.Vector2(),
+      max = new T.Vector2();
     this.clouds.children.forEach((cloud) => {
       position.copy(cloud.position).applyMatrix4(camera.matrixWorldInverse);
+      if (camera instanceof T.PerspectiveCamera)
+        camera.getViewBounds(-position.z, min, max);
+      else {
+        min.set(camera.left, camera.bottom);
+        max.set(camera.right, camera.top);
+      }
       const halfWidth = cloud.scale.x / 2 + 0.12;
       const halfHeight = cloud.scale.y / 2 + 0.12;
       position.x = T.MathUtils.clamp(
         position.x,
-        camera.left + halfWidth,
-        camera.right - halfWidth,
+        min.x + halfWidth,
+        max.x - halfWidth,
       );
       position.y = T.MathUtils.clamp(
         position.y,
-        camera.bottom + halfHeight,
-        camera.top - halfHeight,
+        min.y + halfHeight,
+        max.y - halfHeight,
       );
       cloud.position.copy(position.applyMatrix4(camera.matrixWorld));
     });

@@ -19,6 +19,7 @@ import { BoardTable, EndOverlay } from "../BoardExtras";
 import { UNDO_ENABLED, type GameController } from "../game/useGame";
 import type { Weather } from "../game/weather";
 import type { Route } from "../useHashRoute";
+import { BoardRotationControls } from "../BoardRotationControls";
 /** Full-screen board: the canvas takes every pixel between the two bars. */
 const WEATHER_ICONS: Record<Weather, typeof CloudSun> = {
   off: CloudOff,
@@ -104,11 +105,13 @@ export function GamePage({
           reduced={reduced}
           labels={showLabels}
           weather={weather}
+          rotationStep={game.boardRotationStep}
           onMove={play}
           onSelect={inspect}
           fallback={t.webgl}
           label={t.board}
         />
+        <BoardRotationControls game={game} />
         <BoardTable game={game} />
         <EndOverlay game={game} />
       </div>

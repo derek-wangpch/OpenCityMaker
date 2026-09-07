@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" />
+  <title>Board rotation review</title>
+  <style>
+    body {
+      margin: 0;
+      background: #e6ecdf;
+      font: 14px system-ui;
+    }
+    canvas {
+      display: block;
+      width: 600px;
+      height: 600px;
+    }
+  </style>
+  <canvas id="view" width="600" height="600"></canvas>
+  <script type="module">
+    import { SceneView } from "/src/scene/render.ts";
+    import { cities } from "/src/cities/packs.ts";
+    const view = new SceneView(document.querySelector("canvas"), "board");
+    const board = [2, ...Array(14).fill(0), 4];
+    view.board(cities[0], board, [], false, true, "off");
+    window.rotationReview = { view, cities, board };
+    document.body.dataset.ready = "true";
+  </script>
+</html>
