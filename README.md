@@ -99,7 +99,7 @@ The renderer uses one active board context plus a temporary thumbnail context an
 
 ## Original art and references
 
-All 132 miniatures are authored as procedural geometry in this repository. No TokyoMaker graphics, third-party building meshes, or textures are used. Landmark proportions are deliberately compressed for gameplay; the sequence is a curated visual progression, not a historical timeline. Sources live alongside each building's metadata and are linked in its viewer. Traditional house and neighborhood tiers are architectural interpretations rather than replicas of a particular address.
+All 132 miniatures are authored as procedural geometry in this repository. [docs/CREATION.md](docs/CREATION.md) records how they were made, including the use of GPT-6 Astra to generate their geometry, and what parts of that record can be checked against the source. No TokyoMaker graphics, third-party building meshes, or textures are used. Landmark proportions are deliberately compressed for gameplay; the sequence is a curated visual progression, not a historical timeline. Sources live alongside each building's metadata and are linked in its viewer. Traditional house and neighborhood tiers are architectural interpretations rather than replicas of a particular address.
 
 ## License and attribution
 
