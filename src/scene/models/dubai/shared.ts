@@ -104,8 +104,8 @@ export function windhouse(k: ModelKit, g: T.Group, x = 0, z = 0, s = 1) {
   // Coral-stone mass with its slightly overhanging roof slab.
   k.box(a, 0.72, 0.36, 0.64, "#c4a37c");
   k.box(a, 0.79, 0.055, 0.71, "#ddc29a", 0, 0.38);
-  // Tier 1: one roof tower, one door and two broad windows.
-  barjeel(k, a, -0.13, 0.408, -0.1, 0.25, 0.5, "#ddc29a", true);
+  // Tier 1: a modest roof tower, one door and two broad windows.
+  barjeel(k, a, -0.08, 0.408, -0.06, 0.28, 0.4, "#ddc29a", true);
   k.box(a, 0.13, 0.25, 0.018, "#725e49", 0, 0.125, 0.326);
   for (const x of [-0.25, 0.25])
     k.box(a, 0.09, 0.12, 0.018, "#725e49", x, 0.24, 0.326);

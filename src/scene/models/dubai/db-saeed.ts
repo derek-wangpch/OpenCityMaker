@@ -1,125 +1,92 @@
+import * as T from "three";
 import type { Factory } from "../../kit";
 import { arch } from "../../architecture";
+import { barjeel } from "./shared";
 
-/**
- * Sheikh Saeed Al Maktoum House (1896, Al Shindagha): a low, spreading four-wing
- * courtyard residence — never a tower. Wings ring an open sandy courtyard, the
- * two-story rear wing carries the courtyard loggia, and one barjeel wind tower
- * stands at each corner (front pair shorter, rear pair taller), per the 1991
- * IASTE plan ("four wind towers located on each corner of the building").
+/** Tier 6: a substantial courtyard residence with a two-level shaded loggia.
+ * Four barjeels and flat-roofed wings retain the house's identity. The enlarged
+ * arcades and tower proportions are a board-scale abstraction, not a survey.
  */
 export const dbSaeedFactory: Factory = (k, g) => {
-  const wall = "#d2b184"; // sun-washed sand plaster of the courtyard elevations
-  const trim = "#e2c69b"; // parapets, merlons and tower caps catch more light
-  const sand = "#d4bd93"; // courtyard floor
-  const recess = "#6f5a44"; // shaded openings: arcade bays, tower slits
-  const teak = "#5a4433"; // balustrade, entrance lintel, chandal beam stubs
-
-  // Sandy courtyard (bayt) open to the sky inside the ring of wings.
-  k.box(g, 0.96, 0.012, 0.74, sand, 0, 0.006, 0);
-
-  // Rear wing: the only two-story block, its loggia faces the courtyard.
-  k.box(g, 1.36, 0.56, 0.2, wall, 0, 0.28, -0.47);
-  // Entrance and side wings: one story, keeping the roofline stepped.
-  k.box(g, 1.36, 0.32, 0.2, wall, 0, 0.16, 0.47);
-  for (const x of [-0.58, 0.58]) k.box(g, 0.2, 0.32, 0.74, wall, x, 0.16, 0);
-
-  // Rear-wing courtyard loggia: shaded ground-floor arcade...
-  for (let i = -2; i <= 2; i++)
-    k.box(g, 0.1, 0.2, 0.01, recess, i * 0.2, 0.1, -0.364);
-  // ...real plaster arches above a dark teak balustrade — the house's signature.
-  k.box(g, 0.92, 0.055, 0.025, teak, 0, 0.347, -0.346);
-  for (let i = -2; i <= 1; i++) {
-    const x = i * 0.19 + 0.095;
-    k.box(g, 0.1, 0.14, 0.01, recess, x, 0.43, -0.366);
-    arch(k, g, 0.13, 0.16, 0.06, wall, x, 0.36, -0.345);
+  const wall = "#dbc19b",
+    trim = "#f0dfbf",
+    recess = "#80664c",
+    teak = "#76563b";
+  k.box(g, 1.48, 0.035, 1.34, "#d9c7a4", 0, 0.0175);
+  // A taller rear gallery and broad side rooms surround a clear sky court.
+  k.box(g, 1.44, 0.78, 0.17, wall, 0, 0.39, -0.565);
+  k.box(g, 1.46, 0.05, 0.19, trim, 0, 0.805, -0.565);
+  for (const x of [-0.57, 0.57]) {
+    k.box(g, 0.3, 0.48, 1.06, wall, x, 0.24, 0.05);
+    k.box(g, 0.32, 0.055, 1.06, trim, x, 0.5075, 0.05);
   }
-
-  // Entrance portal on the front wing: carved door under a log-end lintel,
-  // flanked by the round-arched ground-floor bays of the plaza facade.
-  k.box(g, 0.16, 0.22, 0.02, recess, 0, 0.11, 0.562);
-  k.box(g, 0.3, 0.03, 0.05, teak, 0, 0.235, 0.575);
-  for (const x of [-0.48, -0.26, 0.26, 0.48])
-    arch(k, g, 0.1, 0.15, 0.03, recess, x, 0.02, 0.562);
-
-  // Castellated parapet runs along the outer rim of every wing (street faces).
-  for (let i = -4; i <= 4; i++) {
-    k.box(g, 0.045, 0.05, 0.05, trim, i * 0.15, 0.345, 0.555);
-    k.box(g, 0.045, 0.05, 0.05, trim, i * 0.15, 0.585, -0.555);
+  // Front rooms leave a real opening under the large central entrance arch.
+  for (const x of [-0.455, 0.455])
+    k.box(g, 0.53, 0.44, 0.28, wall, x, 0.22, 0.51);
+  arch(k, g, 0.38, 0.44, 0.28, trim, 0, 0, 0.51);
+  k.box(g, 1.46, 0.065, 0.32, trim, 0, 0.4725, 0.51);
+  // Deep two-level loggia: open arches stand in front of a recessed rear wall.
+  for (const y of [0.04, 0.42]) {
+    for (const x of [-0.29, 0, 0.29]) {
+      k.box(g, 0.19, 0.25, 0.014, recess, x, y + 0.135, -0.472);
+      arch(k, g, 0.28, 0.32, 0.07, trim, x, y, -0.32);
+    }
   }
-  for (const x of [-0.655, 0.655])
-    for (let i = -2; i <= 2; i++)
-      k.box(g, 0.05, 0.05, 0.045, trim, x, 0.345, i * 0.12);
-
-  // Side elevations: ground-floor arches (dark bay + round head, since the
-  // arch helper only faces +z) under small square upper windows, as on the
-  // west angle of the real house.
-  for (const x of [-0.58, 0.58])
-    for (const z of [-0.15, 0.15]) {
-      const px = x + (x > 0 ? 0.096 : -0.096);
-      k.box(g, 0.02, 0.1, 0.09, recess, px, 0.05, z);
-      k.cylinder(g, 0.045, 0.02, recess, px, 0.15, z, 0.045, 12).rotation.z =
-        Math.PI / 2;
+  for (const y of [0.38, 0.78]) k.box(g, 0.94, 0.08, 0.31, trim, 0, y, -0.435);
+  k.box(g, 0.87, 0.04, 0.025, teak, 0, 0.49, -0.276);
+  for (const x of [-0.38, -0.19, 0, 0.19, 0.38])
+    k.box(g, 0.025, 0.09, 0.025, teak, x, 0.445, -0.276);
+  // Broad shallow steps into the courtyard gallery, kept clear of the entrance.
+  for (let i = 0; i < 3; i++)
+    k.box(
+      g,
+      0.42,
+      0.025 * (i + 1),
+      0.065,
+      trim,
+      0,
+      0.0125 * (i + 1),
+      -0.12 - i * 0.065,
+    );
+  // Framed facade recesses on both side elevations and the front rooms.
+  for (const side of [-1, 1]) {
+    const facade = new T.Group();
+    facade.position.x = side * 0.724;
+    facade.rotation.y = (side * Math.PI) / 2;
+    g.add(facade);
+    for (const x of [-0.18, 0.18]) {
+      k.box(facade, 0.14, 0.23, 0.012, recess, x, 0.205, 0);
+      arch(k, facade, 0.21, 0.3, 0.035, trim, x, 0.07, 0.014);
     }
-  for (const x of [-0.58, 0.58])
-    for (const z of [-0.2, 0, 0.2]) {
-      k.box(g, 0.02, 0.09, 0.07, recess, x + (x > 0 ? 0.091 : -0.091), 0.19, z);
-      k.box(g, 0.02, 0.09, 0.07, recess, x + (x > 0 ? -0.101 : 0.101), 0.19, z);
+  }
+  for (const x of [-0.47, 0.47]) {
+    k.box(g, 0.16, 0.23, 0.014, recess, x, 0.185, 0.655);
+    arch(k, g, 0.23, 0.3, 0.035, trim, x, 0.05, 0.672);
+  }
+  // Four broad, bright barjeels have real recessed dark panels and timber poles.
+  // Rear pair rises above the gallery; front pair keeps the court visible.
+  for (const z of [-0.49, 0.49]) {
+    const base = z < 0 ? 0.805 : 0.535;
+    for (const x of [-0.56, 0.56]) {
+      k.box(g, 0.34, 0.035, 0.34, trim, x, base - 0.0175, z);
+      barjeel(k, g, x, base, z, 0.3, z < 0 ? 0.78 : 0.66, trim);
+      // Recessed lower-shaft panels emphasize the plaster frame in every view.
+      for (const side of [-1, 1]) {
+        k.box(g, 0.2, 0.14, 0.012, wall, x, base + 0.13, z + side * 0.151);
+        k.box(g, 0.012, 0.14, 0.2, wall, x + side * 0.151, base + 0.13, z);
+      }
     }
-  for (const x of [-0.45, -0.15, 0.15, 0.45])
-    k.box(g, 0.08, 0.1, 0.02, recess, x, 0.42, -0.562);
-
-  // Corner barjeel: stout square shaft (never minaret-slender), two vertical
-  // slit openings plus a small upper slit per face, teak chandal beam stubs,
-  // projecting cap and open top.
-  const tower = (x: number, z: number, base: number, top: number) => {
-    k.box(g, 0.22, top - base, 0.22, wall, x, (base + top) / 2, z);
-    for (const [ox, oz, sx] of [
-      [0.111, 0, 1],
-      [-0.111, 0, 1],
-      [0, 0.111, 0],
-      [0, -0.111, 0],
-    ] as const) {
-      const w = sx ? 0.012 : 0.036,
-        d = sx ? 0.036 : 0.012;
-      for (const o of [-0.048, 0.048])
-        k.box(
-          g,
-          w,
-          (top - base) * 0.62,
-          d,
-          recess,
-          x + ox + (sx ? 0 : o),
-          base + (top - base) * 0.53,
-          z + oz + (sx ? o : 0),
-        );
-      k.box(
-        g,
-        sx ? 0.014 : 0.13,
-        0.06,
-        sx ? 0.13 : 0.014,
-        recess,
-        x + ox,
-        top - 0.13,
-        z + oz,
-      );
-      for (const f of [0.62, 0.84])
-        k.box(
-          g,
-          sx ? 0.05 : 0.012,
-          0.012,
-          sx ? 0.012 : 0.05,
-          teak,
-          x + ox * 1.3,
-          base + (top - base) * f,
-          z + oz * 1.3,
-        );
-    }
-    k.box(g, 0.26, 0.05, 0.26, trim, x, top + 0.025, z);
-    k.box(g, 0.16, 0.02, 0.16, recess, x, top + 0.06, z);
-  };
-  tower(-0.57, 0.47, 0.32, 1.08);
-  tower(0.57, 0.47, 0.32, 1.08);
-  tower(-0.57, -0.47, 0.56, 1.3);
-  tower(0.57, -0.47, 0.56, 1.3);
+  }
+  // Sparse broad parapet accents, instead of a fringe of tiny castle teeth.
+  for (const x of [-0.31, 0, 0.31]) {
+    k.box(g, 0.065, 0.065, 0.065, trim, x, 0.5375, 0.615);
+    k.box(g, 0.065, 0.065, 0.065, trim, x, 0.8375, -0.62);
+  }
+  for (const x of [-0.71, 0.71])
+    for (const z of [-0.16, 0.16])
+      k.box(g, 0.045, 0.065, 0.07, trim, x, 0.5675, z);
+  // Rear elevation still has a readable rhythm when the board is rotated.
+  for (const x of [-0.28, 0, 0.28])
+    for (const y of [0.21, 0.58])
+      k.box(g, 0.12, 0.18, 0.016, recess, x, y, -0.658);
 };

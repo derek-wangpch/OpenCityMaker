@@ -28,7 +28,12 @@
       params.get("rotation") ??
         (tier === 10 && elevation !== "default" ? 0.9 : 0),
     );
-    view.model(dubai, 2 ** tier, rotation);
+    view.model(
+      dubai,
+      2 ** tier,
+      rotation,
+      params.get("theme") === "dark" ? "dark" : "light",
+    );
     if (elevation === "top") {
       view.camera.up.set(0, 0, -1);
       view.camera.position.set(0, 12, 0);

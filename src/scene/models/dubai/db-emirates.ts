@@ -119,8 +119,8 @@ export const dbEmiratesFactory: Factory = (k, g) => {
       z + ZF + 0.003,
     );
 
-    // The adjacent elevations have tall glazed fields rather than blank
-    // silver slabs. Keep broad silver borders and a few structural bands.
+    // The angled elevations keep their broad glazing, subdivided into grouped
+    // window rows. Tier 9 needs a readable rhythm on all three faces.
     for (const [a, b] of [
       [FR, AP],
       [AP, FL],
@@ -143,19 +143,34 @@ export const dbEmiratesFactory: Factory = (k, g) => {
         cz,
       );
       panel.rotation.y = -Math.atan2(dz, dx);
-      for (const f of [0.2, 0.68, 0.87]) {
+      // Coarse spandrels sit just above the glass, not across the full shaft:
+      // retain solid silver corner piers and avoid floating projecting bands.
+      const rows = strips - 1;
+      for (let i = 0; i <= rows; i++) {
         const band = k.box(
           g,
-          length * 0.62,
+          length * 0.58,
           0.027,
-          0.022,
+          0.012,
           metal,
-          cx + nx * 0.005,
-          hC * f,
-          cz + nz * 0.005,
+          cx + nx * 0.008,
+          hC * (0.17 + (0.72 * i) / rows),
+          cz + nz * 0.008,
         );
         band.rotation.y = panel.rotation.y;
       }
+      // One broad mullion creates paired window bays without a dense grid.
+      const mullion = k.box(
+        g,
+        0.018,
+        hC * 0.72,
+        0.014,
+        metal,
+        cx + nx * 0.009,
+        hC * 0.53,
+        cz + nz * 0.009,
+      );
+      mullion.rotation.y = panel.rotation.y;
     }
 
     // Sloped metal crown block.

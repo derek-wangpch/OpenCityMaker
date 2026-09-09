@@ -95,3 +95,18 @@ it("all eleven Dubai models keep finite geometry inside the plot and height limi
     kit.dispose();
   }
 });
+
+it("Sheikh Saeed House keeps the entrance and central sky court open", () => {
+  const { kit, group } = model("db-saeed");
+  const entrance = new Raycaster(
+    new Vector3(0, 0.18, 0.9),
+    new Vector3(0, 0, -1),
+    0,
+    0.9,
+  );
+  expect(entrance.intersectObject(group, true)).toHaveLength(0);
+  const courtyard = cast(group, [0, 2, 0], [0, -1, 0])[0];
+  expect(courtyard).toBeDefined();
+  expect(courtyard.point.y).toBeLessThan(0.04);
+  kit.dispose();
+});
