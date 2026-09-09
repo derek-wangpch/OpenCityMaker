@@ -881,7 +881,7 @@ footer button {
   padding: 0;
   background: var(--surface);
   color: var(--text-strong);
-  width: min(440px, calc(100% - 32px));
+  width: min(480px, calc(100% - 32px));
   max-height: calc(100dvh - 40px);
   box-shadow: 0 30px 120px var(--shadow);
 }
@@ -993,7 +993,9 @@ footer button {
   color: var(--accent-ui);
 }
 .model-view {
-  height: 280px;
+  /* The viewer frames a fixed 3.8 world units of height, so the box height is
+     what scales the model. Past a square box the width becomes the limit. */
+  height: min(360px, calc(100vw - 92px));
   background: var(--surface-muted);
   border-radius: 12px;
   margin: 15px 0 8px;
@@ -1484,8 +1486,26 @@ footer button {
   .modal-body {
     padding: 24px;
   }
+  .modal-body:has(.model-view) {
+    padding-block: 16px;
+  }
+  .modal-body:has(.model-view) h2 {
+    font-size: 22px;
+    margin: 0 30px 10px 0;
+  }
+  .modal-body:has(.model-view) p {
+    line-height: 1.6;
+    margin: 8px 0;
+  }
+  .modal-body:has(.model-view) p:not(.muted) {
+    font-size: 12px;
+  }
   .model-view {
-    height: 240px;
+    /* Grow to the modal width, but leave room for the copy below it on short
+       screens rather than pushing the reference link out of the dialog. */
+    height: min(320px, calc(100vw - 80px), calc(100dvh - 320px));
+    min-height: 220px;
+    margin-top: 10px;
   }
 }
 @media (max-width: 400px) {

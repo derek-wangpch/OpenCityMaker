@@ -14,6 +14,8 @@ import {
   swipeDirection,
 } from "../game/boardRotation";
 export type SceneMode = "board" | "model" | "portrait";
+/** Model-viewer camera placement, as an offset from whatever it is aimed at. */
+const MODEL_CAMERA_OFFSET = new T.Vector3(9, 10.15, 12);
 /** Framing at the viewing target: [width, minimum height] in world units. */
 const FRUSTUM: Record<SceneMode, [number, number]> = {
   board: [11.7, 9.9],
@@ -138,13 +140,20 @@ export class SceneView {
       this.rotationStep = rotationStep;
       this.applyBoardCamera();
     } else {
-      this.camera.position.set(9, 11, 12);
-      this.camera.lookAt(0, 0.85, 0);
+      this.aimAtModel(0.85);
     }
     this.observer = new ResizeObserver(() => this.resize());
     this.observer.observe(canvas);
     document.addEventListener("visibilitychange", this.visibility);
     this.resize();
+  }
+  /** Keeps the isometric angle while re-aiming the model camera at height `y`. */
+  private aimAtModel(y: number) {
+    this.camera.position
+      .copy(MODEL_CAMERA_OFFSET)
+      .setY(MODEL_CAMERA_OFFSET.y + y);
+    this.camera.lookAt(0, y, 0);
+    this.camera.updateMatrixWorld();
   }
   private applyBoardCamera() {
     const position = boardCameraPosition(this.rotationStep);
@@ -472,6 +481,13 @@ export class SceneView {
         0,
         -0.135,
       );
+    // Aim at the middle of what was actually built: a low pavilion and a tall
+    // tower then both sit centred in the frame instead of riding a fixed pivot.
+    // Height is rotation-invariant, so dragging the model does not shift it.
+    if (this.mode === "model") {
+      const bounds = new T.Box3().setFromObject(this.root);
+      if (!bounds.isEmpty()) this.aimAtModel((bounds.min.y + bounds.max.y) / 2);
+    }
     this.draw();
   }
   rotate(angle: number) {
