@@ -11,8 +11,11 @@ export const dbFahidiFactory: Factory = (k, g) => {
     [-0.43, 0.36, 0.5, 0.5, 0.36, "#d9ba93"],
     [0.3, 0.35, 0.64, 0.52, 0.42, "#c69c75"],
   ] as const;
-  k.box(g, 0.18, 0.012, 1.36, "#a28463", -0.055, 0.006, 0);
-  k.box(g, 1.32, 0.012, 0.18, "#a28463", 0, 0.006, 0.01);
+  // Above the shared entrance path (top y=0.012), with no overlapping
+  // coplanar tops at the cross-alley junction. Otherwise rotation flickers.
+  k.box(g, 0.18, 0.024, 1.36, "#a28463", -0.055, 0.012, 0);
+  k.box(g, 0.515, 0.024, 0.18, "#a28463", -0.4025, 0.012, 0.01);
+  k.box(g, 0.625, 0.024, 0.18, "#a28463", 0.3475, 0.012, 0.01);
   for (const [x, z, w, d, h, color] of houses) {
     k.box(g, w, h, d, color, x, h / 2, z);
     // Continuous flat parapets read as terraces rather than tiny castle teeth.

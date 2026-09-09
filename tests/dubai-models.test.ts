@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
 import { Box3, Group, Mesh, Raycaster, Vector3 } from "three";
-import { ModelKit, modelFactories } from "../src/scene/models";
+import { ModelKit, modelFactories, createBuilding } from "../src/scene/models";
 import { dubai } from "../src/cities/dubai";
 function model(id: string) {
   const kit = new ModelKit(),
@@ -108,5 +108,24 @@ it("Sheikh Saeed House keeps the entrance and central sky court open", () => {
   const courtyard = cast(group, [0, 2, 0], [0, -1, 0])[0];
   expect(courtyard).toBeDefined();
   expect(courtyard.point.y).toBeLessThan(0.04);
+  kit.dispose();
+});
+
+it("Al Fahidi alley has one exposed surface above the shared entrance path", () => {
+  const kit = new ModelKit();
+  const group = createBuilding(kit, dubai, 16);
+  group.updateMatrixWorld(true);
+  // Both the front alley / generic path overlap and the cross-alley junction.
+  for (const [x, z] of [
+    [-0.06, 0.37],
+    [-0.07, 0.02],
+  ]) {
+    const hits = cast(group, [x, 0.1, z], [0, -1, 0]);
+    expect(hits.length).toBeGreaterThan(0);
+    expect(hits[0].point.y).toBeGreaterThan(0.02);
+    expect(
+      hits.filter((hit) => Math.abs(hit.distance - hits[0].distance) < 1e-5),
+    ).toHaveLength(1);
+  }
   kit.dispose();
 });
