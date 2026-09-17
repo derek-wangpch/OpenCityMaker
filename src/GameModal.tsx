@@ -8,12 +8,13 @@ import {
   Plus,
 } from "lucide-react";
 import { Modal } from "./Modal";
+import { Settings } from "./Settings";
 import { buildingReference } from "./cities/references";
 import { History } from "./History";
 import { ModelCanvas } from "./scene/Canvas";
 import type { GameController } from "./game/useGame";
 import type { GameRepository } from "./game/repository";
-/** Help, restart, match history and building detail dialogs, shared by every layout. */
+/** Help, preferences, restart, history and building detail dialogs, shared by every layout. */
 export function GameModal({
   game,
   repository,
@@ -21,7 +22,8 @@ export function GameModal({
   game: GameController;
   repository: GameRepository;
 }) {
-  const { modal, setModal, city, current, locale, t, restart } = game;
+  const { modal, setModal, city, current, locale, t, restart, pendingMode } =
+    game;
   if (!modal) return null;
   return (
     <Modal
@@ -29,16 +31,22 @@ export function GameModal({
         modal === "help"
           ? t.helpTitle
           : modal === "restart"
-            ? t.restartTitle
-            : modal === "history"
-              ? t.history
-              : modal.name[locale]
+            ? pendingMode
+              ? t.modeRestartTitle
+              : t.restartTitle
+            : modal === "settings"
+              ? t.settings
+              : modal === "history"
+                ? t.history
+                : modal.name[locale]
       }
       close={() => setModal(null)}
       closeLabel={t.close}
     >
       {modal === "history" ? (
         <History repository={repository} locale={locale} />
+      ) : modal === "settings" ? (
+        <Settings game={game} />
       ) : modal === "help" ? (
         <>
           <div className="help-illustration">
@@ -48,7 +56,7 @@ export function GameModal({
             <ArrowRight />
             <Landmark />
           </div>
-          <p>{t.helpBody}</p>
+          <p>{game.moveMode === "step" ? t.helpBodyStep : t.helpBody}</p>
           <p className="muted">{t.controls}</p>
           <button className="primary" onClick={() => setModal(null)}>
             {t.play}
@@ -57,13 +65,13 @@ export function GameModal({
         </>
       ) : modal === "restart" ? (
         <>
-          <p>{t.restartBody}</p>
+          <p>{pendingMode ? t.modeRestartBody : t.restartBody}</p>
           <div className="modal-buttons">
             <button className="secondary" onClick={() => setModal(null)}>
               {t.cancel}
             </button>
             <button className="primary" onClick={restart}>
-              {t.confirm}
+              {pendingMode ? t.modeRestartConfirm : t.confirm}
             </button>
           </div>
         </>

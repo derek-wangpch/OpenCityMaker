@@ -8,6 +8,7 @@ import { StartPage } from "./StartPage";
 import { CitiesPage } from "./CitiesPage";
 import { GamePage } from "./GamePage";
 import { AtlasPage } from "./AtlasPage";
+import { SettingsPage } from "./SettingsPage";
 /** Phone layout: Start → city list → full-screen board, each in the URL hash. */
 export function MobileApp({
   game,
@@ -35,6 +36,8 @@ export function MobileApp({
         <CitiesPage game={game} navigate={navigate} />
       ) : route === "atlas" ? (
         <AtlasPage game={game} from={from} back={back} />
+      ) : route === "settings" ? (
+        <SettingsPage game={game} from={from} back={back} />
       ) : (
         <StartPage game={game} navigate={navigate} />
       )}

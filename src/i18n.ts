@@ -37,6 +37,8 @@ const en = {
   helpTitle: "Small moves. Great cities.",
   helpBody:
     "Slide the whole board along an arrow. Two matching buildings merge into the next landmark. Each building can merge once per move. A new home appears after every valid move. Reach 2048 to complete your city, then keep building toward 4096 and beyond!",
+  helpBodyStep:
+    "Nudge the board one cell along an arrow. Two matching buildings that meet merge into the next landmark, once per line per move. A new home appears after every valid move. Reach 2048 to complete your city, then keep building toward 4096 and beyond!",
   controls: "Swipe along the grid · Arrow keys or WASD",
   rotateBoard: "Rotate board",
   rotateBoardClockwise: "Rotate board clockwise 45°",
@@ -99,6 +101,16 @@ const en = {
   noMove: "No movement in that direction.",
   moved: "Move complete",
   settings: "Preferences",
+  settingsHint: "Saved on this device.",
+  gameplay: "Gameplay",
+  stepMove: "One-cell moves",
+  stepMoveHint:
+    "Threes!-style: one swipe nudges the board a single cell instead of sliding it to the wall.",
+  numbers: "Tile numbers",
+  modeRestartTitle: "Switch move style?",
+  modeRestartBody:
+    "Changing the move style starts a new city, so every score is earned under one set of rules. Your best score and landmark discoveries will stay.",
+  modeRestartConfirm: "Switch and start fresh",
   appearance: "Appearance",
   themeSystem: "Follow system",
   themeLight: "Light",
@@ -114,6 +126,7 @@ const en = {
   hideNumbers: "Hide numbers",
   weather: "Weather",
   weatherOff: "Off",
+  weatherHint: "Changes on its own every minute or so.",
   weatherClear: "Clear",
   weatherRain: "Rain",
   weatherSnow: "Snow",
@@ -169,6 +182,8 @@ const cn: Messages = {
   helpTitle: "小小一步，宏伟城市。",
   helpBody:
     "沿箭头方向滑动整个棋盘。两个相同建筑会合并为下一级地标，每个建筑每步只能合并一次。每次有效移动后会出现一座新房屋。达到2048即可通关，之后可以继续挑战4096和更高数字！",
+  helpBodyStep:
+    "沿箭头方向把棋盘推进一格。相遇的两个相同建筑会合并为下一级地标，每行每步只合并一次。每次有效移动后会出现一座新房屋。达到2048即可通关，之后可以继续挑战4096和更高数字！",
   controls: "沿棋盘方向滑动 · 方向键或 WASD",
   rotateBoard: "旋转棋盘",
   rotateBoardClockwise: "顺时针旋转棋盘 45°",
@@ -225,6 +240,15 @@ const cn: Messages = {
   noMove: "此方向无法移动。",
   moved: "移动完成",
   settings: "偏好设置",
+  settingsHint: "设置保存在本设备。",
+  gameplay: "玩法",
+  stepMove: "单格移动",
+  stepMoveHint: "Threes! 风格：每次滑动只把棋盘推进一格，而不是一路滑到底。",
+  numbers: "数字标签",
+  modeRestartTitle: "切换移动方式？",
+  modeRestartBody:
+    "切换移动方式会开始一座新城市，让每个得分都在同一套规则下取得。最佳得分和地标收藏会保留。",
+  modeRestartConfirm: "切换并重新开始",
   appearance: "外观",
   themeSystem: "跟随系统",
   themeLight: "浅色",
@@ -240,6 +264,7 @@ const cn: Messages = {
   hideNumbers: "隐藏数字",
   weather: "天气",
   weatherOff: "关闭",
+  weatherHint: "每分钟左右自动变化。",
   weatherClear: "晴",
   weatherRain: "雨",
   weatherSnow: "雪",
@@ -300,6 +325,8 @@ const tw: Messages = {
   helpTitle: "小小一步，宏偉城市。",
   helpBody:
     "沿箭頭方向滑動整個棋盤。兩個相同建築會合併為下一級地標，每個建築每步只能合併一次。每次有效移動後會出現一座新房屋。達到2048即可通關，之後可以繼續挑戰4096和更高數字！",
+  helpBodyStep:
+    "沿箭頭方向把棋盤推進一格。相遇的兩個相同建築會合併為下一級地標，每行每步只合併一次。每次有效移動後會出現一座新房屋。達到2048即可通關，之後可以繼續挑戰4096和更高數字！",
   controls: "沿棋盤方向滑動 · 方向鍵或 WASD",
   rotateBoard: "旋轉棋盤",
   rotateBoardClockwise: "順時針旋轉棋盤 45°",
@@ -344,6 +371,14 @@ const tw: Messages = {
   noMove: "此方向無法移動。",
   moved: "移動完成",
   settings: "偏好設定",
+  settingsHint: "設定保存在本裝置。",
+  stepMove: "單格移動",
+  stepMoveHint: "Threes! 風格：每次滑動只把棋盤推進一格，而不是一路滑到底。",
+  numbers: "數字標籤",
+  modeRestartTitle: "切換移動方式？",
+  modeRestartBody:
+    "切換移動方式會開始一座新城市，讓每個得分都在同一套規則下取得。最佳得分和地標收藏會保留。",
+  modeRestartConfirm: "切換並重新開始",
   appearance: "外觀",
   themeSystem: "跟隨系統",
   themeLight: "淺色",
@@ -359,6 +394,7 @@ const tw: Messages = {
   hideNumbers: "隱藏數字",
   weather: "天氣",
   weatherOff: "關閉",
+  weatherHint: "每分鐘左右自動變化。",
   weatherClear: "晴",
   weatherRain: "雨",
   weatherSnow: "雪",

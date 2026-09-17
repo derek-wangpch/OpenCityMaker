@@ -122,6 +122,102 @@ describe("2048 rules", () => {
   });
 });
 
+describe("Threes-style step moves", () => {
+  const line = (row: number[], direction: "left" | "right" = "left") =>
+    slide(board(row), direction, "step");
+  it("nudges a line one cell and merges at the first opening", () => {
+    for (const [input, expected, points] of [
+      [[2, 0, 4, 4], [2, 4, 4, 0], 0],
+      [[2, 2, 4, 0], [4, 4, 0, 0], 4],
+      [[2, 4, 4, 0], [2, 8, 0, 0], 8],
+      [[4, 4, 4, 4], [8, 4, 4, 0], 8],
+      [[0, 0, 0, 2], [0, 0, 2, 0], 0],
+      [[2, 4, 2, 4], [2, 4, 2, 4], 0],
+      // A gap ahead of a mergeable pair takes the move: no merge this turn.
+      [[0, 2, 2, 0], [2, 2, 0, 0], 0],
+      [[2, 2, 0, 2], [4, 0, 2, 0], 4],
+    ] as [number[], number[], number][]) {
+      const result = line(input);
+      expect(result.board.slice(0, 4)).toEqual(expected);
+      expect(result.points).toBe(points);
+    }
+  });
+  it("names every tile on screen, including the ones that stay put", () => {
+    expect(line([2, 0, 4, 4]).events).toEqual([
+      { from: 0, to: 0, value: 2, merged: false },
+      { from: 2, to: 1, value: 4, merged: false },
+      { from: 3, to: 2, value: 4, merged: false },
+    ]);
+    expect(line([2, 2, 4, 0]).events).toEqual([
+      { from: 0, to: 0, value: 2, merged: true },
+      { from: 1, to: 0, value: 2, merged: true },
+      { from: 2, to: 1, value: 4, merged: false },
+    ]);
+    expect(line([2, 4, 2, 4]).events).toEqual([
+      { from: 0, to: 0, value: 2, merged: false },
+      { from: 1, to: 1, value: 4, merged: false },
+      { from: 2, to: 2, value: 2, merged: false },
+      { from: 3, to: 3, value: 4, merged: false },
+    ]);
+  });
+  it("handles all four axes", () => {
+    expect(line([4, 4, 0, 2], "right").board.slice(0, 4)).toEqual([0, 4, 4, 2]);
+    const column = board([2, 0, 0, 0, 0, 0, 0, 0, 2]);
+    // The lone tile at row 2 moves up one row, not to the top edge.
+    expect(slide(column, "up", "step").board.filter(Boolean).length).toBe(2);
+    expect(slide(column, "up", "step").board[4]).toBe(2);
+    expect(slide(column, "down", "step").board[4]).toBe(2);
+    expect(slide(column, "down", "step").board[12]).toBe(2);
+  });
+  it("keeps the classic slide as the default", () => {
+    expect(slide(board([2, 0, 0, 2]), "left").board.slice(0, 4)).toEqual([
+      4, 0, 0, 0,
+    ]);
+    expect(move(run([2, 0, 0, 2]), "left", () => 0).run.board[0]).toBe(4);
+  });
+  it("conserves mass and agrees with the slide on whether a move exists", () => {
+    let seed = 17;
+    const random = () => {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 2 ** 32;
+    };
+    for (let n = 0; n < 100; n++) {
+      const input = Array.from({ length: 16 }, () =>
+        random() < 0.3 ? 0 : 2 ** (1 + Math.floor(random() * 8)),
+      );
+      for (const direction of ["up", "down", "left", "right"] as const) {
+        const stepped = slide(input, direction, "step");
+        expect(stepped.board.reduce((a, b) => a + b, 0)).toBe(
+          input.reduce((a, b) => a + b, 0),
+        );
+        expect(stepped.events.length).toBe(input.filter(Boolean).length);
+        // Shared deadlock detection relies on this equivalence.
+        const changed = (next: number[]) => next.some((v, i) => v !== input[i]);
+        expect(changed(stepped.board)).toBe(
+          changed(slide(input, direction).board),
+        );
+      }
+    }
+  });
+  it("scores, spawns once and records a single undo step", () => {
+    const initial = { ...run([2, 2, 4, 4]), score: 16 };
+    const result = move(initial, "left", () => 0, "step");
+    // One merge, the tiles behind it shift a single cell, then a home spawns.
+    expect(result.run.board.slice(0, 4)).toEqual([4, 4, 4, 2]);
+    expect(result.run.score).toBe(20);
+    expect(result.spawned).not.toBe(null);
+    expect(undo(result.run)).toEqual(initial);
+  });
+  it("never spawns when a one-cell move changes nothing", () => {
+    const random = () => {
+      throw new Error("Unexpected RNG");
+    };
+    const dead = [2, 4, 2, 4, 4, 2, 4, 2, 2, 4, 2, 4, 4, 2, 4, 2];
+    for (const direction of ["up", "down", "left", "right"] as const)
+      expect(move(run(dead), direction, random, "step").changed).toBe(false);
+  });
+});
+
 describe("continued cities", () => {
   it("acknowledges a win without changing the board, score, or undo", () => {
     const won = move(run([1024, 1024]), "left", () => 0).run;

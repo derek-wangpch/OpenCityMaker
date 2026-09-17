@@ -180,20 +180,6 @@ button:not(:disabled):active {
   align-items: center;
   gap: 20px;
 }
-.language {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 12px;
-}
-.language select {
-  appearance: none;
-  border: 0;
-  background: none;
-  padding: 6px 0;
-  color: var(--text);
-  cursor: pointer;
-}
 .icon-button {
   background: transparent;
   display: grid;
@@ -203,18 +189,6 @@ button:not(:disabled):active {
 .help-button {
   border-left: 1px solid var(--border);
   padding-left: 20px;
-}
-.theme-button {
-  color: var(--text-muted);
-  border-radius: 10px;
-}
-.theme-button:hover {
-  color: var(--accent-ui);
-  background: var(--surface-muted);
-}
-.theme-button:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
 }
 main {
   margin: 0 5.5%;
@@ -939,6 +913,95 @@ footer button {
   justify-content: flex-end;
   margin-top: 24px;
 }
+/* Preferences body, shared by the desktop dialog and the phone page. */
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin-top: 6px;
+}
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.settings-group h3 {
+  font-size: 10px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  font-weight: 550;
+  margin: 0 0 4px;
+}
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--surface-muted);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+.settings-label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.settings-label > span {
+  font-size: 13px;
+  color: var(--text-strong);
+}
+.settings-label small {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-soft);
+}
+.settings-row select {
+  flex: none;
+  appearance: none;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font-size: 12px;
+  padding: 4px 0;
+  cursor: pointer;
+}
+/* Explicit, because the muted modal paragraph style does not reach the phone page. */
+.settings-note {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--text-soft);
+}
+.switch {
+  flex: none;
+  width: 44px;
+  height: 26px;
+  border-radius: 13px;
+  padding: 3px;
+  background: var(--border-strong);
+  display: flex;
+  transition: background 0.18s ease;
+}
+.switch[aria-checked="true"] {
+  background: var(--accent);
+}
+.switch-knob {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--surface-raised);
+  box-shadow: 0 1px 3px var(--shadow);
+  transition: transform 0.18s ease;
+}
+.switch[aria-checked="true"] .switch-knob {
+  transform: translateX(18px);
+}
+.switch:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
 .help-illustration {
   display: flex;
   align-items: center;
@@ -1282,22 +1345,6 @@ footer button {
   }
   .header-actions {
     gap: 8px;
-  }
-  /* The ?gallery QA sheet deliberately keeps the desktop shell on phones.
-     Its compact header predates the mobile Start screen, where the theme
-     control remains available at this width. */
-  .header .theme-button {
-    display: none;
-  }
-  .language {
-    gap: 4px;
-  }
-  .language > svg {
-    display: none;
-  }
-  .language select {
-    width: 53px;
-    font-size: 10px;
   }
   .help-button {
     display: none;

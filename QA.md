@@ -28,6 +28,9 @@
 
 - Keyboard merge, score update, collection discovery, undo, personal best retention, city independence, reload persistence.
 - Restart cancel and confirm; all language options; localized document language; help dialog; Escape and focus return.
+- The Preferences weather switch turns the diorama weather on and off: off survives several 45–90s changeover intervals under a fake clock, and switching back on resumes at clear and drifts again on the next changeover. Individual states stay in the board toolbar.
+- Preferences on both layouts: the desktop dialog and the phone `#/settings` page hold the same controls, the phone back button returns to whichever page opened them, and the header/footer no longer duplicate the language, appearance or reduce-motion controls.
+- One-cell moves: toggling on an untouched or finished run applies straight away; toggling mid-run raises the "Switch move style?" prompt, where Cancel, Escape and the close icon all leave the run and the switch untouched, and confirming starts a fresh city with the new style. A single arrow key then moves tiles one cell (`2 _ 4 4` becomes `2 4 4`, not `2 8`), scores one merge per line, and the choice survives a reload.
 - Landmark atlas and interactive model rotation by drag and keyboard.
 - Phone touch swipe via Chromium touch events; directional button taps; controls inside a 390×844 viewport.
 - Atlas at 360×740 and all 132 model cards in the development gallery.

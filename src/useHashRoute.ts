@@ -1,10 +1,11 @@
 import { useSyncExternalStore } from "react";
-export type Route = "start" | "cities" | "play" | "atlas";
+export type Route = "start" | "cities" | "play" | "atlas" | "settings";
 export const paths: Record<Route, string> = {
   start: "#/",
   cities: "#/cities",
   play: "#/play",
   atlas: "#/atlas",
+  settings: "#/settings",
 };
 export function parseRoute(hash: string): Route {
   const found = (Object.keys(paths) as Route[]).find(

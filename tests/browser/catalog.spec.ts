@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { cities } from "../../src/cities/packs";
+import { setLanguage } from "./preferences";
 
 // Full-resolution city sheets complement the downscaled 132-model overview.
 test("city sheets, three-language mobile layout and landmark rotation", async ({
@@ -49,9 +50,7 @@ test("city sheets, three-language mobile layout and landmark rotation", async ({
     });
     if (index >= 4) {
       for (const locale of ["zh-CN", "zh-HK", "en"] as const) {
-        await page
-          .getByRole("combobox", { name: /Language|语言|語言/ })
-          .selectOption(locale);
+        await setLanguage(page, locale);
         await expect(page.locator(".gallery-city:visible")).toHaveText(
           city.name[locale],
         );

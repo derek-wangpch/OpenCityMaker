@@ -83,7 +83,10 @@ function browserThemeStorage(): ThemeStorage | undefined {
 interface ThemeContextValue {
   preference: ThemePreference;
   resolved: ResolvedTheme;
+  /** Step through system → light → dark, for a single toggle button. */
   cycle: () => void;
+  /** Pick one directly, for the preferences list. */
+  choose: (preference: ThemePreference) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
@@ -115,6 +118,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       preference,
       resolved,
       cycle: () => setPreference((current) => nextThemePreference(current)),
+      choose: setPreference,
     }),
     [preference, resolved],
   );

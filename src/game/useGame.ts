@@ -8,9 +8,15 @@ import {
   VALUES,
   type Direction,
   type Movement,
+  type MoveMode,
 } from "./engine";
 import { freshCity, type Save } from "./storage";
-import { nextWeather, randomWeather, readWeather } from "./weather";
+import {
+  nextWeather,
+  randomWeather,
+  readWeather,
+  type Weather,
+} from "./weather";
 import type { GameRepository } from "./repository";
 import { messages } from "../i18n";
 import { keyboardDirection, normalizeRotation } from "./boardRotation";
@@ -20,7 +26,13 @@ const EMPTY_EVENTS: Movement[] = [];
  * snapshot (saves stay compatible), only the controls are hidden.
  */
 export const UNDO_ENABLED: boolean = false;
-export type GameModalState = "help" | "restart" | "history" | Building | null;
+export type GameModalState =
+  "help" | "restart" | "history" | "settings" | Building | null;
+/** A move style waiting on the restart prompt, plus where to return on cancel. */
+interface PendingMode {
+  mode: MoveMode;
+  returnTo: GameModalState;
+}
 /**
  * Game state shared by every layout (desktop page, mobile pages). Layout-specific
  * UI state such as the active page stays in the layout component so a viewport
@@ -28,7 +40,8 @@ export type GameModalState = "help" | "restart" | "history" | Building | null;
  */
 export function useGame(initial: Save, repository: GameRepository) {
   const [save, setSave] = useState(initial),
-    [modal, setModal] = useState<GameModalState>(null),
+    [modal, setRawModal] = useState<GameModalState>(null),
+    [pending, setPending] = useState<PendingMode | null>(null),
     [events, setEvents] = useState<Movement[]>(EMPTY_EVENTS);
   const [stored, setStored] = useState<boolean | null>(null),
     [announcement, setAnnouncement] = useState(""),
@@ -43,6 +56,7 @@ export function useGame(initial: Save, repository: GameRepository) {
     locale = save.locale,
     t = messages[locale],
     showLabels = save.showLabels ?? false,
+    moveMode: MoveMode = save.moveMode ?? "slide",
     boardRotationStep = save.boardRotationStep ?? 0,
     weather = readWeather(save.weather, city.id) ?? "clear";
   const highest = Math.max(...current.discovered),
@@ -112,6 +126,35 @@ export function useGame(initial: Save, repository: GameRepository) {
   function setLocale(next: Locale) {
     setSave((prev) => ({ ...prev, locale: next }));
   }
+  /**
+   * Every dialog exit funnels through here, so the Cancel button, the close
+   * icon, Escape and a backdrop click all abandon a pending move style and
+   * return to wherever the toggle was flipped.
+   */
+  function setModal(next: GameModalState) {
+    if (pending && next === null) {
+      setRawModal(pending.returnTo);
+      setPending(null);
+      return;
+    }
+    if (next !== "restart") setPending(null);
+    setRawModal(next);
+  }
+  function setMoveMode(next: MoveMode) {
+    const before = latest.current,
+      entry = before.cities[before.city];
+    if ((before.moveMode ?? "slide") === next) return;
+    // An untouched or finished run has no score to protect, so switch straight away.
+    if (entry.session.moves === 0 || entry.run.status !== "playing") {
+      busyUntil.current = 0;
+      setEvents(EMPTY_EVENTS);
+      setSave((prev) => ({ ...prev, moveMode: next }));
+      return;
+    }
+    // A score belongs to one ruleset: confirm a fresh city before switching.
+    setPending({ mode: next, returnTo: modal });
+    setRawModal("restart");
+  }
   function toggleLabels() {
     // Re-rendering the board replays pending events, so drop them first.
     setEvents(EMPTY_EVENTS);
@@ -126,6 +169,16 @@ export function useGame(initial: Save, repository: GameRepository) {
       ),
     }));
   }
+  /**
+   * Preferences offers weather as a single on/off switch: on hands the diorama
+   * back to the automatic changeover, off stops it. The board toolbar still
+   * cycles through the individual states.
+   */
+  function setWeather(next: Weather) {
+    // Re-rendering the board replays pending events, so drop them first.
+    setEvents(EMPTY_EVENTS);
+    setSave((prev) => ({ ...prev, weather: next }));
+  }
   function cycleWeather() {
     // Re-rendering the board replays pending events, so drop them first.
     setEvents(EMPTY_EVENTS);
@@ -138,12 +191,17 @@ export function useGame(initial: Save, repository: GameRepository) {
     if (modal || performance.now() < busyUntil.current) return;
     const before = latest.current,
       entry = before.cities[before.city],
-      result = move(entry.run, direction);
+      // Read from the same snapshot as the run so a just-changed move style and
+      // a queued move can never disagree.
+      mode = before.moveMode ?? "slide",
+      result = move(entry.run, direction, Math.random, mode);
     if (!result.changed) {
       setAnnouncement(t.noMove);
       return;
     }
-    busyUntil.current = performance.now() + (reduced ? 0 : 325);
+    // A one-cell nudge travels less and needs many more inputs, so it unlocks sooner.
+    busyUntil.current =
+      performance.now() + (reduced ? 0 : mode === "step" ? 170 : 325);
     setEvents(result.events);
     const discoveries = result.run.board.filter(
       (v) => VALUES.includes(v) && !entry.discovered.includes(v),
@@ -227,6 +285,7 @@ export function useGame(initial: Save, repository: GameRepository) {
         old = prev.cities[prev.city];
       return {
         ...prev,
+        ...(pending ? { moveMode: pending.mode } : {}),
         cities: {
           ...prev.cities,
           [prev.city]: {
@@ -237,7 +296,9 @@ export function useGame(initial: Save, repository: GameRepository) {
         },
       };
     });
-    setModal(null);
+    setPending(null);
+    // Close outright: the pending style was applied, so do not bounce back.
+    setRawModal(null);
     setAnnouncement("");
   }
   return {
@@ -260,10 +321,14 @@ export function useGame(initial: Save, repository: GameRepository) {
     setReduced,
     showLabels,
     toggleLabels,
+    moveMode,
+    setMoveMode,
+    pendingMode: pending?.mode ?? null,
     boardRotationStep,
     rotateBoard,
     weather,
     cycleWeather,
+    setWeather,
     changeCity,
     setLocale,
     play,

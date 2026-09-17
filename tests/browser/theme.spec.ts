@@ -1,4 +1,9 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+// Appearance lives in Preferences, so every theme check opens it first.
+import { openPreferences, preferencesButton } from "./preferences";
+
+const themeSelect = (page: Page) =>
+  page.getByRole("combobox", { name: "Appearance" });
 
 test("system theme, overrides, persistence and dialogs stay in sync", async ({
   page,
@@ -7,29 +12,26 @@ test("system theme, overrides, persistence and dialogs stay in sync", async ({
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  const toggle = page.getByRole("button", {
-    name: "Appearance: Follow system",
-  });
-  await expect(toggle).toBeVisible();
   await expect
     .poll(() =>
       page.locator('meta[name="theme-color"]').getAttribute("content"),
     )
     .toBe("#171c1a");
 
-  await toggle.click();
+  await openPreferences(page);
+  await expect(themeSelect(page)).toHaveValue("system");
+  await themeSelect(page).selectOption("light");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-  await expect(
-    page.getByRole("button", { name: "Appearance: Light" }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Appearance: Light" }).click();
+  await expect(themeSelect(page)).toHaveValue("light");
+  await themeSelect(page).selectOption("dark");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await expect(
-    page.getByRole("button", { name: "Appearance: Dark" }),
-  ).toBeVisible();
   expect(
     await page.evaluate(() => localStorage.getItem("citymaker:theme")),
   ).toBe("dark");
+  await page.screenshot({
+    path: "artifacts/screenshots/ui/dark-desktop-settings.png",
+  });
+  await page.keyboard.press("Escape");
 
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
@@ -46,10 +48,10 @@ test("system theme, overrides, persistence and dialogs stay in sync", async ({
   await expect(page.locator(".atlas-card")).toHaveCount(11);
   await page.screenshot({ path: "artifacts/screenshots/ui/dark-atlas.png" });
 
-  await page.getByRole("button", { name: "Appearance: Dark" }).click();
-  await expect(
-    page.getByRole("button", { name: "Appearance: Follow system" }),
-  ).toBeVisible();
+  await openPreferences(page);
+  await themeSelect(page).selectOption("system");
+  await expect(themeSelect(page)).toHaveValue("system");
+  await page.keyboard.press("Escape");
   await page.emulateMedia({ colorScheme: "light" });
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await page.emulateMedia({ colorScheme: "dark" });
@@ -68,12 +70,16 @@ test("phone start and game use the resolved dark theme", async ({
   const page = await context.newPage();
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await expect(
-    page.getByRole("button", { name: "Appearance: Follow system" }),
-  ).toBeVisible();
   await page.screenshot({
     path: "artifacts/screenshots/ui/dark-mobile-start.png",
   });
+  await preferencesButton(page).tap();
+  await expect(page.locator(".mobile-settings")).toBeVisible();
+  await expect(themeSelect(page)).toHaveValue("system");
+  await page.screenshot({
+    path: "artifacts/screenshots/ui/dark-mobile-settings.png",
+  });
+  await page.goBack();
   await page.getByRole("button", { name: "Play", exact: true }).tap();
   await expect(page.locator(".mobile-game")).toBeVisible();
   await page.screenshot({

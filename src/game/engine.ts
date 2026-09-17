@@ -34,6 +34,14 @@ export function isTileValue(value: unknown): value is number {
   );
 }
 const canMerge = (a: number, b: number) => a === b && isTileValue(a * 2);
+/** "slide" packs a line against the wall; "step" nudges it a single cell. */
+export type MoveMode = "slide" | "step";
+/**
+ * Shared by both move modes: a line changes under "step" exactly when it changes
+ * under "slide" (step fires on the first gap with a tile behind it or the first
+ * mergeable neighbours, and a line with neither is packed and unmergeable), so
+ * "no move left" does not depend on the mode.
+ */
 export function getStatus(
   board: Board,
   continued = false,
@@ -67,9 +75,55 @@ export function newRun(random: () => number = Math.random): Run {
     undo: null,
   };
 }
+/**
+ * Threes-style line move. Scanning from the destination edge, the first cell a
+ * tile can enter — a gap, or an equal value — takes it, and every tile behind
+ * follows by exactly one cell. Tiles in front of that point never move and a
+ * line merges at most once per move. Returns the points scored.
+ */
+function step(
+  board: Board,
+  indices: number[],
+  next: Board,
+  events: Movement[],
+): number {
+  const values = indices.map((i) => board[i]);
+  const at = values.findIndex(
+    (value, i) =>
+      i < 3 &&
+      values[i + 1] !== 0 &&
+      (value === 0 || canMerge(value, values[i + 1])),
+  );
+  let points = 0;
+  for (let i = 0; i < 4; i++) {
+    const from = indices[i],
+      value = values[i];
+    if (at < 0 || i < at) {
+      // Nothing ahead of the action moves. It still needs an event, because the
+      // renderer draws only the tiles named by events while a move animates.
+      next[from] = value;
+      if (value) events.push({ from, to: from, value, merged: false });
+    } else if (i === at) {
+      if (!value) continue; // an empty target is filled by the tile behind it
+      next[from] = value * 2;
+      points += value * 2;
+      events.push({ from, to: from, value, merged: true });
+    } else {
+      const to = indices[i - 1];
+      if (i === at + 1 && values[at])
+        events.push({ from, to, value, merged: true }); // second half of the merge
+      else if (value) {
+        next[to] = value;
+        events.push({ from, to, value, merged: false });
+      }
+    }
+  }
+  return points;
+}
 export function slide(
   board: Board,
   direction: Direction,
+  mode: MoveMode = "slide",
 ): { board: Board; points: number; events: Movement[] } {
   const next = Array(16).fill(0);
   const events: Movement[] = [];
@@ -87,6 +141,10 @@ export function slide(
           return (3 - offset) * 4 + line;
       }
     });
+    if (mode === "step") {
+      points += step(board, indices, next, events);
+      continue;
+    }
     const occupied = indices.filter((i) => board[i]);
     let target = 0;
     for (let j = 0; j < occupied.length; j++) {
@@ -109,10 +167,11 @@ export function move(
   run: Run,
   direction: Direction,
   random: () => number = Math.random,
+  mode: MoveMode = "slide",
 ): MoveResult {
   const unchanged = { run, changed: false, events: [], spawned: null };
   if (run.status !== "playing") return unchanged;
-  const result = slide(run.board, direction);
+  const result = slide(run.board, direction, mode);
   if (result.board.every((v, i) => v === run.board[i])) return unchanged;
   const added = spawn(result.board, random);
   const hasWon = run.hasWon || added.board.some((v) => v >= 2048);

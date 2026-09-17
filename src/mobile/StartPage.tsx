@@ -1,23 +1,21 @@
 import {
   ArrowRight,
   BookOpen,
-  ChevronDown,
   CircleHelp,
-  Globe2,
   History as HistoryIcon,
   MapPin,
+  SlidersHorizontal,
   SquarePlus,
   Trophy,
 } from "lucide-react";
 import { cities } from "../cities/packs";
 import { useState, type CSSProperties } from "react";
-import type { CityPack, Locale } from "../cities/types";
+import type { CityPack } from "../cities/types";
 import type { GameController } from "../game/useGame";
 import { usePreviews } from "../scene/useThumbnails";
 import type { Route } from "../useHashRoute";
 import { browserHomeScreen } from "../homeScreen";
 import { AddToHome } from "./AddToHome";
-import { ThemeButton } from "../ThemeButton";
 /** Cover skyline: the three top landmarks, tallest in the middle. */
 const skyline = (city: CityPack) => {
   const b = city.buildings;
@@ -30,17 +28,7 @@ export function StartPage({
   game: GameController;
   navigate: (route: Route) => void;
 }) {
-  const {
-    city,
-    current,
-    locale,
-    t,
-    stored,
-    reduced,
-    setReduced,
-    setModal,
-    setLocale,
-  } = game;
+  const { city, current, locale, t, stored, setModal } = game;
   const preview = usePreviews(city, skyline, "portrait", 3);
   // Read once: the answer belongs to how this document was opened.
   const [homeScreen] = useState(browserHomeScreen);
@@ -61,20 +49,13 @@ export function StartPage({
           CityMaker
         </span>
         <div className="mobile-start-actions">
-          <label className="language">
-            <Globe2 size={16} />
-            <select
-              aria-label={t.language}
-              value={locale}
-              onChange={(e) => setLocale(e.target.value as Locale)}
-            >
-              <option value="en">English</option>
-              <option value="zh-CN">简体中文</option>
-              <option value="zh-HK">繁體中文</option>
-            </select>
-            <ChevronDown size={13} />
-          </label>
-          <ThemeButton t={t} />
+          <button
+            className="icon-button"
+            aria-label={t.settings}
+            onClick={() => navigate("settings")}
+          >
+            <SlidersHorizontal size={19} />
+          </button>
         </div>
       </div>
       <div className="mobile-city-hero">
@@ -162,9 +143,7 @@ export function StartPage({
           <span className={`save-dot ${stored ? "" : "warning"}`} />
           {stored === null ? t.saving : stored ? t.saved : t.unsaved}
         </span>
-        <button onClick={() => setReduced((v) => !v)} aria-pressed={reduced}>
-          {reduced ? t.reduce : t.normal}
-        </button>
+        <button onClick={() => navigate("settings")}>{t.settings}</button>
       </footer>
     </section>
   );

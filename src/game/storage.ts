@@ -3,6 +3,7 @@ import {
   isTileValue,
   newRun,
   VALUES,
+  type MoveMode,
   type Run,
   type Snapshot,
 } from "./engine";
@@ -60,6 +61,8 @@ export interface Save {
   weather?: Weather;
   /** Clockwise 45-degree steps from the default camera. Absent means zero. */
   boardRotationStep?: number;
+  /** Threes-style one-cell moves. Absent means the classic slide. */
+  moveMode?: MoveMode;
 }
 export interface StorageLike {
   getItem(key: string): string | null;
@@ -105,6 +108,8 @@ export function readSave(
     if (["en", "zh-CN", "zh-HK"].includes(String(data.locale)))
       base.locale = data.locale as Locale;
     if (typeof data.showLabels === "boolean") base.showLabels = data.showLabels;
+    if (data.moveMode === "step" || data.moveMode === "slide")
+      base.moveMode = data.moveMode;
     const rotation = readRotation(data.boardRotationStep);
     if (rotation !== undefined) base.boardRotationStep = rotation;
     if (typeof data.city === "string" && ids.includes(data.city))

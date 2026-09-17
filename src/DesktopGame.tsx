@@ -3,7 +3,6 @@ import {
   ArrowUpRight,
   ArrowRight,
   Check,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
   CircleHelp,
@@ -15,18 +14,17 @@ import {
   CloudOff,
   Eye,
   EyeOff,
-  Globe2,
   History as HistoryIcon,
   LockKeyhole,
   MapPin,
   Plus,
   RotateCcw,
   Sparkles,
+  SlidersHorizontal,
   Trophy,
   Undo2,
 } from "lucide-react";
 import { cities } from "./cities/packs";
-import type { Locale } from "./cities/types";
 import type { Weather } from "./game/weather";
 import { BoardCanvas } from "./scene/Canvas";
 import { useThumbnails } from "./scene/useThumbnails";
@@ -44,7 +42,6 @@ import {
   VictoryNotice,
 } from "./BoardExtras";
 import { GameModal } from "./GameModal";
-import { ThemeButton } from "./ThemeButton";
 import { BoardRotationControls } from "./BoardRotationControls";
 import {
   directionGlyph,
@@ -80,14 +77,12 @@ export function DesktopGame({
     events,
     stored,
     reduced,
-    setReduced,
     showLabels,
     toggleLabels,
     boardRotationStep,
     weather,
     cycleWeather,
     changeCity,
-    setLocale,
     play,
     inspect,
     doUndo,
@@ -179,20 +174,14 @@ export function DesktopGame({
           </button>
         </nav>
         <div className="header-actions">
-          <label className="language">
-            <Globe2 size={16} />
-            <select
-              aria-label={t.language}
-              value={locale}
-              onChange={(e) => setLocale(e.target.value as Locale)}
-            >
-              <option value="en">English</option>
-              <option value="zh-CN">简体中文</option>
-              <option value="zh-HK">繁體中文</option>
-            </select>
-            <ChevronDown size={13} />
-          </label>
-          <ThemeButton t={t} />
+          <button
+            className="icon-button"
+            onClick={() => setModal("settings")}
+            aria-label={t.settings}
+            title={t.settings}
+          >
+            <SlidersHorizontal size={19} />
+          </button>
           <button
             className="icon-button help-button"
             onClick={() => setModal("help")}
@@ -570,9 +559,7 @@ export function DesktopGame({
           </span>
           <span>{t.interpretation}</span>
           <button onClick={() => setModal("help")}>{t.how}</button>
-          <button onClick={() => setReduced((v) => !v)} aria-pressed={reduced}>
-            {reduced ? t.reduce : t.normal}
-          </button>
+          <button onClick={() => setModal("settings")}>{t.settings}</button>
         </footer>
       </main>
       <LiveRegion game={game} />

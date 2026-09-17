@@ -1,6 +1,7 @@
 import { move, type Direction } from "../../src/game/engine";
 import { test, expect, type Page } from "@playwright/test";
 import { cities } from "../../src/cities/packs";
+import { openPreferences, closePreferences, setLanguage } from "./preferences";
 import { PerspectiveCamera, Vector3 } from "three";
 import {
   BOARD_CAMERA,
@@ -253,16 +254,16 @@ test("restart confirmation, language choices, help and atlas viewer", async ({
   await page.getByRole("button", { name: "New city", exact: true }).click();
   await page.getByRole("button", { name: "Start fresh" }).click();
   await expect(page.getByTestId("score")).toHaveText("0");
-  await page.getByRole("combobox", { name: "Language" }).selectOption("zh-CN");
+  await setLanguage(page, "zh-CN");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("北京");
   await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");
   await page.screenshot({ path: "artifacts/screenshots/ui/simplified.png" });
-  await page.getByRole("combobox").selectOption("zh-HK");
+  await setLanguage(page, "zh-HK");
   await expect(
     page.getByRole("button", { name: "地標圖鑑", exact: true }),
   ).toBeVisible();
   await page.screenshot({ path: "artifacts/screenshots/ui/traditional.png" });
-  await page.getByRole("combobox").selectOption("en");
+  await setLanguage(page, "en");
   await page.getByRole("button", { name: "How to play" }).first().click();
   await expect(page.getByRole("dialog")).toContainText("once per move");
   await page.keyboard.press("Escape");
@@ -543,9 +544,11 @@ test("reduced motion and unavailable storage/WebGL stay usable", async ({
   const page = await context.newPage();
   await seed(page);
   await load(page);
+  await openPreferences(page);
   await expect(
-    page.getByRole("button", { name: "Reduce motion" }),
-  ).toHaveAttribute("aria-pressed", "true");
+    page.getByRole("switch", { name: "Reduce motion" }),
+  ).toHaveAttribute("aria-checked", "true");
+  await closePreferences(page);
   await page.keyboard.press("ArrowLeft");
   await expect(page.getByTestId("score")).toHaveText("4");
   await context.close();
@@ -686,7 +689,7 @@ test("IndexedDB migration, match history and reload", async ({ page }) => {
   await saved(page);
   await page.reload();
   await load(page);
-  await page.getByRole("combobox").selectOption("zh-CN");
+  await setLanguage(page, "zh-CN");
   await saved(page);
   await page.getByRole("button", { name: "战绩历史", exact: true }).click();
   await expect(page.locator(".history-row")).toHaveCount(1);
@@ -809,7 +812,7 @@ test("weather cycles clear, cloudy, rain, snow, fog and off, persists and tints 
     page.getByRole("button", { name: "Weather · Fog" }),
   ).toBeVisible();
   expect((await saved(page)).weather).toBe("fog");
-  await page.getByRole("combobox", { name: "Language" }).selectOption("zh-CN");
+  await setLanguage(page, "zh-CN");
   await expect(page.getByRole("button", { name: "天气 · 雾" })).toBeVisible();
   // Gallery sheets use model contexts, which never construct weather.
   await page.goto("/?gallery");

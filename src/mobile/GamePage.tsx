@@ -10,6 +10,7 @@ import {
   EyeOff,
   House,
   RotateCcw,
+  SlidersHorizontal,
   Sparkles,
   Trophy,
   Undo2,
@@ -167,6 +168,13 @@ export function GamePage({
             onClick={cycleWeather}
           >
             <WeatherIcon size={18} />
+          </button>
+          <button
+            title={t.settings}
+            aria-label={t.settings}
+            onClick={() => navigate("settings")}
+          >
+            <SlidersHorizontal size={18} />
           </button>
         </div>
       </div>

@@ -152,6 +152,28 @@ describe("local persistence", () => {
       undefined,
     );
   });
+  it("remembers the move style and drops unknown rulesets", () => {
+    const save: Save = {
+      version: 1,
+      city: "beijing",
+      locale: "en",
+      cities: { beijing: freshCity() },
+      showLabels: true,
+      weather: "rain",
+    };
+    for (const mode of ["slide", "step"] as const) {
+      const stored = { ...save, moveMode: mode };
+      const storage = memory();
+      writeSave(storage, stored);
+      // The move style is independent of the other preferences.
+      expect(readSave(storage, ids)).toEqual(stored);
+    }
+    for (const invalid of [undefined, null, "steps", "Step", "", 1, true, {}])
+      expect(
+        readSave(memory(JSON.stringify({ ...save, moveMode: invalid })), ids)
+          .moveMode,
+      ).toBeUndefined();
+  });
 });
 
 describe("twelve-city additions", () => {
